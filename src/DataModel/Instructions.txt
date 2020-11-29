@@ -1,0 +1,4 @@
+﻿
+UPDATE DB MODEL:
+
+Scaffold-DbContext "server=localhost;port=3306;user=root;password=Mysqlserver;database=ProjectX" MySql.Data.EntityFrameworkCore -OutputDir Entities\ProjectX -ContextDir DbContexts -Context "ProjectXDbContext" -f
