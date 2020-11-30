@@ -42,6 +42,7 @@ namespace ToDoList.Api
 			services.AddTransient(typeof(IRepository<UserRole>), typeof(Repository<UserRole, ProjectXDbContext>));
 			services.AddTransient(typeof(IRepository<User>), typeof(Repository<User, ProjectXDbContext>));
 			services.AddTransient(typeof(IRepository<ToDoTask>), typeof(Repository<ToDoTask, ProjectXDbContext>));
+			services.AddTransient(typeof(IRepository<UserActionView>), typeof(Repository<UserActionView, ProjectXDbContext>));
 
 			services.AddControllers();
 			services.AddSwaggerGen(x => 

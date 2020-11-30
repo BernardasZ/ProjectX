@@ -9,6 +9,7 @@ namespace DataModel.Entities.ProjectX
         {
             ToDoTask = new HashSet<ToDoTask>();
         }
+
         public int Id { get; set; }
         public int RoleId { get; set; }
         public string UserName { get; set; }

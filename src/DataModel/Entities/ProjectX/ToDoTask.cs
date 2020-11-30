@@ -1,4 +1,7 @@
-﻿namespace DataModel.Entities.ProjectX
+﻿using System;
+using System.Collections.Generic;
+
+namespace DataModel.Entities.ProjectX
 {
     public class ToDoTask
     {

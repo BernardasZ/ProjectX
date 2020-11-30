@@ -3,19 +3,17 @@ using System.Collections.Generic;
 
 namespace DataModel.Entities.ProjectX
 {
-    public class UserRole
+    public class ActionPermission
     {
-        public UserRole()
+        public ActionPermission()
         {
-            User = new HashSet<User>();
             UserAction = new HashSet<UserAction>();
         }
 
         public int Id { get; set; }
-        public string RoleName { get; set; }
-        public byte RoleValue { get; set; }
+        public string PermissionName { get; set; }
+        public byte PermissionValue { get; set; }
 
-        public virtual ICollection<User> User { get; set; }
         public virtual ICollection<UserAction> UserAction { get; set; }
     }
 }

@@ -16,13 +16,10 @@ namespace ToDoList.Api.Controllers
     public class ToDoTasksController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionsManager> options;
-        private readonly IRepository<DataModel.Entities.ProjectX.UserRole> userRoleRepository;
 
         public ToDoTasksController(
-            IOptionsMonitor<OptionsManager> options,
-            IRepository<DataModel.Entities.ProjectX.UserRole> userRoleRepository)
+            IOptionsMonitor<OptionsManager> options)
         {
-            this.userRoleRepository = userRoleRepository;
             this.options = options;
         }
 

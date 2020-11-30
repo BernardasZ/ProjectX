@@ -6,7 +6,7 @@ namespace DataModel.Repositories
 {
 	public interface IRepository<TEntity> where TEntity : class
     {
-        IQueryable<TEntity> GetAll();
+        IQueryable<TEntity> FetchAll();
         TEntity GetById(int id);
         void Insert(TEntity entity);
         void Update(TEntity entity);
@@ -24,7 +24,7 @@ namespace DataModel.Repositories
             this.context = context;
         }
 
-        public IQueryable<TEntity> GetAll()
+        public IQueryable<TEntity> FetchAll()
         {
             return context.Set<TEntity>().AsQueryable();
         }
