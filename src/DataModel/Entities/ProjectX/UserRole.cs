@@ -1,4 +1,4 @@
-﻿using System;
+﻿using DataModel.Enums;
 using System.Collections.Generic;
 
 namespace DataModel.Entities.ProjectX
@@ -13,7 +13,7 @@ namespace DataModel.Entities.ProjectX
 
         public int Id { get; set; }
         public string RoleName { get; set; }
-        public byte RoleValue { get; set; }
+        public UserRoleEnum RoleValue { get; set; }
 
         public virtual ICollection<User> User { get; set; }
         public virtual ICollection<UserAction> UserAction { get; set; }

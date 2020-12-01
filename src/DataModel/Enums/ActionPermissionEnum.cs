@@ -6,6 +6,7 @@
 		Create = 2,
 		Update = 4,
 		Delete = 8,
-		AllowAll = 16
+
+		AllowAll = 127
 	}
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DataModel.Enums;
 
 namespace DataModel.Entities.ProjectX
 {
@@ -8,7 +7,7 @@ namespace DataModel.Entities.ProjectX
         public int Id { get; set; }
         public int UserId { get; set; }
         public string TaskName { get; set; }
-        public byte Status { get; set; }
+        public TaskStatusEnum Status { get; set; }
 
         public virtual User User { get; set; }
     }

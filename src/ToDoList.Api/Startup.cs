@@ -2,6 +2,8 @@ using DataModel.DbContexts;
 using DataModel.Entities;
 using DataModel.Entities.ProjectX;
 using DataModel.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -11,12 +13,17 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MySql.Data.EntityFrameworkCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using ToDoList.Api.Authorization;
 using ToDoList.Api.Helpers;
+using static ToDoList.Api.Constants.Constants.UserPermissions;
 
 namespace ToDoList.Api
 {
@@ -45,9 +52,62 @@ namespace ToDoList.Api
 			services.AddTransient(typeof(IRepository<UserActionView>), typeof(Repository<UserActionView, ProjectXDbContext>));
 
 			services.AddControllers();
-			services.AddSwaggerGen(x => 
-			{ 
-				x.EnableAnnotations(); 
+			services.AddSwaggerGen(x =>
+			{
+				x.EnableAnnotations();
+				x.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+				{
+					Description = "JWT Authorization header using the Bearer scheme",
+					Name = "Authorization",
+					In = ParameterLocation.Header,
+					Type = SecuritySchemeType.ApiKey,
+					Scheme = "Bearer"
+				});
+
+				x.AddSecurityRequirement(new OpenApiSecurityRequirement
+				{
+					{
+						new OpenApiSecurityScheme
+						{
+							Reference = new OpenApiReference
+							{
+								Type = ReferenceType.SecurityScheme,
+								Id = "Bearer"
+							}
+						},
+						Array.Empty<string>()
+					}
+				});
+			});
+
+			services.AddAuthorization(options =>
+			{
+				options.AddPolicy(Create, policy => policy.Requirements.Add(new ActionPermissionRequirement(Create)));
+				options.AddPolicy(Read, policy => policy.Requirements.Add(new ActionPermissionRequirement(Read)));
+				options.AddPolicy(Update, policy => policy.Requirements.Add(new ActionPermissionRequirement(Update)));
+				options.AddPolicy(Delete, policy => policy.Requirements.Add(new ActionPermissionRequirement(Delete)));
+			});
+
+			services.AddSingleton<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
+
+			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.Secret);
+
+			services.AddAuthentication(x =>
+			{
+				x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+				x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+			})
+			.AddJwtBearer(x =>
+			{
+				x.RequireHttpsMetadata = false;
+				x.SaveToken = true;
+				x.TokenValidationParameters = new TokenValidationParameters
+				{
+					ValidateIssuerSigningKey = true,
+					IssuerSigningKey = new SymmetricSecurityKey(key),
+					ValidateIssuer = false,
+					ValidateAudience = false
+				};
 			});
 		}
 
@@ -66,7 +126,7 @@ namespace ToDoList.Api
 			});
 
 			app.UseRouting();
-
+			app.UseAuthentication();
 			app.UseAuthorization();
 
 			app.UseEndpoints(endpoints =>

@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DataModel.Entities.ProjectX
+﻿namespace DataModel.Entities.ProjectX
 {
     public class UserAction
     {

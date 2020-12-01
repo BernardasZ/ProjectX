@@ -3,7 +3,6 @@
 	public class OptionsManager
 	{
 		public AppSettings AppSettings { get; set; }
-
 		public ConnectionStrings ConnectionStrings { get; set; }
 	}
 
@@ -14,5 +13,6 @@
 
 	public class AppSettings
 	{
+		public string Secret { get; set; }
 	}
 }
