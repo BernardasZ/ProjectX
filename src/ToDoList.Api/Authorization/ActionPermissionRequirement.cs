@@ -13,5 +13,10 @@ namespace ToDoList.Api.Authorization
 		{
 			this.permission = permission;
 		}
+
+		public string GetPermission()
+		{
+			return this.permission;
+		}
 	}
 }

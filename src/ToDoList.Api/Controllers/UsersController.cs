@@ -21,10 +21,10 @@ namespace ToDoList.Api.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly IOptionsMonitor<OptionsManager> optionsManager;
+        private readonly IOptionsMonitor<OptionManager> optionsManager;
 
         public UsersController(
-            IOptionsMonitor<OptionsManager> optionsManager)
+            IOptionsMonitor<OptionManager> optionsManager)
         {
             this.optionsManager = optionsManager;
         }
@@ -34,7 +34,7 @@ namespace ToDoList.Api.Controllers
         public ActionResult<string> Login()
         {
             var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.AppSettings.Secret);
+            var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.AppSettings.JWTSecret);
 
             var tokenDescriptor = new SecurityTokenDescriptor
             {

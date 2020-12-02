@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using DataModel.DbContexts;
 using DataModel.Enums;
 using DataModel.Repositories;
@@ -12,6 +14,7 @@ using ToDoList.Api.Authorization;
 using ToDoList.Api.Constants;
 using ToDoList.Api.Helpers;
 using ToDoList.Api.Models;
+using ToDoList.Api.Services;
 using static ToDoList.Api.Constants.Constants.UserPermissions;
 
 namespace ToDoList.Api.Controllers
@@ -20,10 +23,10 @@ namespace ToDoList.Api.Controllers
     [ApiController]
     public class TasksController : ControllerBase
     {
-        private readonly IOptionsMonitor<OptionsManager> optionsManager;
+        private readonly IOptionsMonitor<OptionManager> optionsManager;
 
         public TasksController(
-            IOptionsMonitor<OptionsManager> optionsManager)
+            IOptionsMonitor<OptionManager> optionsManager)
         {
             this.optionsManager = optionsManager;
         }

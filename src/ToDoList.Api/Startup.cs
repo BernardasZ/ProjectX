@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +24,8 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Api.Authorization;
 using ToDoList.Api.Helpers;
+using ToDoList.Api.Services;
+using ToDoList.Api.Services.Concrete;
 using static ToDoList.Api.Constants.Constants.UserPermissions;
 
 namespace ToDoList.Api
@@ -39,12 +42,13 @@ namespace ToDoList.Api
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			var optionManager = new OptionsManager();
+			var optionManager = new OptionManager();
 			Configuration.Bind(optionManager);
 
-			services.Configure<OptionsManager>(Configuration);
+			services.Configure<OptionManager>(Configuration);
 
-			services.AddEntityFrameworkMySQL().AddDbContext<ProjectXDbContext>(options => options.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
+			services.AddMemoryCache();
+			services.AddDbContext<ProjectXDbContext>(options => options.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
 
 			services.AddTransient(typeof(IRepository<UserRole>), typeof(Repository<UserRole, ProjectXDbContext>));
 			services.AddTransient(typeof(IRepository<User>), typeof(Repository<User, ProjectXDbContext>));
@@ -88,9 +92,15 @@ namespace ToDoList.Api
 				options.AddPolicy(Delete, policy => policy.Requirements.Add(new ActionPermissionRequirement(Delete)));
 			});
 
-			services.AddSingleton<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
 
-			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.Secret);
+			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddScoped<IAesCryptoService, AesCryptoService>();
+			services.AddScoped<ICacheService, CacheService>();
+			services.AddScoped<IUserPermissionService, UserPermissionService>();
+
+			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
+
+			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.JWTSecret);
 
 			services.AddAuthentication(x =>
 			{
@@ -109,6 +119,9 @@ namespace ToDoList.Api
 					ValidateAudience = false
 				};
 			});
+
+
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

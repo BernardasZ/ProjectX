@@ -146,6 +146,14 @@ namespace DataModel.DbContexts
                 entity.Property(e => e.ActionName)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.Property(e => e.PermissionName)
+                    .IsRequired()
+                    .HasMaxLength(255);
+
+                entity.Property(e => e.RoleName)
+                    .IsRequired()
+                    .HasMaxLength(50);
             });
 
             base.OnModelCreating(modelBuilder);
