@@ -9,6 +9,6 @@ namespace ToDoList.Api.Services
 	public interface IUserPermissionService
 	{
 		bool ValidateUserPermissions(string userRole, string action, string permission);
-		List<UserActionView> GetPermissions();
+		List<PermissionView> GetPermissions();
 	}
 }

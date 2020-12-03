@@ -5,6 +5,6 @@
 		Admin = 0,
 		User = 1,
 
-		AllRoles = 127
+		AllRoles = 255
 	}
 }

@@ -15,58 +15,58 @@ using ToDoList.Api.Constants;
 using ToDoList.Api.Helpers;
 using ToDoList.Api.Models;
 using ToDoList.Api.Services;
-using static ToDoList.Api.Constants.Constants.UserPermissions;
+using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class TasksController : ControllerBase
+    public class TaskController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionManager> optionsManager;
 
-        public TasksController(
+        public TaskController(
             IOptionsMonitor<OptionManager> optionsManager)
         {
             this.optionsManager = optionsManager;
         }
 
         [HttpGet]
-        [Route("GetTasksList")]
-        [Authorize(Policy = Read)]
-        public ActionResult<IEnumerable<ToDoTask>> GetTasksList([FromQuery] int userId)
+        [Route("Tasks")]
+        [Authorize(Policy = CheckPermissions)]
+        public ActionResult<IEnumerable<TaskDTO>> Tasks([FromQuery] int userId)
         {
-            return new JsonResult(new List<Models.ToDoTask>() { new ToDoTask() { Id = 1 } });
+            return Ok(new List<Models.TaskDTO>() { new TaskDTO() { Id = 1 } });
         }
 
         [HttpPost]
-        [Route("CreateTask")]
-        [Authorize(Policy = Create)]
-        public IActionResult CreateTask([FromBody] ToDoTask toDoTask)
+        [Route("Create")]
+        [Authorize(Policy = CheckPermissions)]
+        public IActionResult CreateTask([FromBody] TaskDTO toDoTask)
         {
             return Ok();
         }
 
         [HttpGet]
-        [Route("ReadTask")]
-        [Authorize(Policy = Read)]
-        public ActionResult<ToDoTask> ReadTask([FromQuery] int taskId)
+        [Route("Read")]
+        [Authorize(Policy = CheckPermissions)]
+        public ActionResult<TaskDTO> ReadTask([FromQuery] int taskId)
         {
-            return new JsonResult(new ToDoTask());
+            return Ok(new TaskDTO());
         }
 
         [HttpPost]
-        [Route("UpdateTask")]
-        [Authorize(Policy = Update)]
-        public ActionResult<ToDoTask> UpdateTask([FromBody] ToDoTask toDoTask)
+        [Route("Update")]
+        [Authorize(Policy = CheckPermissions)]
+        public ActionResult<TaskDTO> UpdateTask([FromBody] TaskDTO toDoTask)
         {
-            return new JsonResult(toDoTask);
+            return Ok(toDoTask);
         }
 
         [HttpPost]
-        [Route("DeleteTask")]
-        [Authorize(Policy = Delete)]
-        public ActionResult<ToDoTask> DeleteTask([FromBody] int taskId)
+        [Route("Delete")]
+        [Authorize(Policy = CheckPermissions)]
+        public ActionResult<TaskDTO> DeleteTask([FromBody] int taskId)
         {
             return Ok();
         }

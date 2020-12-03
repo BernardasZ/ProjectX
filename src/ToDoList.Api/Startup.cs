@@ -26,7 +26,7 @@ using ToDoList.Api.Authorization;
 using ToDoList.Api.Helpers;
 using ToDoList.Api.Services;
 using ToDoList.Api.Services.Concrete;
-using static ToDoList.Api.Constants.Constants.UserPermissions;
+using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api
 {
@@ -49,11 +49,7 @@ namespace ToDoList.Api
 
 			services.AddMemoryCache();
 			services.AddDbContext<ProjectXDbContext>(options => options.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
-
-			services.AddTransient(typeof(IRepository<UserRole>), typeof(Repository<UserRole, ProjectXDbContext>));
-			services.AddTransient(typeof(IRepository<User>), typeof(Repository<User, ProjectXDbContext>));
-			services.AddTransient(typeof(IRepository<ToDoTask>), typeof(Repository<ToDoTask, ProjectXDbContext>));
-			services.AddTransient(typeof(IRepository<UserActionView>), typeof(Repository<UserActionView, ProjectXDbContext>));
+			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 
 			services.AddControllers();
 			services.AddSwaggerGen(x =>
@@ -86,18 +82,13 @@ namespace ToDoList.Api
 
 			services.AddAuthorization(options =>
 			{
-				options.AddPolicy(Create, policy => policy.Requirements.Add(new ActionPermissionRequirement(Create)));
-				options.AddPolicy(Read, policy => policy.Requirements.Add(new ActionPermissionRequirement(Read)));
-				options.AddPolicy(Update, policy => policy.Requirements.Add(new ActionPermissionRequirement(Update)));
-				options.AddPolicy(Delete, policy => policy.Requirements.Add(new ActionPermissionRequirement(Delete)));
+				options.AddPolicy(CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement(CheckPermissions)));
 			});
-
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddScoped<IAesCryptoService, AesCryptoService>();
-			services.AddScoped<ICacheService, CacheService>();
+			services.AddScoped<ICacheService<List<PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
-
 			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
 
 			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.JWTSecret);

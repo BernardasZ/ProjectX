@@ -12,45 +12,24 @@ namespace ToDoList.Api.Services.Concrete
 {
 	public class UserPermissionService : IUserPermissionService
 	{
-		private readonly IRepository<UserActionView> userActionViewrepository;
-		private readonly ICacheService cacheService;
-		private readonly IOptionsMonitor<OptionManager> optionsManager;
+		private readonly ICacheService<List<PermissionView>> cacheService;
 
 		public UserPermissionService(
-			IRepository<UserActionView> userActionViewrepository,
-			ICacheService cacheService,
-			IOptionsMonitor<OptionManager> optionsManager)
+			ICacheService<List<PermissionView>> cacheService)
 		{
-			this.userActionViewrepository = userActionViewrepository;
 			this.cacheService = cacheService;
-			this.optionsManager = optionsManager;
 		}
 
-		public bool ValidateUserPermissions(string userRole, string action, string permission)
+		public bool ValidateUserPermissions(string userRole, string controller, string action)
 		{
 			return GetPermissions()
-				.Where(x => 
-							(x.RoleName == userRole || x.RoleName == UserRoleEnum.AllRoles.ToString()) 
-							&& x.ActionName == action 
-							&& (x.PermissionName == permission || x.PermissionName == ActionPermissionEnum.AllowAll.ToString()))
+				.Where(x => (x.RoleName == userRole || x.RoleName == UserRoleEnum.AllRoles.ToString()) && x.ControllerName == controller && (x.ActionName == action || x.AllowAllActions))
 				.Any();
 		}
 
-		public List<UserActionView> GetPermissions()
+		public List<PermissionView> GetPermissions()
 		{
-			string key = optionsManager.CurrentValue.PermissionCacheSettings.Key;
-			var expirationTime = TimeSpan.FromMinutes(optionsManager.CurrentValue.PermissionCacheSettings.ExpirationTimeInMin);
-
-			List<UserActionView> permissions = cacheService.GetCache<List<UserActionView>>(key);
-
-			if (permissions == null)
-			{
-				permissions = userActionViewrepository.FetchAll().ToList();
-
-				cacheService.SetCache<List<UserActionView>>(permissions, key, expirationTime);
-			}
-
-			return permissions;
+			return cacheService.GetCache();
 		}
 	}
 }

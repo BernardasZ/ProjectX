@@ -14,149 +14,88 @@ namespace DataModel.DbContexts
         {
         }
 
-        public virtual DbSet<ActionPermission> ActionPermission { get; set; }
-        public virtual DbSet<ControllerAction> ControllerAction { get; set; }
-        public virtual DbSet<ToDoTask> ToDoTask { get; set; }
-        public virtual DbSet<User> User { get; set; }
-        public virtual DbSet<UserAction> UserAction { get; set; }
-        public virtual DbSet<UserRole> UserRole { get; set; }
-        public virtual DbSet<UserActionView> UserActionView { get; set; }
+        public virtual DbSet<PermissionAction> PermissionAction { get; set; }
+        public virtual DbSet<PermissionController> PermissionController { get; set; }
+        public virtual DbSet<PermissionMapping> PermissionMapping { get; set; }
+        public virtual DbSet<PermissionView> PermissionView { get; set; }
+        public virtual DbSet<Role> Role { get; set; }
+        public virtual DbSet<Task> Task { get; set; }
+        public virtual DbSet<UserData> UserData { get; set; }
+        public virtual DbSet<UserSession> UserSession { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<ActionPermission>(entity =>
+            modelBuilder.Entity<PermissionAction>(entity =>
             {
-                entity.ToTable("ActionPermission", "ProjectX");
+                entity.HasIndex(e => e.ControllerId)
+                    .HasName("permission_action__permission_controller_idx");
 
-                entity.Property(e => e.PermissionName)
-                    .IsRequired()
-                    .HasMaxLength(255);
-            });
-
-            modelBuilder.Entity<ControllerAction>(entity =>
-            {
-                entity.ToTable("ControllerAction", "ProjectX");
-
-                entity.Property(e => e.ActionName)
-                    .IsRequired()
-                    .HasMaxLength(255);
-            });
-
-            modelBuilder.Entity<ToDoTask>(entity =>
-            {
-                entity.ToTable("ToDoTask", "ProjectX");
-
-                entity.HasIndex(e => e.Id)
-                    .HasName("idToDoTask_UNIQUE")
-                    .IsUnique();
-
-                entity.HasIndex(e => e.UserId)
-                    .HasName("FK_ToDoTask_UserId_To_User_idx");
-
-                entity.Property(e => e.Status).HasDefaultValueSql("'1'");
-
-                entity.Property(e => e.TaskName)
-                    .IsRequired()
-                    .HasMaxLength(1000);
-
-                entity.HasOne(d => d.User)
-                    .WithMany(p => p.ToDoTask)
-                    .HasForeignKey(d => d.UserId)
+                entity.HasOne(d => d.Controller)
+                    .WithMany(p => p.PermissionAction)
+                    .HasForeignKey(d => d.ControllerId)
                     .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("FK_ToDoTask_UserId_To_User");
+                    .HasConstraintName("permission_action__permission_controller");
             });
 
-            modelBuilder.Entity<User>(entity =>
+            modelBuilder.Entity<PermissionMapping>(entity =>
             {
-                entity.ToTable("User", "ProjectX");
+                entity.HasIndex(e => e.ActionId)
+                    .HasName("permission_mapping__permission_action_idx");
 
-                entity.HasIndex(e => e.Email)
-                    .HasName("Email_UNIQUE")
-                    .IsUnique();
+                entity.HasIndex(e => e.ControllerId)
+                    .HasName("permission_mapping__permission_controller_idx");
 
                 entity.HasIndex(e => e.RoleId)
-                    .HasName("FK_User_RoleId_To_Role_idx");
+                    .HasName("permission_mapping__role_idx");
+
+                entity.HasOne(d => d.Action)
+                    .WithMany(p => p.PermissionMapping)
+                    .HasForeignKey(d => d.ActionId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("permission_mapping__permission_action");
+
+                entity.HasOne(d => d.Controller)
+                    .WithMany(p => p.PermissionMapping)
+                    .HasForeignKey(d => d.ControllerId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("permission_mapping__permission_controller");
+
+                entity.HasOne(d => d.Role)
+                    .WithMany(p => p.PermissionMapping)
+                    .HasForeignKey(d => d.RoleId)
+                    .OnDelete(DeleteBehavior.Restrict)
+                    .HasConstraintName("permission_mapping__role");
+            });
+
+            modelBuilder.Entity<PermissionView>(entity =>
+            {
+                entity.HasNoKey();
+
+                entity.ToView("permission_view", "ProjectX");
+            });
+
+            modelBuilder.Entity<UserData>(entity =>
+            {
+                entity.HasIndex(e => e.RoleId)
+                    .HasName("user_data__role_idx");
+
+                entity.HasIndex(e => e.UserEmail)
+                    .HasName("Email_UNIQUE")
+                    .IsUnique();
 
                 entity.HasIndex(e => e.UserName)
                     .HasName("UserName_UNIQUE")
                     .IsUnique();
 
-                entity.Property(e => e.Email).HasMaxLength(255);
-
-                entity.Property(e => e.PasswordHash)
-                    .IsRequired()
-                    .HasMaxLength(64);
-
-                entity.Property(e => e.UserName).HasMaxLength(255);
-
                 entity.HasOne(d => d.Role)
-                    .WithMany(p => p.User)
+                    .WithMany(p => p.UserData)
                     .HasForeignKey(d => d.RoleId)
                     .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("FK_User_RoleId_To_Role");
-            });
-
-            modelBuilder.Entity<UserAction>(entity =>
-            {
-                entity.ToTable("UserAction", "ProjectX");
-
-                entity.HasIndex(e => e.ActionId)
-                    .HasName("FK_UserAction_ActionId_To_Action_idx");
-
-                entity.HasIndex(e => e.ActionPermissionId)
-                    .HasName("FK_UserAction_ActionPermissionId_To_ActionPermission_idx");
-
-                entity.HasIndex(e => e.UserRoleId)
-                    .HasName("FK_UserAction_UserRoleId_To_UserRole_idx");
-
-                entity.HasOne(d => d.Action)
-                    .WithMany(p => p.UserAction)
-                    .HasForeignKey(d => d.ActionId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("FK_UserAction_ActionId_To_Action");
-
-                entity.HasOne(d => d.ActionPermission)
-                    .WithMany(p => p.UserAction)
-                    .HasForeignKey(d => d.ActionPermissionId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("FK_UserAction_ActionPermissionId_To_ActionPermission");
-
-                entity.HasOne(d => d.UserRole)
-                    .WithMany(p => p.UserAction)
-                    .HasForeignKey(d => d.UserRoleId)
-                    .OnDelete(DeleteBehavior.Restrict)
-                    .HasConstraintName("FK_UserAction_UserRoleId_To_UserRole");
-            });
-
-            modelBuilder.Entity<UserRole>(entity =>
-            {
-                entity.ToTable("UserRole", "ProjectX");
-
-                entity.Property(e => e.RoleName)
-                    .IsRequired()
-                    .HasMaxLength(50);
-            });
-
-            modelBuilder.Entity<UserActionView>(entity =>
-            {
-                entity.HasNoKey();
-
-                entity.ToView("useractionview", "ProjectX");
-
-                entity.Property(e => e.ActionName)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.PermissionName)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.Property(e => e.RoleName)
-                    .IsRequired()
-                    .HasMaxLength(50);
+                    .HasConstraintName("user_data__role");
             });
 
             base.OnModelCreating(modelBuilder);
         }
+
     }
 }

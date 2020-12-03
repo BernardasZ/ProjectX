@@ -2,7 +2,7 @@
 
 namespace ToDoList.Api.Models
 {
-    public class ToDoTask
+    public class TaskDTO
 	{
         public int Id { get; set; }
         public int UserId { get; set; }

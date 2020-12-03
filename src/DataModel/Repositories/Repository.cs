@@ -14,12 +14,10 @@ namespace DataModel.Repositories
         void Save();
     }
 
-    public class Repository<TEntity, TContext> : IRepository<TEntity> 
-        where TEntity : class 
-        where TContext : DbContext
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class 
     {
-        protected readonly TContext context;
-        public Repository(TContext context)
+        protected readonly ProjectXDbContext context;
+        public Repository(ProjectXDbContext context)
         {
             this.context = context;
         }

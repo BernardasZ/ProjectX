@@ -19,17 +19,18 @@ namespace ToDoList.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionManager> optionsManager;
 
-        public UsersController(
+        public UserController(
             IOptionsMonitor<OptionManager> optionsManager)
         {
             this.optionsManager = optionsManager;
         }
 
         [HttpGet]
+        [Route("Login")]
         [AllowAnonymous]
         public ActionResult<string> Login()
         {
@@ -46,8 +47,10 @@ namespace ToDoList.Api.Controllers
                 Expires = DateTime.UtcNow.AddDays(7),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
+            
+            var token = tokenHandler.CreateEncodedJwt(tokenDescriptor);
 
-            return tokenHandler.CreateEncodedJwt(tokenDescriptor);
+            return Ok(new { jwt = token });
         }
     }
 }

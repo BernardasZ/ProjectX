@@ -30,7 +30,7 @@ namespace ToDoList.Api.Authorization
 			var endpoint = context.Resource as RouteEndpoint;
 			var descriptor = endpoint?.Metadata?.SingleOrDefault(md => md is ControllerActionDescriptor) as ControllerActionDescriptor;
 
-			if (!string.IsNullOrWhiteSpace(userRole) && descriptor != null && userPermissionService.ValidateUserPermissions(userRole, descriptor.ControllerName, requirement.GetPermission()))
+			if (!string.IsNullOrWhiteSpace(userRole) && descriptor != null && userPermissionService.ValidateUserPermissions(userRole, descriptor.ControllerName, descriptor.ActionName))
 			{
 				context.Succeed(requirement);
 			}
