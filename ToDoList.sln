@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ToDoList.Api", "src\ToDoList.Api\ToDoList.Api.csproj", "{4C244EF7-B569-4799-B4EF-227B67603267}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataModel", "src\DataModel\DataModel.csproj", "{18476316-784D-4E68-A9F3-EF4EDA94D23A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataModel", "src\DataModel\DataModel.csproj", "{18476316-784D-4E68-A9F3-EF4EDA94D23A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

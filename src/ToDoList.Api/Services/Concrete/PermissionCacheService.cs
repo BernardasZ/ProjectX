@@ -12,7 +12,7 @@ namespace ToDoList.Api.Services.Concrete
 {
 	public class PermissionCacheService : ICacheService<List<PermissionView>>
 	{
-		private readonly object cacheLockOne = new object();
+		private static readonly object cacheLockOne = new object();
 
 		private readonly IMemoryCache memoryCache;
 		private readonly IRepository<PermissionView> permissionViewRepository;

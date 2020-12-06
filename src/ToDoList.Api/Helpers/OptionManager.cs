@@ -16,6 +16,7 @@
 	public class AppSettings
 	{
 		public string JWTSecret { get; set; }
+		public int JWTExpirationInDay { get; set; }
 		public string AesKey { get; set; }
 		public string AlgorithmIV { get; set; }
 	}

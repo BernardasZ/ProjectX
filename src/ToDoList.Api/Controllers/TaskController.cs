@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Annotations;
+using ToDoList.Api.Attributes;
 using ToDoList.Api.Authorization;
 using ToDoList.Api.Constants;
 using ToDoList.Api.Helpers;
@@ -21,6 +22,7 @@ namespace ToDoList.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [SessionCheck]
     public class TaskController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionManager> optionsManager;
@@ -66,7 +68,7 @@ namespace ToDoList.Api.Controllers
         [HttpPost]
         [Route("Delete")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskDTO> DeleteTask([FromBody] int taskId)
+        public ActionResult<TaskDTO> DeleteTask([FromBody] TaskDTO toDoTask)
         {
             return Ok();
         }

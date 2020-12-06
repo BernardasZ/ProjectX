@@ -1,12 +1,11 @@
 using DataModel.DbContexts;
-using DataModel.Entities;
-using DataModel.Entities.ProjectX;
 using DataModel.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -20,6 +19,7 @@ using MySql.Data.EntityFrameworkCore.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Api.Authorization;
@@ -39,7 +39,6 @@ namespace ToDoList.Api
 
 		public IConfiguration Configuration { get; }
 
-		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
 			var optionManager = new OptionManager();
@@ -48,7 +47,7 @@ namespace ToDoList.Api
 			services.Configure<OptionManager>(Configuration);
 
 			services.AddMemoryCache();
-			services.AddDbContext<ProjectXDbContext>(options => options.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
+			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
 			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 
 			services.AddControllers();
@@ -80,16 +79,18 @@ namespace ToDoList.Api
 				});
 			});
 
-			services.AddAuthorization(options =>
+			services.AddAuthorization(x =>
 			{
-				options.AddPolicy(CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement(CheckPermissions)));
+				x.AddPolicy(CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement(CheckPermissions)));
 			});
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddScoped<IAesCryptoService, AesCryptoService>();
-			services.AddScoped<ICacheService<List<PermissionView>>, PermissionCacheService>();
+			services.AddScoped<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
 			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IClientContextScraper, ClientContextScraper>();
 
 			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.JWTSecret);
 
@@ -110,12 +111,8 @@ namespace ToDoList.Api
 					ValidateAudience = false
 				};
 			});
-
-
-
 		}
 
-		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 		{
 			if (env.IsDevelopment())
@@ -127,6 +124,11 @@ namespace ToDoList.Api
 			app.UseSwaggerUI(c =>
 			{
 				c.SwaggerEndpoint("/swagger/v1/swagger.json", "ToDoTasks.Api");
+			});
+
+			app.UseForwardedHeaders(new ForwardedHeadersOptions
+			{
+				ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
 			});
 
 			app.UseRouting();
