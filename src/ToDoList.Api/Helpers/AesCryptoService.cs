@@ -8,13 +8,19 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Api.Helpers;
 
-namespace ToDoList.Api.Services.Concrete
+namespace ToDoList.Api.Helpers
 {
-	public class AesCryptoService : IAesCryptoService
+    public interface IAesCryptoHelper
+    {
+        string EncryptString(string text);
+        string DecryptString(string text);
+    }
+
+    public class AesCryptoHelper : IAesCryptoHelper
     {
         private readonly IOptionsMonitor<OptionManager> optionManager;
 
-        public AesCryptoService(IOptionsMonitor<OptionManager> optionManager)
+        public AesCryptoHelper(IOptionsMonitor<OptionManager> optionManager)
 		{
             this.optionManager = optionManager;
         }

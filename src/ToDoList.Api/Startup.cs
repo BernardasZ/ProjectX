@@ -81,11 +81,11 @@ namespace ToDoList.Api
 
 			services.AddAuthorization(x =>
 			{
-				x.AddPolicy(CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement(CheckPermissions)));
+				x.AddPolicy(CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement()));
 			});
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-			services.AddScoped<IAesCryptoService, AesCryptoService>();
+			services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
 			services.AddScoped<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
 			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
@@ -107,6 +107,8 @@ namespace ToDoList.Api
 				{
 					ValidateIssuerSigningKey = true,
 					IssuerSigningKey = new SymmetricSecurityKey(key),
+					ValidateLifetime = true,
+					RequireExpirationTime = true,
 					ValidateIssuer = false,
 					ValidateAudience = false
 				};

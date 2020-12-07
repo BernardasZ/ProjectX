@@ -8,15 +8,8 @@ namespace ToDoList.Api.Authorization
 {
 	internal class ActionPermissionRequirement : IAuthorizationRequirement
 	{
-		private readonly string permission;
-		public ActionPermissionRequirement(string permission)
+		public ActionPermissionRequirement()
 		{
-			this.permission = permission;
-		}
-
-		public string GetPermission()
-		{
-			return this.permission;
 		}
 	}
 }
