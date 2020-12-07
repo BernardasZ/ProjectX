@@ -41,13 +41,10 @@ namespace ToDoList.Api
 
 		public void ConfigureServices(IServiceCollection services)
 		{
-			var optionManager = new OptionManager();
-			Configuration.Bind(optionManager);
-
 			services.Configure<OptionManager>(Configuration);
 
 			services.AddMemoryCache();
-			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(optionManager.ConnectionStrings.ProjectXConnectionString), ServiceLifetime.Scoped);
+			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(Configuration.GetConnectionString("ProjectXConnectionString")), ServiceLifetime.Scoped);
 			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 
 			services.AddControllers();
@@ -92,7 +89,7 @@ namespace ToDoList.Api
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IClientContextScraper, ClientContextScraper>();
 
-			var key = Encoding.ASCII.GetBytes(optionManager.AppSettings.JWTSecret);
+			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("AppSettings:JWTSecret"));
 
 			services.AddAuthentication(x =>
 			{

@@ -15,23 +15,15 @@ namespace ToDoList.Api.Authorization
 	internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<ActionPermissionRequirement>
 	{
 		private readonly IUserPermissionService userPermissionService;
-		private readonly IClientContextScraper clientContextScraper;
 		public ActionPermissionAuthorizationHandler(
-			IUserPermissionService userPermissionService,
-			IClientContextScraper clientContextScraper)
+			IUserPermissionService userPermissionService)
 		{
 			this.userPermissionService = userPermissionService;
-			this.clientContextScraper = clientContextScraper;
 		}
 
 		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ActionPermissionRequirement requirement)
 		{
-			string userRole = clientContextScraper.GetClientClaimsRole();
-
-			var endpoint = context.Resource as RouteEndpoint;
-			var descriptor = endpoint?.Metadata?.SingleOrDefault(md => md is ControllerActionDescriptor) as ControllerActionDescriptor;
-
-			if (!string.IsNullOrWhiteSpace(userRole) && descriptor != null && userPermissionService.ValidateUserPermissions(userRole, descriptor.ControllerName, descriptor.ActionName))
+			if (userPermissionService.ValidateUserPermissions())
 			{
 				context.Succeed(requirement);
 			}

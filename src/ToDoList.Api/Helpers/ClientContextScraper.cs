@@ -12,6 +12,8 @@ namespace ToDoList.Api.Helpers
 		string GetClientClaimsName();
 		string GetClientClaimsRole();
 		string GetClientIpAddress();
+		string GetControllerName();
+		string GetActionrName();
 	}
 
 	public class ClientContextScraper : IClientContextScraper
@@ -42,6 +44,16 @@ namespace ToDoList.Api.Helpers
 		public string GetClientClaimsRole()
 		{
 			return httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+		}
+
+		public string GetControllerName()
+		{
+			return httpContextAccessor.HttpContext.Request.RouteValues.GetValueOrDefault("controller").ToString();
+		}
+
+		public string GetActionrName()
+		{
+			return httpContextAccessor.HttpContext.Request.RouteValues.GetValueOrDefault("action").ToString();
 		}
 	}
 }
