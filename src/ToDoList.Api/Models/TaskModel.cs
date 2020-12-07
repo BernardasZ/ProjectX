@@ -1,12 +1,12 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
+﻿using DataModel.Enums;
 
 namespace ToDoList.Api.Models
 {
-    public class TaskDTO
+    public class TaskModel
 	{
         public int Id { get; set; }
         public int UserId { get; set; }
         public string TaskName { get; set; }
-        public byte Status { get; set; }
+        public TaskStatusEnum Status { get; set; }
     }
 }

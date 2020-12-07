@@ -22,7 +22,7 @@ namespace ToDoList.Api.Attributes
 
 		public override void OnActionExecuting(ActionExecutingContext context)
 		{
-			var userService = context.HttpContext.RequestServices.GetRequiredService<IUserService>();
+			var userService = context.HttpContext.RequestServices.GetRequiredService<IUserSessionService>();
 
 			if (!userService.IsValidUserSession())
 			{

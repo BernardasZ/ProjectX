@@ -26,50 +26,65 @@ namespace ToDoList.Api.Controllers
     public class TaskController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionManager> optionsManager;
+        private readonly ITaskService taskService;
 
         public TaskController(
-            IOptionsMonitor<OptionManager> optionsManager)
+            IOptionsMonitor<OptionManager> optionsManager,
+            ITaskService taskService)
         {
             this.optionsManager = optionsManager;
+            this.taskService = taskService;
         }
 
         [HttpGet]
         [Route("Tasks")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<IEnumerable<TaskDTO>> Tasks([FromQuery] int userId)
+        public ActionResult<IEnumerable<TaskModel>> Tasks([FromQuery] int userId)
         {
-            return Ok(new List<Models.TaskDTO>() { new TaskDTO() { Id = 1 } });
+            var model = new TaskModel() { UserId = userId };
+            var tasks = taskService.GetTaskList(model);
+
+            return Ok(tasks);
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("Create")]
         [Authorize(Policy = CheckPermissions)]
-        public IActionResult CreateTask([FromBody] TaskDTO toDoTask)
+        public IActionResult CreateTask([FromBody] TaskModel model)
         {
-            return Ok();
+            var task = taskService.CreateTask(model);
+
+            return Ok(task);
         }
 
         [HttpGet]
         [Route("Read")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskDTO> ReadTask([FromQuery] int taskId)
+        public ActionResult<TaskModel> ReadTask([FromQuery] int taskId)
         {
-            return Ok(new TaskDTO());
+            var model = new TaskModel() { Id = taskId };
+            var task = taskService.ReadTask(model);
+
+            return Ok(task);
         }
 
         [HttpPost]
         [Route("Update")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskDTO> UpdateTask([FromBody] TaskDTO toDoTask)
+        public ActionResult<TaskModel> UpdateTask([FromBody] TaskModel model)
         {
-            return Ok(toDoTask);
+            var task = taskService.UpdateTask(model);
+
+            return Ok(task);
         }
 
-        [HttpPost]
+        [HttpDelete]
         [Route("Delete")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskDTO> DeleteTask([FromBody] TaskDTO toDoTask)
+        public ActionResult DeleteTask([FromBody] TaskModel model)
         {
+            taskService.DeleteTask(model);
+
             return Ok();
         }
     }

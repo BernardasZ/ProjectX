@@ -1,6 +1,8 @@
 ﻿using DataModel.DbContexts;
-using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using EFCore.BulkExtensions;
+using System.Linq.Expressions;
+using System;
 
 namespace DataModel.Repositories
 {
@@ -10,11 +12,13 @@ namespace DataModel.Repositories
         TEntity GetById(int id);
         void Insert(TEntity entity);
         void Update(TEntity entity);
+        //void BatchUpdate(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TEntity>> updateExpression);
         void Delete(TEntity entity);
+        //void BatchDelete(Expression<Func<TEntity, bool>> predicate);   
         void Save();
     }
 
-    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class 
+    public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         protected readonly ProjectXDbContext context;
         public Repository(ProjectXDbContext context)
@@ -41,10 +45,20 @@ namespace DataModel.Repositories
             context.Set<TEntity>().Update(entity);
         }
 
+        //public void BatchUpdate(Expression<Func<TEntity, bool>> predicate, Expression<Func<TEntity, TEntity>> updateExpression)
+        //{
+        //    this.FetchAll().Where(predicate).BatchUpdate(updateExpression);
+        //}
+
         public void Delete(TEntity entity)
         {
             context.Set<TEntity>().Remove(entity);
         }
+        //public void BatchDelete(Expression<Func<TEntity, bool>> predicate)
+        //{
+        //    this.FetchAll().Where(predicate).BatchDelete();
+        //}
+
         public void Save()
         {
             context.SaveChanges();

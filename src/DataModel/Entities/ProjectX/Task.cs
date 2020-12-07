@@ -19,6 +19,6 @@ namespace DataModel.Entities.ProjectX
         [StringLength(1000)]
         public string TaskName { get; set; }
         [Column("task_status", TypeName = "tinyint unsigned")]
-        public TaskStatusEnum TaskStatus { get; set; }
+        public TaskStatusEnum Status { get; set; }
     }
 }

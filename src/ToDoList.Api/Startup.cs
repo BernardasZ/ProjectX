@@ -1,3 +1,4 @@
+using AutoMapper;
 using DataModel.DbContexts;
 using DataModel.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -43,6 +44,7 @@ namespace ToDoList.Api
 		{
 			services.Configure<OptionManager>(Configuration);
 
+			services.AddAutoMapper(typeof(Startup));
 			services.AddMemoryCache();
 			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(Configuration.GetConnectionString("ProjectXConnectionString")), ServiceLifetime.Scoped);
 			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
@@ -82,12 +84,16 @@ namespace ToDoList.Api
 			});
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+			services.AddSingleton<IHashCryptoHelper, HashCryptoHelper>();
 			services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
 			services.AddScoped<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
 			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
-			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IUserSessionService, UserSessionService>();
 			services.AddScoped<IClientContextScraper, ClientContextScraper>();
+			services.AddScoped<IJwtHelper, JwtHelper>();
+			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<ITaskService, TaskService>();
 
 			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("AppSettings:JWTSecret"));
 

@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DataModel.DbContexts;
-using DataModel.Entities.ProjectX;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using System.Text;
 using Microsoft.Extensions.Options;
+using System;
+using System.Threading.Tasks;
+using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
+using ToDoList.Api.Models;
+using ToDoList.Api.Services;
 
 namespace ToDoList.Api.Controllers
 {
@@ -22,35 +17,45 @@ namespace ToDoList.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly IOptionsMonitor<OptionManager> optionsManager;
+        private readonly IUserService userService;
+        private readonly IHashCryptoHelper hashCryptoHelper;
+        private readonly IMapper mapper;
 
         public UserController(
-            IOptionsMonitor<OptionManager> optionsManager)
+            IOptionsMonitor<OptionManager> optionsManager,
+            IUserService userService,
+            IHashCryptoHelper hashCryptoHelper,
+            IMapper mapper)
         {
             this.optionsManager = optionsManager;
+            this.userService = userService;
+            this.hashCryptoHelper = hashCryptoHelper;
+            this.mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public ActionResult<string> Login()
+        public async Task<IActionResult> Login([FromBody] LoginModel model)
         {
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.AppSettings.JWTSecret);
-
-            var tokenDescriptor = new SecurityTokenDescriptor
+            try
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, "UserIDLALALALAL"),
-                    new Claim(ClaimTypes.Role, "Admin")
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-            };
-            
-            var token = tokenHandler.CreateEncodedJwt(tokenDescriptor);
+                model.Password = hashCryptoHelper.HashString(model.Password);
 
-            return Ok(new { jwt = token });
+                var user = mapper.Map<UserModel>(model);
+                var userData = userService.Login(user);
+                var jwt = userService.GetNewJwt(userData);
+
+                return Ok(new { JWT = jwt });
+            }
+            catch (GenericException e)
+			{
+                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorCode = e.ErrorCode.ToString() });
+            }
+            catch (Exception e)
+			{
+                return StatusCode(StatusCodes.Status500InternalServerError);
+            }      
         }
     }
 }
