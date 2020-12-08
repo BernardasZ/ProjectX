@@ -7,9 +7,9 @@ namespace ToDoList.Api.Enums
 {
 	public enum GenericErrorEnum
 	{
-		InternalSystemError,
+		InternalSystemError = 0,
 
-		UserDoesNotExist,
-		TaskDoesNotExist
+		UserDoesNotExist = 100,
+		TaskDoesNotExist = 101
 	}
 }

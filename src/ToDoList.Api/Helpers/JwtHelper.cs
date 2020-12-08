@@ -27,8 +27,8 @@ namespace ToDoList.Api.Helpers
 
 		public string ConstructUserJwt(ClaimsIdentity subject)
 		{
-			var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.AppSettings.JWTSecret);
-			var days = optionsManager.CurrentValue.AppSettings.JWTExpirationInDay;
+			var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.Jwt.JWTSecret);
+			var days = optionsManager.CurrentValue.Jwt.JWTExpirationInDay;
 
 			var tokenHandler = new JwtSecurityTokenHandler();
 
@@ -36,7 +36,7 @@ namespace ToDoList.Api.Helpers
 			{
 				Subject = subject,
 				Expires = DateTime.UtcNow.AddDays(days),
-				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
 			};
 
 			return tokenHandler.CreateEncodedJwt(tokenDescriptor);

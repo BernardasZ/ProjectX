@@ -14,7 +14,7 @@ using ToDoList.Api.Attributes;
 using ToDoList.Api.Authorization;
 using ToDoList.Api.Constants;
 using ToDoList.Api.Helpers;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.Task;
 using ToDoList.Api.Services;
 using static ToDoList.Api.Constants.Permissions;
 
@@ -37,9 +37,9 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet]
-        [Route("Tasks")]
+        [Route("Tasks/{userId}")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<IEnumerable<TaskModel>> Tasks([FromQuery] int userId)
+        public ActionResult<IEnumerable<TaskModel>> Tasks(int userId)
         {
             var model = new TaskModel() { UserId = userId };
             var tasks = taskService.GetTaskList(model);
@@ -58,9 +58,9 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpGet]
-        [Route("Read")]
+        [Route("Read/{taskId}")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskModel> ReadTask([FromQuery] int taskId)
+        public ActionResult<TaskModel> ReadTask(int taskId)
         {
             var model = new TaskModel() { Id = taskId };
             var task = taskService.ReadTask(model);

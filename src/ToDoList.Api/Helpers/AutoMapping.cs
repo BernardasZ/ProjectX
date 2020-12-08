@@ -3,7 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.Task;
+using ToDoList.Api.Models.User;
 
 namespace ToDoList.Api.Helpers
 {
@@ -11,7 +12,7 @@ namespace ToDoList.Api.Helpers
     {
         public AutoMapping()
         {
-            CreateMap<LoginModel, UserModel>();
+            CreateMap<UserLoginModel, UserModel>();
             CreateMap<TaskModel, DataModel.Entities.ProjectX.Task>();
         }
     }

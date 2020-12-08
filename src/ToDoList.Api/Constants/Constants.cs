@@ -15,5 +15,6 @@ namespace ToDoList.Api.Constants
 		public const string PasswordRequired = "PasswordIsRequired";
 		public const string PasswordLength = "PasswordIsTooShort";
 		public const string UserCredentialRequired = "UserNameOrEmailRequired";
+		public const string TokenRequired = "TokenIsRequired";
 	}
 }

@@ -5,15 +5,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using static ToDoList.Api.Constants.ValidationError;
 
-namespace ToDoList.Api.Models
+namespace ToDoList.Api.Models.User
 {
-	public class LoginModel
+	public class UserChangePasswordModel
 	{
-		[Required(ErrorMessage = UserCredentialRequired)]
 		public string UserEmail { get; set; }
-
-		[Required(ErrorMessage = PasswordRequired)]
-		[MinLength(12, ErrorMessage = PasswordLength)]
-		public string Password { get; set; }
-	}
+		public string NewPassword { get; set; }
+        public string OldPassword { get; set; }
+    }
 }

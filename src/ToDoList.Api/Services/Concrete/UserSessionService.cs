@@ -24,7 +24,7 @@ namespace ToDoList.Api.Services.Concrete
 
 		public bool IsValidUserSession()
 		{
-			string userIdentity = clientContextScraper.GetClientClaimsName();
+			string userIdentity = clientContextScraper.GetClientClaimsIdentityName();
 			string ipAddress = clientContextScraper.GetClientIpAddress();
 
 			return userSessionRepository.FetchAll().Where(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress).Any();
@@ -49,7 +49,7 @@ namespace ToDoList.Api.Services.Concrete
 		public void DeleteUserSession()
 		{
 			string ipAddress = clientContextScraper.GetClientIpAddress();
-			string userIdentity = clientContextScraper.GetClientClaimsName();
+			string userIdentity = clientContextScraper.GetClientClaimsIdentityName();
 
 			DeleteUserSession(userIdentity, ipAddress);
 		}

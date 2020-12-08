@@ -7,8 +7,9 @@ using System;
 using System.Threading.Tasks;
 using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.User;
 using ToDoList.Api.Services;
+using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api.Controllers
 {
@@ -36,26 +37,51 @@ namespace ToDoList.Api.Controllers
         [HttpPost]
         [Route("Login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginModel model)
+        public async Task<IActionResult> Login([FromBody] UserLoginModel model)
         {
-            try
-            {
-                model.Password = hashCryptoHelper.HashString(model.Password);
+            var data = userService.Login(model);
 
-                var user = mapper.Map<UserModel>(model);
-                var userData = userService.Login(user);
-                var jwt = userService.GetNewJwt(userData);
+            return Ok(data);
+        }
 
-                return Ok(new { JWT = jwt });
-            }
-            catch (GenericException e)
-			{
-                return StatusCode(StatusCodes.Status500InternalServerError, new { ErrorCode = e.ErrorCode.ToString() });
-            }
-            catch (Exception e)
-			{
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }      
+        [HttpPost]
+        [Route("Logout")]
+        [Authorize(Policy = CheckPermissions)]
+        public async Task<IActionResult> Logout()
+        {
+            userService.Logout();
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("ChangePassword")]
+        [Authorize(Policy = CheckPermissions)]
+        public async Task<IActionResult> ChangePassword([FromBody] UserChangePasswordModel model)
+        {
+            userService.ChangePassword(model);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("ResetPassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] UserResetPasswordModel model)
+        {
+            userService.ResetPassword(model);
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("InitPasswordReset")]
+        [AllowAnonymous]
+        public async Task<IActionResult> InitPasswordReset([FromBody] UserModel model)
+        {
+            userService.InitUserPasswordReset(model);
+
+            return Ok();
         }
     }
 }

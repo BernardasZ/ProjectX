@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.Task;
 
 namespace ToDoList.Api.Services.Concrete
 {

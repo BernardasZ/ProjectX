@@ -9,7 +9,7 @@ namespace ToDoList.Api.Helpers
 {
 	public interface IClientContextScraper
 	{
-		string GetClientClaimsName();
+		string GetClientClaimsIdentityName();
 		string GetClientClaimsRole();
 		string GetClientIpAddress();
 		string GetControllerName();
@@ -36,7 +36,7 @@ namespace ToDoList.Api.Helpers
 			return remoteIpAddress;
 		}
 
-		public string GetClientClaimsName()
+		public string GetClientClaimsIdentityName()
 		{
 			return httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
 		}

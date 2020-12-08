@@ -16,7 +16,7 @@ namespace DataModel.Entities.ProjectX
         [StringLength(255)]
         public string SessionIdentifier { get; set; }
         [Required]
-        [Column("create_dt")]
+        [Column("create_dt", TypeName = "datetime")]
         [StringLength(255)]
         public DateTime CreateDt { get; set; }
         [Required]

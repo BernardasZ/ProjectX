@@ -23,6 +23,15 @@ namespace DataModel.Entities.ProjectX
         [Column("pass_hash")]
         [StringLength(255)]
         public string PassHash { get; set; }
+        [Column("token_hash")]
+        [StringLength(255)]
+        public string TokenHash { get; set; }
+        [Column("is_token_used", TypeName = "bit(1)")]
+        public bool? IsTokenUsed { get; set; }
+        [Column("token_expiration_time", TypeName = "datetime")]
+		public DateTime? TokenExpirationTime { get; set; }
+		[Column("failed_login_count")]
+        public int FailedLoginCount { get; set; }
 
         [ForeignKey(nameof(RoleId))]
         [InverseProperty("UserData")]

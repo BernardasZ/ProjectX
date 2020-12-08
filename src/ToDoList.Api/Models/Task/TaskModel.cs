@@ -1,6 +1,6 @@
 ﻿using DataModel.Enums;
 
-namespace ToDoList.Api.Models
+namespace ToDoList.Api.Models.Task
 {
     public class TaskModel
 	{

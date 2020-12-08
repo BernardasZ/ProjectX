@@ -14,7 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.User;
 
 namespace ToDoList.Api.Services.Concrete
 {
@@ -25,67 +25,92 @@ namespace ToDoList.Api.Services.Concrete
 		private readonly IJwtHelper jwtHelper;
 		private readonly IAesCryptoHelper aesCryptoHelper;
 		private readonly IClientContextScraper clientContextScraper;
-
+		private readonly IHashCryptoHelper hashCryptoHelper;
+		private readonly IOptionsMonitor<OptionManager> optionManager;
 
 		public UserService(
 			IRepository<UserData> userDataRepository,
 			IUserSessionService userSessionService,
 			IJwtHelper jwtHelper,
 			IAesCryptoHelper aesCryptoHelper,
-			IClientContextScraper clientContextScraper)
+			IClientContextScraper clientContextScraper,
+			IHashCryptoHelper hashCryptoHelper,
+			IOptionsMonitor<OptionManager> optionManager)
 		{
 			this.userDataRepository = userDataRepository;
 			this.userSessionService = userSessionService;
 			this.jwtHelper = jwtHelper;
 			this.aesCryptoHelper = aesCryptoHelper;
 			this.clientContextScraper = clientContextScraper;
+			this.hashCryptoHelper = hashCryptoHelper;
+			this.optionManager = optionManager;
 		}
 
-		public UserModel Login(UserModel user)
+		public UserLoginResponseModel Login(UserLoginModel model)
 		{
-			var userData = GetUserData(user)
-				.Select(x => new UserModel
-				{
-					UserId = x.Id,
-					Role = x.Role.RoleValue,
-					UserName = x.UserName,
-					UserEmail = x.UserEmail,
-					Password = x.PassHash
+			model.Password = hashCryptoHelper.HashString(model.Password);
+
+			var data = userDataRepository.FetchAll()
+				.Where(x => x.UserEmail == model.UserEmail && x.PassHash == model.Password)
+				.Select(x => new 
+				{ 
+					user = x, 
+					role = x.Role.RoleValue 
 				})
 				.FirstOrDefault();
 
-			if (userData != null)
+			if (data != null)
 			{
-				userSessionService.DeleteUserSession(userData.UserId.ToString());
-				userSessionService.CreateUserSession(userData.UserId.ToString());
+				userSessionService.DeleteUserSession(data.user.Id.ToString());
+				userSessionService.CreateUserSession(data.user.Id.ToString());
+
+				if (data.user.FailedLoginCount != 0)
+				{
+					data.user.FailedLoginCount = 0;
+					userDataRepository.Update(data.user);
+					userDataRepository.Save();
+				}
 			}
 			else
 			{
 				throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
 			}
 
-			return userData;
+			var claims = new ClaimsIdentity(new Claim[]
+			{
+				new Claim(ClaimTypes.Name, aesCryptoHelper.EncryptString(data.user.Id.ToString())),
+				new Claim(ClaimTypes.Role, data.role.ToString())
+			});
+
+			string jwt = jwtHelper.ConstructUserJwt(claims);
+
+			return  new UserLoginResponseModel()
+			{
+				UserName = data.user.UserName,
+				UserEmail = data.user.UserEmail,
+				UserId = data.user.Id,
+				Role = data.role,
+				JWT = jwt
+			};
 		}
 
-		public void LoginOut(UserModel user)
+		public void Logout()
 		{
-			if (CheckIfUserExists(user))
-			{
-				userSessionService.DeleteUserSession();
-			}
-			else
-			{
-				throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
-			}
+			userSessionService.DeleteUserSession();
 		}
 
-		public void ChangePassword(UserPassChangeModel user)
+		public void ChangePassword(UserChangePasswordModel model)
 		{
-			var userData = GetUserData(user).FirstOrDefault();
+			model.NewPassword = hashCryptoHelper.HashString(model.NewPassword);
+			model.OldPassword = hashCryptoHelper.HashString(model.OldPassword);
+
+			var userId = int.Parse(aesCryptoHelper.DecryptString(clientContextScraper.GetClientClaimsIdentityName()));
+			var userData = userDataRepository.FetchAll().Where(x => x.Id == userId && x.UserEmail == model.UserEmail && x.PassHash == model.OldPassword).FirstOrDefault();
 
 			if (userData != null)
 			{
-				userData.PassHash = user.NewPassword;
+				userData.PassHash = model.NewPassword;
+				userData.FailedLoginCount = 0;
 				userDataRepository.Update(userData);
 				userDataRepository.Save();
 			}
@@ -95,43 +120,53 @@ namespace ToDoList.Api.Services.Concrete
 			}
 		}
 
-		public bool CheckIfUserExists(UserModel user)
+		public void ResetPassword(UserResetPasswordModel model)
 		{
-			return userDataRepository.FetchAll().Where(x => (x.UserName == user.UserName || x.UserEmail == user.UserName)).Any();
-		}
+			model.NewPassword = hashCryptoHelper.HashString(model.NewPassword);
 
-		public IQueryable<UserData> GetUserData(UserModel user)
-		{
-			return userDataRepository
-				.FetchAll()
-				.Where(x => (x.UserName == user.UserName || x.UserEmail == user.UserEmail) && x.PassHash == user.Password);
-		}
+			var userData = userDataRepository.FetchAll().Where(x => x.TokenHash == model.Token && x.IsTokenUsed == false && x.TokenExpirationTime.Value >= DateTime.Now).FirstOrDefault();
 
-		public string GetNewJwt(UserModel user)
-		{
-			string userIdentity = aesCryptoHelper.EncryptString(user.UserId.ToString());
-
-			var claims = new ClaimsIdentity(new Claim[]
+			if (userData != null)
 			{
-				new Claim(ClaimTypes.Name, userIdentity),
-				new Claim(ClaimTypes.Role, user.Role.ToString())
-			});
+				userData.PassHash = model.NewPassword;
+				userData.IsTokenUsed = true;
+				userData.FailedLoginCount = 0;
 
-			return jwtHelper.ConstructUserJwt(claims);
-		}
-
-		public bool CheckUserIdentity(string id)
-		{
-			string userIdentity = aesCryptoHelper.DecryptString(clientContextScraper.GetClientClaimsName());
-
-			if (userIdentity == id)
-			{
-				return true;
+				userDataRepository.Update(userData);
+				userDataRepository.Save();
 			}
 			else
 			{
-				return false;
+				throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
 			}
+		}
+
+		public void InitUserPasswordReset(UserModel model)
+		{
+			var userData = userDataRepository.FetchAll().Where(x => x.UserEmail == model.UserEmail).FirstOrDefault();
+
+			if (userData != null)
+			{
+				string token = hashCryptoHelper.HashString(model.UserEmail);
+				int expirationMins = optionManager.CurrentValue.AppSettings.PasswordResetExpirationInMin;
+
+				userData.IsTokenUsed = false;
+				userData.TokenExpirationTime = DateTime.Now.AddMinutes(expirationMins);
+				userData.TokenHash = token;
+				userDataRepository.Update(userData);
+				userDataRepository.Save();
+
+				//SendEmail
+			}
+			else
+			{
+				throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
+			}
+		}
+
+		public bool CheckIfUserExists(UserModel model)
+		{
+			return userDataRepository.FetchAll().Where(x => (x.UserEmail == model.UserEmail)).Any();
 		}
 	}
 }

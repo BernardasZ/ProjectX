@@ -25,6 +25,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDoList.Api.Authorization;
 using ToDoList.Api.Helpers;
+using ToDoList.Api.Middleware;
 using ToDoList.Api.Services;
 using ToDoList.Api.Services.Concrete;
 using static ToDoList.Api.Constants.Permissions;
@@ -49,7 +50,7 @@ namespace ToDoList.Api
 			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(Configuration.GetConnectionString("ProjectXConnectionString")), ServiceLifetime.Scoped);
 			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
 
-			services.AddControllers();
+			services.AddControllers().AddJsonOptions(x => x.JsonSerializerOptions.IgnoreNullValues = true);
 			services.AddSwaggerGen(x =>
 			{
 				x.EnableAnnotations();
@@ -95,7 +96,7 @@ namespace ToDoList.Api
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<ITaskService, TaskService>();
 
-			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("AppSettings:JWTSecret"));
+			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("Jwt:JWTSecret"));
 
 			services.AddAuthentication(x =>
 			{
@@ -113,7 +114,8 @@ namespace ToDoList.Api
 					ValidateLifetime = true,
 					RequireExpirationTime = true,
 					ValidateIssuer = false,
-					ValidateAudience = false
+					ValidateAudience = false,
+					ClockSkew = TimeSpan.Zero
 				};
 			});
 		}
@@ -137,6 +139,7 @@ namespace ToDoList.Api
 			});
 
 			app.UseRouting();
+			app.UseErrorHandlerMiddleware();
 			app.UseAuthentication();
 			app.UseAuthorization();
 

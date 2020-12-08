@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.Task;
 
 namespace ToDoList.Api.Services
 {
@@ -13,6 +13,5 @@ namespace ToDoList.Api.Services
 		TaskModel ReadTask(TaskModel task);
 		TaskModel UpdateTask(TaskModel task);
 		void DeleteTask(TaskModel task);
-		bool CheckIfTaskExists(TaskModel task);
 	}
 }

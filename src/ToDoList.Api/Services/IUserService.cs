@@ -3,18 +3,17 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ToDoList.Api.Models;
+using ToDoList.Api.Models.User;
 
 namespace ToDoList.Api.Services
 {
 	public interface IUserService
 	{
-		UserModel Login(UserModel user);
-		void LoginOut(UserModel user);
-		void ChangePassword(UserPassChangeModel user);
-		bool CheckIfUserExists(UserModel user);
-		IQueryable<UserData> GetUserData(UserModel user);
-		string GetNewJwt(UserModel user);
-		bool CheckUserIdentity(string id);
+		UserLoginResponseModel Login(UserLoginModel model);
+		void Logout();
+		void ChangePassword(UserChangePasswordModel model);
+		void ResetPassword(UserResetPasswordModel model);
+		void InitUserPasswordReset(UserModel model);
+		bool CheckIfUserExists(UserModel model);
 	}
 }
