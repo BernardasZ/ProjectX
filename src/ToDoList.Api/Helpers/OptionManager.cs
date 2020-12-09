@@ -6,6 +6,7 @@
 		public ConnectionStrings ConnectionStrings { get; set; }
 		public PermissionCacheSettings PermissionCacheSettings { get; set; }
 		public Jwt Jwt { get; set; }
+		public SmtpSettings SmtpSettings { get; set; }
 	}
 
 	public class AppSettings
@@ -29,5 +30,13 @@
 	{
 		public string Key { get; set; }
 		public int ExpirationTimeInMin { get; set; }
+	}
+
+	public class SmtpSettings 
+	{
+		public string Host { get; set; }
+		public string UserName { get; set; }
+		public string Password { get; set; }
+		public string Sender { get; set; }
 	}
 }

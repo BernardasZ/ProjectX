@@ -1,8 +1,4 @@
 ﻿using DataModel.Enums;
-using ExpressiveAnnotations.Attributes;
-using System.ComponentModel.DataAnnotations;
-using ToDoList.Api.Enums;
-using static ToDoList.Api.Constants.ValidationError;
 
 namespace ToDoList.Api.Models.User
 {

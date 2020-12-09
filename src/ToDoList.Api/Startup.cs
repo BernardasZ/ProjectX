@@ -1,4 +1,3 @@
-using AutoMapper;
 using DataModel.DbContexts;
 using DataModel.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -45,7 +44,6 @@ namespace ToDoList.Api
 		{
 			services.Configure<OptionManager>(Configuration);
 
-			services.AddAutoMapper(typeof(Startup));
 			services.AddMemoryCache();
 			services.AddDbContext<ProjectXDbContext>(x => x.UseMySQL(Configuration.GetConnectionString("ProjectXConnectionString")), ServiceLifetime.Scoped);
 			services.AddTransient(typeof(IRepository<>), typeof(Repository<>));
@@ -95,6 +93,7 @@ namespace ToDoList.Api
 			services.AddScoped<IJwtHelper, JwtHelper>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<ITaskService, TaskService>();
+			services.AddScoped<IMessageService, MessageService>();
 
 			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("Jwt:JWTSecret"));
 

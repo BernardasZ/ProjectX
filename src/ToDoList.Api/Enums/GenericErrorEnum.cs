@@ -9,7 +9,11 @@ namespace ToDoList.Api.Enums
 	{
 		InternalSystemError = 0,
 
-		UserDoesNotExist = 100,
-		TaskDoesNotExist = 101
+		TaskDoesNotExist = 100,
+
+		UserDoesNotExist = 200,	
+		UserExist = 201,
+		UserIdentityMissMatch = 202,
+		UserResetPasswordTokenIsExpired = 203
 	}
 }

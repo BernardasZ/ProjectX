@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace ToDoList.Api.Models.User
+﻿namespace ToDoList.Api.Models.User
 {
-	public class UserLoginResponseModel : UserModel
+	public class UserLoginResponseModel
 	{
 		public string JWT { get; set; }
 	}

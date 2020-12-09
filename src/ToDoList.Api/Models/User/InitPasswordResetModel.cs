@@ -1,8 +1,7 @@
 ﻿namespace ToDoList.Api.Models.User
 {
-	public class UserLoginModel
+	public class InitPasswordResetModel
 	{
 		public string UserEmail { get; set; }
-		public string Password { get; set; }
 	}
 }

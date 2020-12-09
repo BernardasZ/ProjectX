@@ -8,10 +8,10 @@ namespace ToDoList.Api.Services
 {
 	public interface ITaskService
 	{
-		List<TaskModel> GetTaskList(TaskModel task);
-		TaskModel CreateTask(TaskModel task);
-		TaskModel ReadTask(TaskModel task);
-		TaskModel UpdateTask(TaskModel task);
-		void DeleteTask(TaskModel task);
+		List<TaskModel> GetTaskList(TaskModel model);
+		TaskModel CreateTask(TaskModel model);
+		TaskModel ReadTask(TaskModel model);
+		TaskModel UpdateTask(TaskModel model);
+		void DeleteTask(TaskModel model);
 	}
 }

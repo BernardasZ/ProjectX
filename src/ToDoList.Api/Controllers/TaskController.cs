@@ -1,19 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using DataModel.DbContexts;
-using DataModel.Enums;
-using DataModel.Repositories;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Annotations;
+using System.Collections.Generic;
 using ToDoList.Api.Attributes;
-using ToDoList.Api.Authorization;
-using ToDoList.Api.Constants;
-using ToDoList.Api.Helpers;
 using ToDoList.Api.Models.Task;
 using ToDoList.Api.Services;
 using static ToDoList.Api.Constants.Permissions;
@@ -25,14 +13,11 @@ namespace ToDoList.Api.Controllers
     [SessionCheck]
     public class TaskController : ControllerBase
     {
-        private readonly IOptionsMonitor<OptionManager> optionsManager;
         private readonly ITaskService taskService;
 
         public TaskController(
-            IOptionsMonitor<OptionManager> optionsManager,
             ITaskService taskService)
         {
-            this.optionsManager = optionsManager;
             this.taskService = taskService;
         }
 
@@ -42,40 +27,34 @@ namespace ToDoList.Api.Controllers
         public ActionResult<IEnumerable<TaskModel>> Tasks(int userId)
         {
             var model = new TaskModel() { UserId = userId };
-            var tasks = taskService.GetTaskList(model);
 
-            return Ok(tasks);
+            return Ok(taskService.GetTaskList(model));
         }
 
-        [HttpPut]
+        [HttpPost]
         [Route("Create")]
         [Authorize(Policy = CheckPermissions)]
         public IActionResult CreateTask([FromBody] TaskModel model)
         {
-            var task = taskService.CreateTask(model);
-
-            return Ok(task);
+            return Ok(taskService.CreateTask(model));
         }
 
         [HttpGet]
-        [Route("Read/{taskId}")]
+        [Route("Task/{taskId}")]
         [Authorize(Policy = CheckPermissions)]
         public ActionResult<TaskModel> ReadTask(int taskId)
         {
             var model = new TaskModel() { Id = taskId };
-            var task = taskService.ReadTask(model);
 
-            return Ok(task);
+            return Ok(taskService.ReadTask(model));
         }
 
-        [HttpPost]
+        [HttpPatch]
         [Route("Update")]
         [Authorize(Policy = CheckPermissions)]
         public ActionResult<TaskModel> UpdateTask([FromBody] TaskModel model)
         {
-            var task = taskService.UpdateTask(model);
-
-            return Ok(task);
+            return Ok(taskService.UpdateTask(model));
         }
 
         [HttpDelete]
