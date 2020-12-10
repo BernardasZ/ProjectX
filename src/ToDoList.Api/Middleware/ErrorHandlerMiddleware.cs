@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Serilog;
 using System;
 using System.Net;
 using System.Text.Json;
@@ -11,6 +12,7 @@ namespace ToDoList.Api.Middleware
 {
 	public class ErrorHandlerMiddleware
 	{
+        private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
         private readonly RequestDelegate _next;
 
         public ErrorHandlerMiddleware(RequestDelegate next)
@@ -43,6 +45,8 @@ namespace ToDoList.Api.Middleware
                         response.StatusCode = (int)HttpStatusCode.InternalServerError;
                         break;
                 }
+
+                logger.Error(error, "Handled error message: {message}", message);
 
                 var result = JsonSerializer.Serialize(new { ErrorMessage = message });
                 await response.WriteAsync(result);

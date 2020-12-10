@@ -84,6 +84,8 @@ namespace ToDoList.Api
 
 			services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 			services.AddSingleton<IHashCryptoHelper, HashCryptoHelper>();
+			services.AddScoped<IUserServiceValidationHelper, UserServiceValidationHelper>();
+			services.AddScoped<ITaskServiceValidationHelper, TaskServiceValidationHelper>();
 			services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
 			services.AddScoped<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
@@ -94,6 +96,7 @@ namespace ToDoList.Api
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<ITaskService, TaskService>();
 			services.AddScoped<IMessageService, MessageService>();
+			services.AddScoped<IUserLoginService, UserLoginService>();
 
 			var key = Encoding.ASCII.GetBytes(Configuration.GetValue<string>("Jwt:JWTSecret"));
 

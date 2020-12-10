@@ -1,21 +1,24 @@
-﻿using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using ToDoList.Api.Helpers;
+using System.Linq;
+using Serilog;
+using Microsoft.Extensions.Options;
 
 namespace ToDoList.Api.Services.Concrete
 {
 	public class MessageService : IMessageService
 	{
+		private readonly ILogger logger = Log.ForContext<MessageService>();
 		private readonly IOptionsMonitor<OptionManager> optionManager;
 		public MessageService(IOptionsMonitor<OptionManager> optionManager)
 		{
 			this.optionManager = optionManager;
 		}
 
-		public async void SendEmailAsync(MailMessage message)
+		public void SendEmail(MailMessage message)
 		{
 			Task.Run(() =>
 			{
@@ -31,9 +34,9 @@ namespace ToDoList.Api.Services.Concrete
 						smtp.Send(message);
 					}
 				}
-				catch (Exception)
+				catch (Exception e)
 				{
-					//Log error
+					logger.Error(e, "Failed to send email to: {receiver}", message.To.FirstOrDefault().Address.ToString());
 				}
 			});
 		}

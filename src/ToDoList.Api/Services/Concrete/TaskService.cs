@@ -14,27 +14,31 @@ namespace ToDoList.Api.Services.Concrete
 		private readonly IRepository<TaskData> taskRepository;
 		private readonly IClientContextScraper clientContextScraper;
 		private readonly IAesCryptoHelper aesCryptoHelper;
+		private readonly IUserServiceValidationHelper userServiceValidationHelper;
+		private readonly ITaskServiceValidationHelper taskServiceValidationHelper;
 
 		public TaskService(
 			IRepository<TaskData> taskRepository,
 			IClientContextScraper clientContextScraper,
-			IAesCryptoHelper aesCryptoHelper)
+			IAesCryptoHelper aesCryptoHelper,
+			IUserServiceValidationHelper userServiceValidationHelper,
+			ITaskServiceValidationHelper taskServiceValidationHelper)
 		{
 			this.taskRepository = taskRepository;
 			this.clientContextScraper = clientContextScraper;
 			this.aesCryptoHelper = aesCryptoHelper;
+			this.userServiceValidationHelper = userServiceValidationHelper;
+			this.taskServiceValidationHelper = taskServiceValidationHelper;
 		}
 
 		public List<TaskModel> GetTaskList(TaskModel model)
 		{
-			bool isAdmin = clientContextScraper.GetClientClaimsRole() == UserRoleEnum.Admin.ToString();
-
-			if (!isAdmin) 
-				ValidateUserId(model.UserId);
+			if (!userServiceValidationHelper.IsAdmin())
+				userServiceValidationHelper.ValidateUserId(model.UserId);
 
 			return taskRepository
 				.FetchAll()
-				.Where(x => x.UserId == model.UserId || isAdmin == true)
+				.Where(x => x.UserId == model.UserId)
 				.Select(x => new TaskModel() 
 				{ 
 					Id = x.Id, 
@@ -47,7 +51,7 @@ namespace ToDoList.Api.Services.Concrete
 
 		public TaskModel CreateTask(TaskModel model)
 		{
-			ValidateUserId(model.UserId);
+			userServiceValidationHelper.ValidateUserId(model.UserId);
 
 			var taskData = new TaskData()
 			{
@@ -66,10 +70,13 @@ namespace ToDoList.Api.Services.Concrete
 
 		public TaskModel ReadTask(TaskModel model)
 		{
+			bool isAdmin = userServiceValidationHelper.IsAdmin();
 			var taskData = taskRepository.GetById(model.Id);
 
-			ValidateUserData(taskData);
-			ValidateUserId(taskData.UserId);
+			taskServiceValidationHelper.ValidateTaskData(taskData);
+
+			if (!isAdmin)
+				userServiceValidationHelper.ValidateUserId(taskData.UserId);
 
 			return new TaskModel()
 			{
@@ -82,11 +89,10 @@ namespace ToDoList.Api.Services.Concrete
 
 		public TaskModel UpdateTask(TaskModel model)
 		{
-			ValidateUserId(model.UserId);
-
 			var taskData = taskRepository.GetById(model.Id);
 
-			ValidateUserData(taskData);
+			taskServiceValidationHelper.ValidateTaskData(taskData);
+			userServiceValidationHelper.ValidateUserId(taskData.UserId);
 
 			taskData.TaskName = model.TaskName;
 			taskData.Status = model.Status;
@@ -101,29 +107,16 @@ namespace ToDoList.Api.Services.Concrete
 
 		public void DeleteTask(TaskModel model)
 		{
-			bool isAdmin = clientContextScraper.GetClientClaimsRole() == UserRoleEnum.Admin.ToString();
-
-			if (!isAdmin)
-				ValidateUserId(model.UserId);
-
+			bool isAdmin = userServiceValidationHelper.IsAdmin();
 			var taskData = taskRepository.FetchAll().Where(x => (x.UserId == model.UserId || isAdmin == true) && x.Id == model.Id).FirstOrDefault();
 
-			ValidateUserData(taskData);	
+			taskServiceValidationHelper.ValidateTaskData(taskData);
+
+			if (!isAdmin)
+				userServiceValidationHelper.ValidateUserId(taskData.UserId);
 
 			taskRepository.Delete(taskData);
 			taskRepository.Save();
-		}
-
-		private void ValidateUserData(TaskData model)
-		{
-			if (model == null)
-				throw new GenericException(Enums.GenericErrorEnum.TaskDoesNotExist);
-		}
-
-		private void ValidateUserId(int userId)
-		{
-			if (userId > 0 && userId.ToString() != aesCryptoHelper.DecryptString(clientContextScraper.GetClientClaimsIdentityName()))
-				throw new GenericException(Enums.GenericErrorEnum.UserIdentityMissMatch);
 		}
 	}
 }

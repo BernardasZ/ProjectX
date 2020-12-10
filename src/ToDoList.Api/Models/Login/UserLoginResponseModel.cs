@@ -1,4 +1,4 @@
-﻿namespace ToDoList.Api.Models.User
+﻿namespace ToDoList.Api.Models.Login
 {
 	public class UserLoginResponseModel
 	{

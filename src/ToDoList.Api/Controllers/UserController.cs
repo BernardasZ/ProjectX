@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using ToDoList.Api.Attributes;
 using ToDoList.Api.Models.User;
@@ -20,18 +21,34 @@ namespace ToDoList.Api.Controllers
             this.userService = userService;
         }
 
+        [HttpGet]
+        [Route("Users")]
+        [Authorize(Policy = CheckPermissions)]
+        [SessionCheck]
+        public ActionResult<IEnumerable<UserModel>> GetUserList()
+        {
+            return Ok(userService.GetUserList());
+        }
+
         [HttpPost]
         [Route("Create")]
         [AllowAnonymous]
-        public IActionResult CreateUser([FromBody] UserModel model)
+        public IActionResult CreateUser([FromBody] UserCreateModel model)
         {
-            userService.CreateUser(model);
+            var data = new UserModel()
+            {
+                UserEmail = model.UserEmail,
+                UserName = model.UserName,
+                Password = model.Password
+            };
+
+            userService.CreateUser(data);
 
             return Ok();
         }
 
         [HttpGet]
-        [Route("User/{userId}")]
+        [Route("{userId}")]
         [Authorize(Policy = CheckPermissions)]
         [SessionCheck]
         public ActionResult<UserModel> ReadUser(int userId)
@@ -45,68 +62,26 @@ namespace ToDoList.Api.Controllers
         [Route("Update")]
         [Authorize(Policy = CheckPermissions)]
         [SessionCheck]
-        public ActionResult<UserModel> UpdateUser([FromBody] UserModel model)
+        public ActionResult<UserModel> UpdateUser([FromBody] UserUpdateModel model)
         {
-            return Ok(userService.UpdateUser(model));
+            var data = new UserModel()
+            {
+                UserId = model.UserId,
+                UserEmail = model.UserEmail,
+                UserName = model.UserName,
+            };
+
+            return Ok(userService.UpdateUser(data));
         }
 
         [HttpDelete]
         [Route("Delete")]
         [Authorize(Policy = CheckPermissions)]
         [SessionCheck]
-        public ActionResult DeleteUser([FromBody] UserModel model)
+        public ActionResult DeleteUser([FromBody] UserDeleteModel model)
         {
-            userService.DeleteUser(model);
-            return Ok();
-        }
-
-        [HttpPost]
-        [Route("Login")]
-        [AllowAnonymous]
-        public ActionResult Login([FromBody] UserLoginModel model)
-        {
-            return Ok(userService.Login(model));
-        }
-
-        [HttpPost]
-        [Route("Logout")]
-        [Authorize(Policy = CheckPermissions)]
-        [SessionCheck]
-        public ActionResult Logout()
-        {
-            userService.Logout();
-
-            return Ok();
-        }
-
-        [HttpPatch]
-        [Route("ChangePassword")]
-        [Authorize(Policy = CheckPermissions)]
-        [SessionCheck]
-        public ActionResult ChangePassword([FromBody] UserChangePasswordModel model)
-        {
-            userService.ChangePassword(model);
-
-            return Ok();
-        }
-
-        [HttpPatch]
-        [Route("ResetPassword")]
-        [AllowAnonymous]
-        public ActionResult ResetPassword([FromBody] UserResetPasswordModel model)
-        {
-            userService.ResetPassword(model);
-
-            return Ok();
-        }
-
-        [HttpPost]
-        [Route("InitPasswordReset")]
-        [AllowAnonymous]
-        public async Task<IActionResult> InitPasswordReset([FromBody] InitPasswordResetModel model)
-        {
-            userService.InitUserPasswordReset(model);
-
+            var data = new UserModel() { UserId = model.UserId };
+            userService.DeleteUser(data);
             return Ok();
         }
     }

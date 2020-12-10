@@ -9,14 +9,10 @@ namespace ToDoList.Api.Services
 {
 	public interface IUserService
 	{
+		IEnumerable<UserModel> GetUserList();
 		void CreateUser(UserModel model);
 		UserModel ReadUser(UserModel model);
 		UserModel UpdateUser(UserModel model);
 		void DeleteUser(UserModel model);
-		UserLoginResponseModel Login(UserLoginModel model);
-		void Logout();
-		void ChangePassword(UserChangePasswordModel model);
-		void ResetPassword(UserResetPasswordModel model);
-		void InitUserPasswordReset(InitPasswordResetModel model);
 	}
 }

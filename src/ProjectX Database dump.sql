@@ -1,3 +1,5 @@
+CREATE DATABASE  IF NOT EXISTS `ProjectX` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `ProjectX`;
 -- MySQL dump 10.13  Distrib 8.0.22, for Win64 (x86_64)
 --
 -- Host: localhost    Database: ProjectX
@@ -29,7 +31,7 @@ CREATE TABLE `permission_action` (
   PRIMARY KEY (`id`),
   KEY `permission_action__permission_controller_idx` (`controller_id`),
   CONSTRAINT `permission_action__permission_controller` FOREIGN KEY (`controller_id`) REFERENCES `permission_controller` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,7 +40,7 @@ CREATE TABLE `permission_action` (
 
 LOCK TABLES `permission_action` WRITE;
 /*!40000 ALTER TABLE `permission_action` DISABLE KEYS */;
-INSERT INTO `permission_action` VALUES (1,1,'ReadTask'),(2,1,'CreateTask'),(3,1,'UpdateTask'),(4,1,'DeleteTask'),(6,1,'Tasks'),(7,2,'All'),(8,1,'All');
+INSERT INTO `permission_action` VALUES (1,1,'ReadTask'),(2,1,'CreateTask'),(3,1,'UpdateTask'),(4,1,'DeleteTask'),(6,1,'Tasks'),(7,2,'All'),(8,1,'All'),(9,3,'All');
 /*!40000 ALTER TABLE `permission_action` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -53,7 +55,7 @@ CREATE TABLE `permission_controller` (
   `id` int NOT NULL AUTO_INCREMENT,
   `controller_name` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +64,7 @@ CREATE TABLE `permission_controller` (
 
 LOCK TABLES `permission_controller` WRITE;
 /*!40000 ALTER TABLE `permission_controller` DISABLE KEYS */;
-INSERT INTO `permission_controller` VALUES (1,'Task'),(2,'User');
+INSERT INTO `permission_controller` VALUES (1,'Task'),(2,'User'),(3,'Login');
 /*!40000 ALTER TABLE `permission_controller` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +88,7 @@ CREATE TABLE `permission_mapping` (
   CONSTRAINT `permission_mapping__permission_action` FOREIGN KEY (`action_id`) REFERENCES `permission_action` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `permission_mapping__permission_controller` FOREIGN KEY (`controller_id`) REFERENCES `permission_controller` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT,
   CONSTRAINT `permission_mapping__role` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,7 +97,7 @@ CREATE TABLE `permission_mapping` (
 
 LOCK TABLES `permission_mapping` WRITE;
 /*!40000 ALTER TABLE `permission_mapping` DISABLE KEYS */;
-INSERT INTO `permission_mapping` VALUES (18,1,1,1,_binary '\0'),(22,1,1,6,_binary '\0'),(24,1,2,7,_binary ''),(25,2,2,7,_binary ''),(26,2,1,1,_binary '\0'),(27,2,1,2,_binary '\0'),(28,2,1,3,_binary '\0'),(29,2,1,4,_binary '\0'),(30,2,1,6,_binary '\0'),(32,1,1,4,_binary '\0');
+INSERT INTO `permission_mapping` VALUES (18,1,1,1,_binary '\0'),(22,1,1,6,_binary '\0'),(24,1,2,7,_binary ''),(25,2,2,7,_binary ''),(26,2,1,1,_binary '\0'),(27,2,1,2,_binary '\0'),(28,2,1,3,_binary '\0'),(29,2,1,4,_binary '\0'),(30,2,1,6,_binary '\0'),(32,1,1,4,_binary '\0'),(34,1,3,8,_binary '');
 /*!40000 ALTER TABLE `permission_mapping` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -152,7 +154,7 @@ CREATE TABLE `task` (
   `task_name` varchar(1000) NOT NULL,
   `task_status` tinyint unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -161,7 +163,7 @@ CREATE TABLE `task` (
 
 LOCK TABLES `task` WRITE;
 /*!40000 ALTER TABLE `task` DISABLE KEYS */;
-INSERT INTO `task` VALUES (2,1,'Mano superinis task',0);
+INSERT INTO `task` VALUES (3,3,'string2222',1),(4,3,'Test task 2',0),(5,3,'Test task 3',0),(7,3,'Test task 5',0),(8,3,'Test task 6',0),(9,3,'Test task 1',0),(10,4,'Test task 222',0);
 /*!40000 ALTER TABLE `task` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -178,12 +180,16 @@ CREATE TABLE `user_data` (
   `user_name` varchar(255) DEFAULT NULL,
   `user_email` varchar(255) DEFAULT NULL,
   `pass_hash` varchar(255) NOT NULL,
+  `token_hash` varchar(255) DEFAULT NULL,
+  `is_token_used` bit(1) DEFAULT NULL,
+  `token_expiration_time` datetime DEFAULT NULL,
+  `failed_login_count` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `UserName_UNIQUE` (`user_name`),
   UNIQUE KEY `Email_UNIQUE` (`user_email`),
   KEY `user_data__role_idx` (`role_id`),
   CONSTRAINT `user_data__role` FOREIGN KEY (`role_id`) REFERENCES `role` (`id`) ON DELETE RESTRICT ON UPDATE RESTRICT
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -192,7 +198,7 @@ CREATE TABLE `user_data` (
 
 LOCK TABLES `user_data` WRITE;
 /*!40000 ALTER TABLE `user_data` DISABLE KEYS */;
-INSERT INTO `user_data` VALUES (2,1,'bernardas','bzxmixrox@gmail.com','b681a50c44242e2a4524ce1ec95c33b990d1afa6b7f47fd6382d4c6be765d8cd');
+INSERT INTO `user_data` VALUES (2,1,'','bzxmixrox@gmail.com','7R0uyLlSSQ1/SxR6q8C//EMOfmn7ntkYd98Hwk/SHas=','uE680KDdYqvLY+tTHDQLNPSpMd060P8rgHeHPotD6Mw=',_binary '','2020-12-10 21:58:43',0);
 /*!40000 ALTER TABLE `user_data` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -209,7 +215,7 @@ CREATE TABLE `user_session` (
   `create_dt` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `ip` varchar(15) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -218,8 +224,13 @@ CREATE TABLE `user_session` (
 
 LOCK TABLES `user_session` WRITE;
 /*!40000 ALTER TABLE `user_session` DISABLE KEYS */;
+INSERT INTO `user_session` VALUES (1,'UserIDLALALALAL','2020-12-06 23:31:27','0.0.0.1'),(12,'XYGHMsETB4iAR9iJK6b6iQ==','2020-12-10 22:34:44','0.0.0.1'),(15,'uhRfrh5FRZhvLQNIrgSwmQ==','2020-12-11 00:30:15','0.0.0.1');
 /*!40000 ALTER TABLE `user_session` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'ProjectX'
+--
 
 --
 -- Final view structure for view `permission_view`
@@ -248,4 +259,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2020-12-03 23:45:58
+-- Dump completed on 2020-12-11  0:39:00

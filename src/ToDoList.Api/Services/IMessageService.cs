@@ -3,6 +3,6 @@ namespace ToDoList.Api.Services
 {
 	public interface IMessageService
 	{
-		void SendEmailAsync(MailMessage message);
+		void SendEmail(MailMessage message);
 	}
 }

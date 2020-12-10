@@ -34,13 +34,20 @@ namespace ToDoList.Api.Controllers
         [HttpPost]
         [Route("Create")]
         [Authorize(Policy = CheckPermissions)]
-        public IActionResult CreateTask([FromBody] TaskModel model)
+        public IActionResult CreateTask([FromBody] TaskCreateModel model)
         {
-            return Ok(taskService.CreateTask(model));
+            var data = new TaskModel() 
+            { 
+                UserId = model.UserId,
+                TaskName = model.TaskName,
+                Status = model.Status
+            };
+
+            return Ok(taskService.CreateTask(data));
         }
 
         [HttpGet]
-        [Route("Task/{taskId}")]
+        [Route("{taskId}")]
         [Authorize(Policy = CheckPermissions)]
         public ActionResult<TaskModel> ReadTask(int taskId)
         {
@@ -52,17 +59,30 @@ namespace ToDoList.Api.Controllers
         [HttpPatch]
         [Route("Update")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskModel> UpdateTask([FromBody] TaskModel model)
+        public ActionResult<TaskModel> UpdateTask([FromBody] TaskUpdateModel model)
         {
-            return Ok(taskService.UpdateTask(model));
+            var data = new TaskModel()
+            {
+                Id = model.Id,
+                TaskName = model.TaskName,
+                Status = model.Status
+            };
+
+            return Ok(taskService.UpdateTask(data));
         }
 
         [HttpDelete]
         [Route("Delete")]
         [Authorize(Policy = CheckPermissions)]
-        public ActionResult DeleteTask([FromBody] TaskModel model)
+        public ActionResult DeleteTask([FromBody] TaskDeleteModel model)
         {
-            taskService.DeleteTask(model);
+            var data = new TaskModel()
+            {
+                Id = model.Id,
+                UserId = model.UserId
+            };
+
+            taskService.DeleteTask(data);
 
             return Ok();
         }

@@ -37,11 +37,17 @@ namespace ToDoList.Api.Helpers
 
 		public string GetClientClaimsIdentityName()
 		{
+			if (!httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Name))
+				return string.Empty;
+
 			return httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
 		}
 
 		public string GetClientClaimsRole()
 		{
+			if (!httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role))
+				return string.Empty;
+
 			return httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
 		}
 

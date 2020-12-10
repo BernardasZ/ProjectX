@@ -1,14 +1,16 @@
 ﻿using DataModel.Enums;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using ToDoList.Api.Validators;
 
 namespace ToDoList.Api.Models.Task
 {
-    public class TaskModel : IValidatableObject
+	public class TaskUpdateModel : IValidatableObject
     {
         public int Id { get; set; }
-        public int UserId { get; set; }
         public string TaskName { get; set; }
         public TaskStatusEnum Status { get; set; }
 
@@ -17,7 +19,6 @@ namespace ToDoList.Api.Models.Task
             TaskValidator validator = new TaskValidator();
 
             validator.ValidateTaskId(Id);
-            validator.ValidateUserId(UserId);
             validator.ValidateName(TaskName);
 
             return validator.GetValidationResults();
