@@ -12,7 +12,7 @@ using ToDoList.Api.Services;
 
 namespace ToDoList.Api.Authorization
 {
-	internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<ActionPermissionRequirement>
+	internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuthorizationRequirement>
 	{
 		private readonly IUserPermissionService userPermissionService;
 		public ActionPermissionAuthorizationHandler(
@@ -21,7 +21,7 @@ namespace ToDoList.Api.Authorization
 			this.userPermissionService = userPermissionService;
 		}
 
-		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, ActionPermissionRequirement requirement)
+		protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IAuthorizationRequirement requirement)
 		{
 			if (userPermissionService.ValidateUserPermissions())
 			{

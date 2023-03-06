@@ -12,17 +12,18 @@ using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api.Controllers
 {
-	[Route("api/[controller]")]
+	[Route("api/authentication")]
 	[ApiController]
-	public class LoginController : ControllerBase
+	public class AuthenticationController : ControllerBase
 	{
         private readonly IUserLoginService userLoginService;
-		public LoginController(IUserLoginService userLoginService)
+		public AuthenticationController(IUserLoginService userLoginService)
 		{
             this.userLoginService = userLoginService;
         }
 
         [HttpPost]
+        [Route("login")]
         [AllowAnonymous]
         public ActionResult Login([FromBody] UserLoginModel model)
         {
@@ -30,8 +31,8 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Logout")]
-        [Authorize(Policy = CheckPermissions)]
+        [Route("logout")]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
         public ActionResult Logout()
         {
@@ -40,9 +41,9 @@ namespace ToDoList.Api.Controllers
             return Ok();
         }
 
-        [HttpPatch]
-        [Route("ChangePassword")]
-        [Authorize(Policy = CheckPermissions)]
+        [HttpPost]
+        [Route("change-password")]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
         public ActionResult ChangePassword([FromBody] UserChangePasswordModel model)
         {
@@ -51,8 +52,8 @@ namespace ToDoList.Api.Controllers
             return Ok();
         }
 
-        [HttpPatch]
-        [Route("ResetPassword")]
+        [HttpPost]
+        [Route("reset-password")]
         [AllowAnonymous]
         public ActionResult ResetPassword([FromBody] UserResetPasswordModel model)
         {
@@ -62,7 +63,7 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPost]
-        [Route("InitPasswordReset")]
+        [Route("init-password-reset")]
         [AllowAnonymous]
         public IActionResult InitPasswordReset([FromBody] InitPasswordResetModel model)
         {

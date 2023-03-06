@@ -1,8 +1,7 @@
-﻿namespace DataModel.Enums
+﻿namespace DataModel.Enums;
+
+public enum TaskStatusEnum
 {
-	public enum TaskStatusEnum
-	{
-		Unfinish = 0,
-		Finish = 255
-	}
+	Unfinish = 0,
+	Finish = 255
 }

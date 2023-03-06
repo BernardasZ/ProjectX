@@ -8,23 +8,22 @@ using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/tasks")]
     [ApiController]
     [SessionCheck]
-    public class TaskController : ControllerBase
+    [Authorize(CheckPermissions)]
+    public class TasksController : ControllerBase
     {
         private readonly ITaskService taskService;
 
-        public TaskController(
-            ITaskService taskService)
+        public TasksController(ITaskService taskService)
         {
             this.taskService = taskService;
         }
 
         [HttpGet]
-        [Route("Tasks/{userId}")]
-        [Authorize(Policy = CheckPermissions)]
-        public ActionResult<IEnumerable<TaskModel>> Tasks(int userId)
+        [Route("{userId}")] 
+        public ActionResult<IEnumerable<TaskModel>> GetAllByUserId(int userId)
         {
             var model = new TaskModel() { UserId = userId };
 
@@ -32,9 +31,7 @@ namespace ToDoList.Api.Controllers
         }
 
         [HttpPost]
-        [Route("Create")]
-        [Authorize(Policy = CheckPermissions)]
-        public IActionResult CreateTask([FromBody] TaskCreateModel model)
+        public IActionResult Create([FromBody] TaskCreateModel model)
         {
             var data = new TaskModel() 
             { 
@@ -46,20 +43,16 @@ namespace ToDoList.Api.Controllers
             return Ok(taskService.CreateTask(data));
         }
 
-        [HttpGet]
-        [Route("{taskId}")]
-        [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskModel> ReadTask(int taskId)
+        [HttpGet("{id}")]
+        public ActionResult<TaskModel> Get(int id)
         {
-            var model = new TaskModel() { Id = taskId };
+            var model = new TaskModel() { Id = id };
 
             return Ok(taskService.ReadTask(model));
         }
 
-        [HttpPatch]
-        [Route("Update")]
-        [Authorize(Policy = CheckPermissions)]
-        public ActionResult<TaskModel> UpdateTask([FromBody] TaskUpdateModel model)
+        [HttpPut("{id}")]
+        public ActionResult<TaskModel> Update([FromBody] TaskUpdateModel model)
         {
             var data = new TaskModel()
             {
@@ -71,10 +64,8 @@ namespace ToDoList.Api.Controllers
             return Ok(taskService.UpdateTask(data));
         }
 
-        [HttpDelete]
-        [Route("Delete")]
-        [Authorize(Policy = CheckPermissions)]
-        public ActionResult DeleteTask([FromBody] TaskDeleteModel model)
+        [HttpDelete("{id}")]
+        public ActionResult Delete([FromBody] TaskDeleteModel model)
         {
             var data = new TaskModel()
             {

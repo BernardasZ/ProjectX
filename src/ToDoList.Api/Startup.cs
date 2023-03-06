@@ -87,7 +87,7 @@ namespace ToDoList.Api
 			services.AddScoped<IUserServiceValidationHelper, UserServiceValidationHelper>();
 			services.AddScoped<ITaskServiceValidationHelper, TaskServiceValidationHelper>();
 			services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
-			services.AddScoped<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
+			services.AddSingleton<ICacheService<List<DataModel.Entities.ProjectX.PermissionView>>, PermissionCacheService>();
 			services.AddScoped<IUserPermissionService, UserPermissionService>();
 			services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
 			services.AddScoped<IUserSessionService, UserSessionService>();

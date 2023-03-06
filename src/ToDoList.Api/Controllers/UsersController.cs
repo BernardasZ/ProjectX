@@ -9,31 +9,28 @@ using static ToDoList.Api.Constants.Permissions;
 
 namespace ToDoList.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [ApiController]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService userService;
 
-        public UserController(
-            IUserService userService)
+        public UsersController(IUserService userService)
         {
             this.userService = userService;
         }
 
         [HttpGet]
-        [Route("Users")]
-        [Authorize(Policy = CheckPermissions)]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
-        public ActionResult<IEnumerable<UserModel>> GetUserList()
+        public ActionResult<IEnumerable<UserModel>> GetAll()
         {
             return Ok(userService.GetUserList());
         }
 
         [HttpPost]
-        [Route("Create")]
         [AllowAnonymous]
-        public IActionResult CreateUser([FromBody] UserCreateModel model)
+        public IActionResult Create([FromBody] UserCreateModel model)
         {
             var data = new UserModel()
             {
@@ -47,22 +44,20 @@ namespace ToDoList.Api.Controllers
             return Ok();
         }
 
-        [HttpGet]
-        [Route("{userId}")]
-        [Authorize(Policy = CheckPermissions)]
+        [HttpGet("{id}")]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
-        public ActionResult<UserModel> ReadUser(int userId)
+        public ActionResult<UserModel> Get(int id)
         {
-            var model = new UserModel() { UserId = userId };
+            var model = new UserModel() { UserId = id };
 
             return Ok(userService.ReadUser(model));
         }
 
-        [HttpPatch]
-        [Route("Update")]
-        [Authorize(Policy = CheckPermissions)]
+        [HttpPut("{id}")]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
-        public ActionResult<UserModel> UpdateUser([FromBody] UserUpdateModel model)
+        public ActionResult<UserModel> Update([FromBody] UserUpdateModel model)
         {
             var data = new UserModel()
             {
@@ -74,11 +69,10 @@ namespace ToDoList.Api.Controllers
             return Ok(userService.UpdateUser(data));
         }
 
-        [HttpDelete]
-        [Route("Delete")]
-        [Authorize(Policy = CheckPermissions)]
+        [HttpDelete("{id}")]
+        [Authorize(CheckPermissions)]
         [SessionCheck]
-        public ActionResult DeleteUser([FromBody] UserDeleteModel model)
+        public ActionResult Delete([FromBody] UserDeleteModel model)
         {
             var data = new UserModel() { UserId = model.UserId };
             userService.DeleteUser(data);
