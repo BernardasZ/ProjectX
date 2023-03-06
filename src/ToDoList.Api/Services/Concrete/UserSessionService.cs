@@ -4,73 +4,76 @@ using System;
 using System.Linq;
 using ToDoList.Api.Helpers;
 
-namespace ToDoList.Api.Services.Concrete
+namespace ToDoList.Api.Services.Concrete;
+
+public class UserSessionService : IUserSessionService
 {
-	public class UserSessionService : IUserSessionService
+	private readonly IRepository<UserSession> _userSessionRepository;
+	private readonly IClientContextScraper _clientContextScraper;
+	private readonly IAesCryptoHelper _aesCryptoHelper;
+
+	public UserSessionService(
+		IRepository<UserSession> userSessionRepository,
+		IClientContextScraper clientContextScraper,
+		IAesCryptoHelper aesCryptoHelper)
 	{
-		private readonly IRepository<UserSession> userSessionRepository;
-		private readonly IClientContextScraper clientContextScraper;
-		private readonly IAesCryptoHelper aesCryptoHelper;
+		_userSessionRepository = userSessionRepository;
+		_clientContextScraper = clientContextScraper;
+		_aesCryptoHelper = aesCryptoHelper;
+	}
 
-		public UserSessionService(
-			IRepository<UserSession> userSessionRepository,
-			IClientContextScraper clientContextScraper,
-			IAesCryptoHelper aesCryptoHelper)
+	public bool IsValidUserSession()
+	{
+		string userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
+		string ipAddress = _clientContextScraper.GetClientIpAddress();
+
+		return _userSessionRepository
+			.FetchAll()
+			.Any(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress);
+	}
+
+	public void CreateUserSession(string userId)
+	{
+		string ipAddress = _clientContextScraper.GetClientIpAddress();
+		string userIdentity = _aesCryptoHelper.EncryptString(userId);
+
+		UserSession userSession = new UserSession
 		{
-			this.userSessionRepository = userSessionRepository;
-			this.clientContextScraper = clientContextScraper;
-			this.aesCryptoHelper = aesCryptoHelper;
-		}
+			SessionIdentifier = userIdentity,
+			Ip = ipAddress,
+			CreateDt = DateTime.Now
+		};
 
-		public bool IsValidUserSession()
+		_userSessionRepository.Insert(userSession);
+		_userSessionRepository.Save();
+	}
+
+	public void DeleteUserSession()
+	{
+		string ipAddress = _clientContextScraper.GetClientIpAddress();
+		string userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
+
+		DeleteUserSession(userIdentity, ipAddress);
+	}
+
+	public void DeleteUserSession(string userId)
+	{
+		string ipAddress = _clientContextScraper.GetClientIpAddress();
+		string userIdentity = _aesCryptoHelper.EncryptString(userId);
+
+		DeleteUserSession(userIdentity, ipAddress);
+	}
+
+	public void DeleteUserSession(string userIdentity, string ipAddress)
+	{
+		var session = _userSessionRepository
+			.FetchAll()
+			.FirstOrDefault(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress);
+
+		if (session != null)
 		{
-			string userIdentity = clientContextScraper.GetClientClaimsIdentityName();
-			string ipAddress = clientContextScraper.GetClientIpAddress();
-
-			return userSessionRepository.FetchAll().Where(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress).Any();
-		}
-
-		public void CreateUserSession(string userId)
-		{
-			string ipAddress = clientContextScraper.GetClientIpAddress();
-			string userIdentity = aesCryptoHelper.EncryptString(userId);
-
-			UserSession userSession = new UserSession()
-			{
-				SessionIdentifier = userIdentity,
-				Ip = ipAddress,
-				CreateDt = DateTime.Now
-			};
-
-			userSessionRepository.Insert(userSession);
-			userSessionRepository.Save();
-		}
-
-		public void DeleteUserSession()
-		{
-			string ipAddress = clientContextScraper.GetClientIpAddress();
-			string userIdentity = clientContextScraper.GetClientClaimsIdentityName();
-
-			DeleteUserSession(userIdentity, ipAddress);
-		}
-
-		public void DeleteUserSession(string userId)
-		{
-			string ipAddress = clientContextScraper.GetClientIpAddress();
-			string userIdentity = aesCryptoHelper.EncryptString(userId);
-
-			DeleteUserSession(userIdentity, ipAddress);
-		}
-
-		public void DeleteUserSession(string userIdentity, string ipAddress)
-		{
-			var session = userSessionRepository.FetchAll().Where(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress).FirstOrDefault();
-
-			if (session != null)
-			{
-				userSessionRepository.Delete(session);
-				userSessionRepository.Save();
-			}
+			_userSessionRepository.Delete(session);
+			_userSessionRepository.Save();
 		}
 	}
 }

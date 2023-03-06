@@ -1,148 +1,140 @@
 ﻿using DataModel.Entities.ProjectX;
 using DataModel.Enums;
 using DataModel.Repositories;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net.Mail;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
 using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
 using ToDoList.Api.Models.User;
 
-namespace ToDoList.Api.Services.Concrete
+namespace ToDoList.Api.Services.Concrete;
+
+public class UserService : IUserService
 {
-	public class UserService : IUserService
+	private readonly IRepository<UserData> _userDataRepository;
+	private readonly IRepository<Role> _roleRepository;
+	private readonly IHashCryptoHelper _hashCryptoHelper;
+	private readonly IUserServiceValidationHelper _userServiceValidationHelper;
+	private readonly IUserLoginService _userLoginService;
+
+	public UserService(
+		IRepository<UserData> userDataRepository,
+		IRepository<Role> roleRepository,
+		IHashCryptoHelper hashCryptoHelper,
+		IUserServiceValidationHelper userServiceValidationHelper,
+		IUserLoginService userLoginService)
 	{
-		private readonly IRepository<UserData> userDataRepository;
-		private readonly IRepository<Role> roleRepository;
-		private readonly IHashCryptoHelper hashCryptoHelper;
-		private readonly IUserServiceValidationHelper userServiceValidationHelper;
-		private readonly IUserLoginService userLoginService;
+		_userDataRepository = userDataRepository;
+		_roleRepository = roleRepository;
+		_hashCryptoHelper = hashCryptoHelper;
+		_userServiceValidationHelper = userServiceValidationHelper;
+		_userLoginService = userLoginService;
+	}
 
-		public UserService(
-			IRepository<UserData> userDataRepository,
-			IRepository<Role> roleRepository,
-			IHashCryptoHelper hashCryptoHelper,
-			IUserServiceValidationHelper userServiceValidationHelper,
-			IUserLoginService userLoginService)
+	public IEnumerable<UserModel> GetUserList()
+	{
+		if (!_userServiceValidationHelper.IsAdmin())
 		{
-			this.userDataRepository = userDataRepository;
-			this.roleRepository = roleRepository;
-			this.hashCryptoHelper = hashCryptoHelper;
-			this.userServiceValidationHelper = userServiceValidationHelper;
-			this.userLoginService = userLoginService;
+			throw new GenericException(Enums.GenericErrorEnum.OperationIsUnavailable);
 		}
 
-		public IEnumerable<UserModel> GetUserList()
-		{
-			if (!userServiceValidationHelper.IsAdmin())
-				throw new GenericException(Enums.GenericErrorEnum.OperationIsUnavailable);
+		return _userDataRepository.
+			FetchAll()
+			.Select(x => new UserModel
+			{
+				UserId = x.Id,
+				UserName = x.UserName,
+				UserEmail = x.UserEmail,
+				Role = x.Role.RoleValue,
+			})
+			.ToList();
+	}
 
-			return userDataRepository.
-				FetchAll()
-				.Select(x => new UserModel
-				{
-					UserId = x.Id,
-					UserName = x.UserName,
-					UserEmail = x.UserEmail,
-					Role = x.Role.RoleValue,
-				})
-				.ToList();
+	public void CreateUser(UserModel model)
+	{
+		if (_userDataRepository.FetchAll().Any(x => x.UserName == model.UserName || x.UserEmail == model.UserEmail))
+		{
+			throw new GenericException(Enums.GenericErrorEnum.UserExist);
 		}
 
-		public void CreateUser(UserModel model)
+		var roleId = _roleRepository.FetchAll().Where(x => x.RoleValue == UserRoleEnum.User).Select(x => x.Id).FirstOrDefault();
+
+		model.Password = _hashCryptoHelper.HashString(model.Password);
+
+		var userData = new UserData()
 		{
-			if (userDataRepository.FetchAll().Where(x => x.UserName == model.UserName || x.UserEmail == model.UserEmail).Any())
-				throw new GenericException(Enums.GenericErrorEnum.UserExist);
+			UserName = model.UserName,
+			UserEmail = model.UserEmail,
+			PassHash = model.Password,
+			RoleId = roleId
+		};
 
-			var roleId = roleRepository.FetchAll().Where(x => x.RoleValue == UserRoleEnum.User).Select(x => x.Id).FirstOrDefault();
+		_userDataRepository.Insert(userData);
+		_userDataRepository.Save();
+	}
 
-			model.Password = hashCryptoHelper.HashString(model.Password);
+	public UserModel ReadUser(UserModel model)
+	{
+		var data = _userDataRepository.GetById(model.UserId);
 
-			var userData = new UserData()
-			{
-				UserName = model.UserName,
-				UserEmail = model.UserEmail,
-				PassHash = model.Password,
-				RoleId = roleId
-			};
+		_userServiceValidationHelper.ValidateUserData(data);
+		_userServiceValidationHelper.ValidateUserId(model.UserId);
 
-			userDataRepository.Insert(userData);
-			userDataRepository.Save();
+		return new UserModel()
+		{
+			UserId = data.Id,
+			UserName = data.UserName,
+			UserEmail = data.UserEmail,
+			Role = data.Role.RoleValue,
+		};
+	}
+
+	public UserModel UpdateUser(UserModel model)
+	{
+		bool needUpdate = false;
+		var userData = _userDataRepository.GetById(model.UserId);
+
+		_userServiceValidationHelper.ValidateUserData(userData);
+		_userServiceValidationHelper.ValidateUserId(model.UserId);
+
+		if (model.UserName != userData.UserName && _userDataRepository.FetchAll().Any(x => x.UserName == model.UserName))
+		{
+			throw new GenericException(Enums.GenericErrorEnum.UserExist);
+		}
+		else
+		{
+			userData.UserName = model.UserName;
+			needUpdate = true;
+		}
+		
+		if (model.UserEmail != userData.UserEmail && _userDataRepository.FetchAll().Any(x => x.UserEmail == model.UserEmail))
+		{
+			throw new GenericException(Enums.GenericErrorEnum.UserExist);
+		}
+		else
+		{
+			userData.UserEmail = model.UserEmail;
+			needUpdate = true;
 		}
 
-		public UserModel ReadUser(UserModel model)
+		if (needUpdate)
 		{
-			var data = userDataRepository.GetById(model.UserId);
-
-			userServiceValidationHelper.ValidateUserData(data);
-			userServiceValidationHelper.ValidateUserId(model.UserId);
-
-			return new UserModel()
-			{
-				UserId = data.Id,
-				UserName = data.UserName,
-				UserEmail = data.UserEmail,
-				Role = data.Role.RoleValue,
-			};
+			_userDataRepository.Update(userData);
+			_userDataRepository.Save();
 		}
 
-		public UserModel UpdateUser(UserModel model)
-		{
-			bool needUpdate = false;
-			var userData = userDataRepository.GetById(model.UserId);
+		return model;
+	}
 
-			userServiceValidationHelper.ValidateUserData(userData);
-			userServiceValidationHelper.ValidateUserId(model.UserId);
+	public void DeleteUser(UserModel model)
+	{
+		var data = _userDataRepository.GetById(model.UserId);
 
-			if (model.UserName != userData.UserName && userDataRepository.FetchAll().Where(x => x.UserName == model.UserName).Any())
-			{
-				throw new GenericException(Enums.GenericErrorEnum.UserExist);
-			}
-			else
-			{
-				userData.UserName = model.UserName;
-				needUpdate = true;
-			}
-			
-			if (model.UserEmail != userData.UserEmail && userDataRepository.FetchAll().Where(x => x.UserEmail == model.UserEmail).Any())
-			{
-				throw new GenericException(Enums.GenericErrorEnum.UserExist);
-			}
-			else
-			{
-				userData.UserEmail = model.UserEmail;
-				needUpdate = true;
-			}
+		_userServiceValidationHelper.ValidateUserData(data);
+		_userServiceValidationHelper.ValidateUserId(model.UserId);
+		_userLoginService.Logout();
 
-			if (needUpdate)
-			{
-				userDataRepository.Update(userData);
-				userDataRepository.Save();
-			}
-
-			return model;
-		}
-
-		public void DeleteUser(UserModel model)
-		{
-			var data = userDataRepository.GetById(model.UserId);
-
-			userServiceValidationHelper.ValidateUserData(data);
-			userServiceValidationHelper.ValidateUserId(model.UserId);
-			userLoginService.Logout();
-
-			userDataRepository.Delete(data);
-			userDataRepository.Save();
-		}
+		_userDataRepository.Delete(data);
+		_userDataRepository.Save();
 	}
 }

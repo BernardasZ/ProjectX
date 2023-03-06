@@ -1,11 +1,14 @@
-﻿namespace ToDoList.Api.Services
+﻿namespace ToDoList.Api.Services;
+
+public interface IUserSessionService
 {
-	public interface IUserSessionService
-	{
-		bool IsValidUserSession();
-		void CreateUserSession(string userId);
-		void DeleteUserSession();
-		void DeleteUserSession(string userId);
-		void DeleteUserSession(string userIdentity, string ipAddress);
-	}
+	bool IsValidUserSession();
+
+	void CreateUserSession(string userId);
+
+	void DeleteUserSession();
+
+	void DeleteUserSession(string userId);
+
+	void DeleteUserSession(string userIdentity, string ipAddress);
 }

@@ -1,64 +1,49 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Serilog;
 using System;
-using System.Net;
-using System.Text.Json;
+using System.Security.Authentication;
 using System.Threading.Tasks;
-using ToDoList.Api.Enums;
 using ToDoList.Api.Exeptions;
 
-namespace ToDoList.Api.Middleware
+namespace ToDoList.Api.Middleware;
+
+public class ErrorHandlerMiddleware
 {
-	public class ErrorHandlerMiddleware
-	{
-        private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
-        private readonly RequestDelegate _next;
+    private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
+    private readonly RequestDelegate _next;
 
-        public ErrorHandlerMiddleware(RequestDelegate next)
-        {
-            _next = next;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            try
-            {
-                await _next(context);
-            }
-            catch (Exception error)
-            {
-                var response = context.Response;
-                response.ContentType = "application/json";
-                
-
-                string message = string.Empty;
-
-                switch (error)
-                {
-                    case GenericException e:
-                        message = e.ErrorCode;
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                    default:
-                        message = GenericErrorEnum.InternalSystemError.ToString();
-                        response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        break;
-                }
-
-                logger.Error(error, "Handled error message: {message}", message);
-
-                var result = JsonSerializer.Serialize(new { ErrorMessage = message });
-                await response.WriteAsync(result);
-            }
-        }
-    }
-
-    public static class ErrorHandlerMiddlewareExtensions
+    public ErrorHandlerMiddleware(RequestDelegate next)
     {
-        public static IApplicationBuilder UseErrorHandlerMiddleware(this IApplicationBuilder builder)
-        {
-            return builder.UseMiddleware<ErrorHandlerMiddleware>();
-        }
+        _next = next;
     }
+
+    public async Task Invoke(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception ex)
+		{
+			await SendErrorResponse(context, ex);
+		}
+	}
+
+	private async Task SendErrorResponse(HttpContext context, Exception ex)
+	{
+		var response = context.Response;
+		response.StatusCode = GetHttpStatusCode(ex);
+		response.ContentType = "application/json";
+
+		logger.Error(ex, "Unhandled service error.");
+
+		await response.WriteAsync(ex.Message);
+	}
+
+	private static int GetHttpStatusCode(Exception exception) => exception switch
+	{
+		GenericException => StatusCodes.Status400BadRequest,
+		AuthenticationException => StatusCodes.Status401Unauthorized,
+		_ => StatusCodes.Status400BadRequest,
+	};
 }

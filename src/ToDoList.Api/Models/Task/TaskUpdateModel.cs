@@ -1,27 +1,17 @@
 ﻿using DataModel.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models.Task
+namespace ToDoList.Api.Models.Task;
+
+public class TaskUpdateModel : BaseValidatableObject
 {
-	public class TaskUpdateModel : IValidatableObject
-    {
-        public int Id { get; set; }
-        public string TaskName { get; set; }
-        public TaskStatusEnum Status { get; set; }
+    public int Id { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            TaskValidator validator = new TaskValidator();
+    public string TaskName { get; set; }
 
-            validator.ValidateTaskId(Id);
-            validator.ValidateName(TaskName);
+    public TaskStatusEnum Status { get; set; }
 
-            return validator.GetValidationResults();
-        }
-    }
+	protected override BaseValidator Validate() => new BaseValidator()
+		.ValidateId<BaseValidator>(Id, nameof(Id))
+		.ValidateString<BaseValidator>(TaskName, nameof(TaskName));
 }

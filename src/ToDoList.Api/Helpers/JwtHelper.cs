@@ -5,41 +5,39 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace ToDoList.Api.Helpers
+namespace ToDoList.Api.Helpers;
+
+public interface IJwtHelper
 {
-	public interface IJwtHelper
+	string ConstructUserJwt(ClaimsIdentity subject);
+}
+
+public class JwtHelper : IJwtHelper
+{
+	private readonly IOptionsMonitor<OptionManager> _optionsManager;
+
+	public JwtHelper(
+		IOptionsMonitor<OptionManager> optionsManager)
 	{
-		string ConstructUserJwt(ClaimsIdentity subject);
+		_optionsManager = optionsManager;
 	}
 
-	public class JwtHelper : IJwtHelper
+	public string ConstructUserJwt(ClaimsIdentity subject)
 	{
-		private readonly IClientContextScraper clientContextScraper;
-		private readonly IOptionsMonitor<OptionManager> optionsManager;
+		var key = Encoding.ASCII.GetBytes(_optionsManager.CurrentValue.Jwt.JWTSecret);
+		var days = _optionsManager.CurrentValue.Jwt.JWTExpirationInDay;
 
-		public JwtHelper(
-			IClientContextScraper clientContextScraper,
-			IOptionsMonitor<OptionManager> optionsManager)
+		var tokenHandler = new JwtSecurityTokenHandler();
+
+		var tokenDescriptor = new SecurityTokenDescriptor
 		{
-			this.clientContextScraper = clientContextScraper;
-			this.optionsManager = optionsManager;
-		}
+			Subject = subject,
+			Expires = DateTime.UtcNow.AddDays(days),
+			SigningCredentials = new SigningCredentials(
+				new SymmetricSecurityKey(key),
+				SecurityAlgorithms.HmacSha256Signature)
+		};
 
-		public string ConstructUserJwt(ClaimsIdentity subject)
-		{
-			var key = Encoding.ASCII.GetBytes(optionsManager.CurrentValue.Jwt.JWTSecret);
-			var days = optionsManager.CurrentValue.Jwt.JWTExpirationInDay;
-
-			var tokenHandler = new JwtSecurityTokenHandler();
-
-			var tokenDescriptor = new SecurityTokenDescriptor
-			{
-				Subject = subject,
-				Expires = DateTime.UtcNow.AddDays(days),
-				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-			};
-
-			return tokenHandler.CreateEncodedJwt(tokenDescriptor);
-		}
+		return tokenHandler.CreateEncodedJwt(tokenDescriptor);
 	}
 }

@@ -1,82 +1,88 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using ToDoList.Api.Attributes;
 using ToDoList.Api.Models.User;
 using ToDoList.Api.Services;
 using static ToDoList.Api.Constants.Permissions;
 
-namespace ToDoList.Api.Controllers
+namespace ToDoList.Api.Controllers;
+
+[Route("api/users")]
+[ApiController]
+public class UsersController : ControllerBase
 {
-    [Route("api/users")]
-    [ApiController]
-    public class UsersController : ControllerBase
+    private readonly IUserService _userService;
+
+    public UsersController(IUserService userService)
     {
-        private readonly IUserService userService;
+        _userService = userService;
+    }
 
-        public UsersController(IUserService userService)
+    [HttpGet]
+    [Authorize(CheckPermissions)]
+    [SessionCheck]
+    public ActionResult<IEnumerable<UserModel>> GetAll()
+    {
+        return Ok(_userService.GetUserList());
+    }
+
+    [HttpPost]
+    [AllowAnonymous]
+    public IActionResult Create([FromBody] UserCreateModel model)
+    {
+        var data = new UserModel
         {
-            this.userService = userService;
-        }
+            UserEmail = model.UserEmail,
+            UserName = model.UserName,
+            Password = model.Password
+        };
 
-        [HttpGet]
-        [Authorize(CheckPermissions)]
-        [SessionCheck]
-        public ActionResult<IEnumerable<UserModel>> GetAll()
+        _userService.CreateUser(data);
+
+        return Ok();
+    }
+
+    [HttpGet("{id}")]
+    [Authorize(CheckPermissions)]
+    [SessionCheck]
+    public ActionResult<UserModel> Get(int id)
+    {
+        var model = new UserModel
         {
-            return Ok(userService.GetUserList());
-        }
+            UserId = id
+        };
 
-        [HttpPost]
-        [AllowAnonymous]
-        public IActionResult Create([FromBody] UserCreateModel model)
+        return Ok(_userService.ReadUser(model));
+    }
+
+    [HttpPut("{id}")]
+    [Authorize(CheckPermissions)]
+    [SessionCheck]
+    public ActionResult<UserModel> Update([FromBody] UserUpdateModel model)
+    {
+        var data = new UserModel
         {
-            var data = new UserModel()
-            {
-                UserEmail = model.UserEmail,
-                UserName = model.UserName,
-                Password = model.Password
-            };
+            UserId = model.UserId,
+            UserEmail = model.UserEmail,
+            UserName = model.UserName,
+        };
 
-            userService.CreateUser(data);
+        return Ok(_userService.UpdateUser(data));
+    }
 
-            return Ok();
-        }
+    [HttpDelete("{id}")]
+    [Authorize(CheckPermissions)]
+    [SessionCheck]
+    public ActionResult Delete([FromBody] UserDeleteModel model)
+    {
+        var data = new UserModel
+        { 
+            UserId = model.UserId
+        };
 
-        [HttpGet("{id}")]
-        [Authorize(CheckPermissions)]
-        [SessionCheck]
-        public ActionResult<UserModel> Get(int id)
-        {
-            var model = new UserModel() { UserId = id };
+        _userService.DeleteUser(data);
 
-            return Ok(userService.ReadUser(model));
-        }
-
-        [HttpPut("{id}")]
-        [Authorize(CheckPermissions)]
-        [SessionCheck]
-        public ActionResult<UserModel> Update([FromBody] UserUpdateModel model)
-        {
-            var data = new UserModel()
-            {
-                UserId = model.UserId,
-                UserEmail = model.UserEmail,
-                UserName = model.UserName,
-            };
-
-            return Ok(userService.UpdateUser(data));
-        }
-
-        [HttpDelete("{id}")]
-        [Authorize(CheckPermissions)]
-        [SessionCheck]
-        public ActionResult Delete([FromBody] UserDeleteModel model)
-        {
-            var data = new UserModel() { UserId = model.UserId };
-            userService.DeleteUser(data);
-            return Ok();
-        }
+        return Ok();
     }
 }

@@ -1,23 +1,14 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using ToDoList.Api.Validators;
-using static ToDoList.Api.Constants.ValidationError;
+﻿using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models.Login
+namespace ToDoList.Api.Models.Login;
+
+public class UserResetPasswordModel : BaseValidatableObject
 {
-	public class UserResetPasswordModel : IValidatableObject
-    {
-		public string Token { get; set; }
-		public string NewPassword { get; set; }
+	public string Token { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            UserValidator validator = new UserValidator();
+	public string NewPassword { get; set; }
 
-            validator.ValidateToken(Token);
-            validator.ValidateNewPassword(NewPassword);
-
-            return validator.GetValidationResults();
-        }
-    }
+	protected override BaseValidator Validate() => new UserValidator()
+		.ValidateString<UserValidator>(Token, nameof(Token))
+		.ValidatePassword<UserValidator>(NewPassword, nameof(NewPassword));
 }

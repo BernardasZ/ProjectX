@@ -7,38 +7,43 @@ using System.Linq;
 using Serilog;
 using Microsoft.Extensions.Options;
 
-namespace ToDoList.Api.Services.Concrete
-{
-	public class MessageService : IMessageService
-	{
-		private readonly ILogger logger = Log.ForContext<MessageService>();
-		private readonly IOptionsMonitor<OptionManager> optionManager;
-		public MessageService(IOptionsMonitor<OptionManager> optionManager)
-		{
-			this.optionManager = optionManager;
-		}
+namespace ToDoList.Api.Services.Concrete;
 
-		public void SendEmail(MailMessage message)
+public class MessageService : IMessageService
+{
+	private readonly ILogger logger = Log.ForContext<MessageService>();
+	private readonly IOptionsMonitor<OptionManager> _optionManager;
+
+	public MessageService(IOptionsMonitor<OptionManager> optionManager)
+	{
+		_optionManager = optionManager;
+	}
+
+	public void SendEmail(MailMessage message)
+	{
+		Task.Run(() =>
 		{
-			Task.Run(() =>
+			try
 			{
-				try
-				{
-					using (var smtp = new SmtpClient())
-					{
-						smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
-						smtp.EnableSsl = true;
-						smtp.Host = optionManager.CurrentValue.SmtpSettings.Host;
-						smtp.Port = 587;
-						smtp.Credentials = new NetworkCredential(optionManager.CurrentValue.SmtpSettings.UserName, optionManager.CurrentValue.SmtpSettings.Password);
-						smtp.Send(message);
-					}
-				}
-				catch (Exception e)
-				{
-					logger.Error(e, "Failed to send email to: {receiver}", message.To.FirstOrDefault().Address.ToString());
-				}
-			});
+				SendEmailMessage(message);
+			}
+			catch (Exception e)
+			{
+				logger.Error(e, "Failed to send email message");
+			}
+		});
+	}
+
+	private void SendEmailMessage(MailMessage message)
+	{
+		using (var smtp = new SmtpClient())
+		{
+			smtp.DeliveryMethod = SmtpDeliveryMethod.Network;
+			smtp.EnableSsl = true;
+			smtp.Host = _optionManager.CurrentValue.SmtpSettings.Host;
+			smtp.Port = 587;
+			smtp.Credentials = new NetworkCredential(_optionManager.CurrentValue.SmtpSettings.UserName, _optionManager.CurrentValue.SmtpSettings.Password);
+			smtp.Send(message);
 		}
 	}
 }

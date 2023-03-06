@@ -3,12 +3,8 @@ using DataModel.Entities.ProjectX;
 
 namespace DataModel.DbContexts;
 
-public partial class ProjectXDbContext : DbContext
+public class ProjectXDbContext : DbContext
 {
-    public ProjectXDbContext()
-    {
-    }
-
     public ProjectXDbContext(DbContextOptions<ProjectXDbContext> options)
         : base(options)
     {

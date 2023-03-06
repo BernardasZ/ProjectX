@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace DataModel.Repositories;
 
-public class Repository<TEntity> : IRepository<TEntity>
+internal class Repository<TEntity> : IRepository<TEntity>
     where TEntity : class
 {
     protected readonly ProjectXDbContext _context;

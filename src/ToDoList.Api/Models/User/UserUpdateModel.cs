@@ -1,26 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using ToDoList.Api.Validators;
+﻿using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models.User
+namespace ToDoList.Api.Models.User;
+
+public class UserUpdateModel : BaseValidatableObject
 {
-	public class UserUpdateModel : IValidatableObject
-    {
-        public int UserId { get; set; }
-        public string UserName { get; set; }
-        public string UserEmail { get; set; }
+    public int UserId { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            UserValidator validator = new UserValidator();
+    public string UserName { get; set; }
 
-            validator.ValidateUserId(UserId);
-            validator.ValidateEmail(UserEmail);
+    public string UserEmail { get; set; }
 
-            return validator.GetValidationResults();
-        }
-    }
+	protected override BaseValidator Validate() => new UserValidator()
+			.ValidateId<UserValidator>(UserId, nameof(UserId))
+			.ValidateEmail<UserValidator>(UserEmail, nameof(UserEmail));
 }

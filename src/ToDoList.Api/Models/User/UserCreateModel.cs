@@ -1,28 +1,17 @@
-﻿using DataModel.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
-using ToDoList.Api.Validators;
+﻿using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models.User
+namespace ToDoList.Api.Models.User;
+
+public class UserCreateModel : BaseValidatableObject
 {
-    public class UserCreateModel : IValidatableObject
-    {
-        public string UserName { get; set; }
-        public string UserEmail { get; set; }
-        public string Password { get; set; }
+    public string UserName { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            UserValidator validator = new UserValidator();
+    public string UserEmail { get; set; }
 
-            validator.ValidateName(UserName);
-            validator.ValidateEmail(UserEmail);
-            validator.ValidatePassword(Password);
+    public string Password { get; set; }
 
-            return validator.GetValidationResults();
-        }
-    }
+	protected override BaseValidator Validate() => new UserValidator()
+		.ValidateString<UserValidator>(UserName, nameof(UserName))
+		.ValidateEmail<UserValidator>(UserEmail, nameof(UserEmail))
+		.ValidatePassword<UserValidator>(Password, nameof(Password));
 }

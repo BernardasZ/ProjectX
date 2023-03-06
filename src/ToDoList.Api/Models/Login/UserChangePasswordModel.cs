@@ -1,24 +1,17 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using ToDoList.Api.Validators;
+﻿using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models.Login
+namespace ToDoList.Api.Models.Login;
+
+public class UserChangePasswordModel : BaseValidatableObject
 {
-	public class UserChangePasswordModel : IValidatableObject
-	{
-		public string UserEmail { get; set; }
-		public string NewPassword { get; set; }
-        public string OldPassword { get; set; }
+	public string UserEmail { get; set; }
 
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            UserValidator validator = new UserValidator();
+	public string NewPassword { get; set; }
 
-            validator.ValidateEmail(UserEmail);
-            validator.ValidateNewPassword(NewPassword);
-            validator.ValidateOldPassword(OldPassword);
+    public string OldPassword { get; set; }
 
-            return validator.GetValidationResults();
-        }
-    }
+	protected override BaseValidator Validate() => new UserValidator()
+		.ValidateEmail<UserValidator>(UserEmail, nameof(UserEmail))
+		.ValidatePassword<UserValidator>(NewPassword, nameof(NewPassword))
+		.ValidatePassword<UserValidator>(OldPassword, nameof(OldPassword));
 }

@@ -78,7 +78,6 @@ public static class ServiceRegistration
 				Type = SecuritySchemeType.ApiKey,
 				Scheme = "Bearer"
 			});
-
 			x.AddSecurityRequirement(new OpenApiSecurityRequirement
 			{
 				{

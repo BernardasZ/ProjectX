@@ -1,28 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading.Tasks;
 using ToDoList.Api.Enums;
 
-namespace ToDoList.Api.Exeptions
+namespace ToDoList.Api.Exeptions;
+
+public class GenericException : Exception
 {
-	public class GenericException : Exception
+	public string ErrorCode { get; set; }
+
+	public GenericException(GenericErrorEnum errorEnum)
+		: base()
 	{
-		public string ErrorCode { get; set; }
-		public GenericException(GenericErrorEnum errorEnum) : base()
-		{
-			this.ErrorCode = errorEnum.ToString();
-		}
+		ErrorCode = errorEnum.ToString();
+	}
 
-		protected GenericException(SerializationInfo info, StreamingContext context) : base(info, context)
-		{
+	protected GenericException(SerializationInfo info, StreamingContext context)
+		: base(info, context)
+	{
+	}
 
-		}
-
-		public GenericException() : base()
-		{
-
-		}
+	public GenericException()
+		: base()
+	{
 	}
 }

@@ -6,76 +6,81 @@ using ToDoList.Api.Models.Task;
 using ToDoList.Api.Services;
 using static ToDoList.Api.Constants.Permissions;
 
-namespace ToDoList.Api.Controllers
+namespace ToDoList.Api.Controllers;
+
+[Route("api/tasks")]
+[ApiController]
+[SessionCheck]
+[Authorize(CheckPermissions)]
+public class TasksController : ControllerBase
 {
-    [Route("api/tasks")]
-    [ApiController]
-    [SessionCheck]
-    [Authorize(CheckPermissions)]
-    public class TasksController : ControllerBase
+    private readonly ITaskService _taskService;
+
+    public TasksController(ITaskService taskService)
     {
-        private readonly ITaskService taskService;
+        _taskService = taskService;
+    }
 
-        public TasksController(ITaskService taskService)
+    [HttpGet]
+    [Route("{userId}")] 
+    public ActionResult<IEnumerable<TaskModel>> GetAllByUserId(int userId)
+    {
+        var model = new TaskModel
         {
-            this.taskService = taskService;
-        }
+            UserId = userId
+        };
 
-        [HttpGet]
-        [Route("{userId}")] 
-        public ActionResult<IEnumerable<TaskModel>> GetAllByUserId(int userId)
+        return Ok(_taskService.GetTaskList(model));
+    }
+
+    [HttpPost]
+    public IActionResult Create([FromBody] TaskCreateModel model)
+    {
+        var data = new TaskModel 
+        { 
+            UserId = model.UserId,
+            TaskName = model.TaskName,
+            Status = model.Status
+        };
+
+        return Ok(_taskService.CreateTask(data));
+    }
+
+    [HttpGet("{id}")]
+    public ActionResult<TaskModel> Get(int id)
+    {
+        var model = new TaskModel
         {
-            var model = new TaskModel() { UserId = userId };
+            Id = id
+        };
 
-            return Ok(taskService.GetTaskList(model));
-        }
+        return Ok(_taskService.ReadTask(model));
+    }
 
-        [HttpPost]
-        public IActionResult Create([FromBody] TaskCreateModel model)
+    [HttpPut("{id}")]
+    public ActionResult<TaskModel> Update([FromBody] TaskUpdateModel model)
+    {
+        var data = new TaskModel
         {
-            var data = new TaskModel() 
-            { 
-                UserId = model.UserId,
-                TaskName = model.TaskName,
-                Status = model.Status
-            };
+            Id = model.Id,
+            TaskName = model.TaskName,
+            Status = model.Status
+        };
 
-            return Ok(taskService.CreateTask(data));
-        }
+        return Ok(_taskService.UpdateTask(data));
+    }
 
-        [HttpGet("{id}")]
-        public ActionResult<TaskModel> Get(int id)
+    [HttpDelete("{id}")]
+    public ActionResult Delete([FromBody] TaskDeleteModel model)
+    {
+        var data = new TaskModel
         {
-            var model = new TaskModel() { Id = id };
+            Id = model.Id,
+            UserId = model.UserId
+        };
 
-            return Ok(taskService.ReadTask(model));
-        }
+        _taskService.DeleteTask(data);
 
-        [HttpPut("{id}")]
-        public ActionResult<TaskModel> Update([FromBody] TaskUpdateModel model)
-        {
-            var data = new TaskModel()
-            {
-                Id = model.Id,
-                TaskName = model.TaskName,
-                Status = model.Status
-            };
-
-            return Ok(taskService.UpdateTask(data));
-        }
-
-        [HttpDelete("{id}")]
-        public ActionResult Delete([FromBody] TaskDeleteModel model)
-        {
-            var data = new TaskModel()
-            {
-                Id = model.Id,
-                UserId = model.UserId
-            };
-
-            taskService.DeleteTask(data);
-
-            return Ok();
-        }
+        return Ok();
     }
 }
