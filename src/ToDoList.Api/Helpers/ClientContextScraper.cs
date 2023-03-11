@@ -27,17 +27,9 @@ public class ClientContextScraper : IClientContextScraper
 		_httpContextAccessor = httpContextAccessor;
 	}
 
-	public string GetClientIpAddress()
-	{
-		var remoteIpAddress = _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
-
-		if (_httpContextAccessor.HttpContext.Request.Headers.ContainsKey("X-Forwarded-For"))
-		{
-			remoteIpAddress = _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].ToString().Split(":")[0].Split(',')[0].Trim();
-		}
-
-		return remoteIpAddress;
-	}
+	public string GetClientIpAddress() => _httpContextAccessor.HttpContext.Request.Headers.ContainsKey("X-Forwarded-For")
+			? _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].ToString().Split(":")[0].Split(',')[0].Trim()
+			: _httpContextAccessor.HttpContext.Connection.RemoteIpAddress.MapToIPv4().ToString();
 
 	public string GetClientClaimsIdentityName() => !_httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Name)
 			? string.Empty

@@ -138,8 +138,8 @@ public class UserLoginService : IUserLoginService
 
 		_userServiceValidationHelper.ValidateUserData(userData);
 
-		string token = _hashCryptoHelper.HashString(model.UserEmail);
-		int expirationMins = _optionManager.CurrentValue.AppSettings.PasswordResetExpirationInMin;
+		var token = _hashCryptoHelper.HashString(model.UserEmail);
+		var expirationMins = _optionManager.CurrentValue.AppSettings.PasswordResetExpirationInMin;
 
 		userData.IsTokenUsed = false;
 		userData.TokenExpirationTime = DateTime.Now.AddMinutes(expirationMins);
@@ -148,10 +148,10 @@ public class UserLoginService : IUserLoginService
 		_userDataRepository.Update(userData);
 		_userDataRepository.Save();
 
-		string from = _optionManager.CurrentValue.SmtpSettings.Sender;
-		string to = model.UserEmail;
-		string subject = Resource.MessageSubject_PasswordReset;
-		string body = string.Format(Resource.MessageTemplate_PasswordReset, token);
+		var from = _optionManager.CurrentValue.SmtpSettings.Sender;
+		var to = model.UserEmail;
+		var subject = Resource.MessageSubject_PasswordReset;
+		var body = string.Format(Resource.MessageTemplate_PasswordReset, token);
 
 		var message = new MailMessage(from, to, subject, body);
 		message.IsBodyHtml = true;

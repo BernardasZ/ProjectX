@@ -91,7 +91,7 @@ public class UserService : IUserService
 
 	public UserModel UpdateUser(UserModel model)
 	{
-		bool needUpdate = false;
+		var needUpdate = false;
 		var userData = _userDataRepository.GetById(model.UserId);
 
 		_userServiceValidationHelper.ValidateUserData(userData);

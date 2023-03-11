@@ -21,9 +21,9 @@ public class UserPermissionService : IUserPermissionService
 
 	public bool ValidateUserPermissions()
 	{
-		string userRole = _clientContextScraper.GetClientClaimsRole();
-		string controller = _clientContextScraper.GetControllerName();
-		string action = _clientContextScraper.GetActionrName();
+		var userRole = _clientContextScraper.GetClientClaimsRole();
+		var controller = _clientContextScraper.GetControllerName();
+		var action = _clientContextScraper.GetActionrName();
 
 		if (string.IsNullOrWhiteSpace(userRole)
 			|| string.IsNullOrWhiteSpace(controller)

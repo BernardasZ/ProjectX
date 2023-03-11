@@ -64,7 +64,7 @@ public class TaskService : ITaskService
 
 	public TaskModel ReadTask(TaskModel model)
 	{
-		bool isAdmin = _userServiceValidationHelper.IsAdmin();
+		var isAdmin = _userServiceValidationHelper.IsAdmin();
 		var taskData = _taskRepository.GetById(model.Id);
 
 		_taskServiceValidationHelper.ValidateTaskData(taskData);
@@ -103,7 +103,7 @@ public class TaskService : ITaskService
 
 	public void DeleteTask(TaskModel model)
 	{
-		bool isAdmin = _userServiceValidationHelper.IsAdmin();
+		var isAdmin = _userServiceValidationHelper.IsAdmin();
 		var taskData = _taskRepository
 			.FetchAll()
 			.FirstOrDefault(x => (x.UserId == model.UserId || isAdmin == true) && x.Id == model.Id);

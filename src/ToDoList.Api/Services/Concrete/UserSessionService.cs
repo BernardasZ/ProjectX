@@ -24,8 +24,8 @@ public class UserSessionService : IUserSessionService
 
 	public bool IsValidUserSession()
 	{
-		string userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
-		string ipAddress = _clientContextScraper.GetClientIpAddress();
+		var userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
+		var ipAddress = _clientContextScraper.GetClientIpAddress();
 
 		return _userSessionRepository
 			.FetchAll()
@@ -34,10 +34,10 @@ public class UserSessionService : IUserSessionService
 
 	public void CreateUserSession(string userId)
 	{
-		string ipAddress = _clientContextScraper.GetClientIpAddress();
-		string userIdentity = _aesCryptoHelper.EncryptString(userId);
+		var ipAddress = _clientContextScraper.GetClientIpAddress();
+		var userIdentity = _aesCryptoHelper.EncryptString(userId);
 
-		UserSession userSession = new UserSession
+		var userSession = new UserSession
 		{
 			SessionIdentifier = userIdentity,
 			Ip = ipAddress,
@@ -50,16 +50,16 @@ public class UserSessionService : IUserSessionService
 
 	public void DeleteUserSession()
 	{
-		string ipAddress = _clientContextScraper.GetClientIpAddress();
-		string userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
+		var ipAddress = _clientContextScraper.GetClientIpAddress();
+		var userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
 
 		DeleteUserSession(userIdentity, ipAddress);
 	}
 
 	public void DeleteUserSession(string userId)
 	{
-		string ipAddress = _clientContextScraper.GetClientIpAddress();
-		string userIdentity = _aesCryptoHelper.EncryptString(userId);
+		var ipAddress = _clientContextScraper.GetClientIpAddress();
+		var userIdentity = _aesCryptoHelper.EncryptString(userId);
 
 		DeleteUserSession(userIdentity, ipAddress);
 	}
