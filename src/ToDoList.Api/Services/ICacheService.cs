@@ -1,6 +1,11 @@
-﻿namespace ToDoList.Api.Services;
+﻿using System;
 
-public interface ICacheService<T> where T : class
+namespace ToDoList.Api.Services;
+
+public interface ICacheService<T>
+	where T : class
 {
-	T GetCache();
+	T GetCache(string key);
+
+	T SetCache(T data, string key, TimeSpan expirationTime);
 }

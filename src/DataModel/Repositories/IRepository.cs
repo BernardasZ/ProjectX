@@ -1,19 +1,21 @@
-﻿using System.Linq;
+﻿using DataModel.Entities.ProjectX;
+using DataModel.Filters;
+using System.Collections.Generic;
 
 namespace DataModel.Repositories;
 
 public interface IRepository<TEntity>
-    where TEntity : class
+	where TEntity : BaseEntity
 {
-    IQueryable<TEntity> FetchAll();
+	List<TEntity> GetAllByFilter(IEntityFilter<TEntity> filter = default);
 
-    TEntity GetById(int id);
+	TEntity GetById(int id);
 
-    void Insert(TEntity entity);
+	TEntity Insert(TEntity entity);
 
-    void Update(TEntity entity);
+	TEntity Update(TEntity entity);
 
-    void Delete(TEntity entity);
+	void Delete(TEntity entity);
 
-    void Save();
+	void Save();
 }

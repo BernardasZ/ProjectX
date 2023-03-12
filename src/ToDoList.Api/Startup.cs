@@ -6,8 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
-using ToDoList.Api.Helpers;
 using ToDoList.Api.Middleware;
+using ToDoList.Api.Options;
 
 namespace ToDoList.Api;
 
@@ -28,9 +28,9 @@ public class Startup
 		services.AddControllers()
 			.AddJsonOptions(x => x.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault);
 		services.AddSwagger();
+		services.AddAuthentication(Configuration);
 		services.AddAuthorization();
 		services.AddLocalServices();
-		services.AddAuthentication(Configuration);
 	}
 
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

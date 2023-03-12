@@ -1,5 +1,6 @@
 ﻿using DataModel.Entities.ProjectX;
 using DataModel.Enums;
+using DataModel.Filters;
 using DataModel.Repositories;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using ToDoList.Api.Models.User;
 
 namespace ToDoList.Api.Services.Concrete;
 
-public class UserService : IUserService
+public class UserService : IBaseService<UserModel>
 {
 	private readonly IRepository<UserData> _userDataRepository;
 	private readonly IRepository<Role> _roleRepository;
@@ -31,15 +32,15 @@ public class UserService : IUserService
 		_userLoginService = userLoginService;
 	}
 
-	public IEnumerable<UserModel> GetUserList()
+	public List<UserModel> GetAll()
 	{
 		if (!_userServiceValidationHelper.IsAdmin())
 		{
-			throw new GenericException(Enums.GenericErrorEnum.OperationIsUnavailable);
+			throw new GenericException(Enums.GenericError.OperationIsUnavailable);
 		}
 
 		return _userDataRepository.
-			FetchAll()
+			GetAllByFilter()
 			.Select(x => new UserModel
 			{
 				UserId = x.Id,
@@ -50,91 +51,97 @@ public class UserService : IUserService
 			.ToList();
 	}
 
-	public void CreateUser(UserModel model)
+	public UserModel Add(UserModel item)
 	{
-		if (_userDataRepository.FetchAll().Any(x => x.UserName == model.UserName || x.UserEmail == model.UserEmail))
+		CheckUserForDuplicates(item);
+
+		var roleFilter = new RoleEntityFilter { RoleValue = UserRoleEnum.User };
+
+		var roleId = _roleRepository.GetAllByFilter(roleFilter).FirstOrDefault();
+
+		var user = new UserData
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserExist);
-		}
-
-		var roleId = _roleRepository.FetchAll().Where(x => x.RoleValue == UserRoleEnum.User).Select(x => x.Id).FirstOrDefault();
-
-		model.Password = _hashCryptoHelper.HashString(model.Password);
-
-		var userData = new UserData()
-		{
-			UserName = model.UserName,
-			UserEmail = model.UserEmail,
-			PassHash = model.Password,
-			RoleId = roleId
+			UserName = item.UserName,
+			UserEmail = item.UserEmail,
+			PassHash = _hashCryptoHelper.HashString(item.Password),
+			RoleId = roleId.Id
 		};
 
-		_userDataRepository.Insert(userData);
-		_userDataRepository.Save();
-	}
+		var userResult = _userDataRepository.Insert(user);
 
-	public UserModel ReadUser(UserModel model)
-	{
-		var data = _userDataRepository.GetById(model.UserId);
-
-		_userServiceValidationHelper.ValidateUserData(data);
-		_userServiceValidationHelper.ValidateUserId(model.UserId);
-
-		return new UserModel()
+		return new UserModel
 		{
-			UserId = data.Id,
-			UserName = data.UserName,
-			UserEmail = data.UserEmail,
-			Role = data.Role.RoleValue,
+			UserId = userResult.Id,
+			UserName = userResult.UserName,
+			UserEmail = userResult.UserEmail,
+			Role = userResult.Role.RoleValue,
 		};
 	}
 
-	public UserModel UpdateUser(UserModel model)
+	public UserModel GetById(int id)
 	{
-		var needUpdate = false;
-		var userData = _userDataRepository.GetById(model.UserId);
+		var user = _userDataRepository.GetById(id);
 
-		_userServiceValidationHelper.ValidateUserData(userData);
-		_userServiceValidationHelper.ValidateUserId(model.UserId);
+		ValidateUser(id, user);
 
-		if (model.UserName != userData.UserName && _userDataRepository.FetchAll().Any(x => x.UserName == model.UserName))
+		return new UserModel
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserExist);
-		}
-		else
-		{
-			userData.UserName = model.UserName;
-			needUpdate = true;
-		}
-		
-		if (model.UserEmail != userData.UserEmail && _userDataRepository.FetchAll().Any(x => x.UserEmail == model.UserEmail))
-		{
-			throw new GenericException(Enums.GenericErrorEnum.UserExist);
-		}
-		else
-		{
-			userData.UserEmail = model.UserEmail;
-			needUpdate = true;
-		}
-
-		if (needUpdate)
-		{
-			_userDataRepository.Update(userData);
-			_userDataRepository.Save();
-		}
-
-		return model;
+			UserId = user.Id,
+			UserName = user.UserName,
+			UserEmail = user.UserEmail,
+			Role = user.Role.RoleValue,
+		};
 	}
 
-	public void DeleteUser(UserModel model)
+	public UserModel Update(UserModel item)
+	{
+		var user = _userDataRepository.GetById(item.UserId);
+
+		ValidateUser(item.UserId, user);
+
+		CheckUserForDuplicates(item);
+
+		user.UserName = item.UserName;
+		user.UserEmail = item.UserEmail;
+
+		var userResult = _userDataRepository.Update(user);
+
+		return new UserModel
+		{
+			UserId = userResult.Id,
+			UserName = userResult.UserName,
+			UserEmail = userResult.UserEmail,
+			Role = userResult.Role.RoleValue,
+		};
+	}
+
+	public void Delete(UserModel model)
 	{
 		var data = _userDataRepository.GetById(model.UserId);
 
-		_userServiceValidationHelper.ValidateUserData(data);
-		_userServiceValidationHelper.ValidateUserId(model.UserId);
+		ValidateUser(model.UserId, data);
+
 		_userLoginService.Logout();
-
 		_userDataRepository.Delete(data);
-		_userDataRepository.Save();
+	}
+
+	private void ValidateUser(int userId, UserData data)
+	{
+		_userServiceValidationHelper.ValidateUserData(data);
+		_userServiceValidationHelper.ValidateUserId(userId);
+	}
+
+	private void CheckUserForDuplicates(UserModel model)
+	{
+		var userFilter = new FindAnyUserEntityFilter
+		{
+			UserEmail = model.UserEmail,
+			UserName = model.UserName
+		};
+
+		if (_userDataRepository.GetAllByFilter(userFilter).Any())
+		{
+			throw new GenericException("User already exists.");
+		}
 	}
 }

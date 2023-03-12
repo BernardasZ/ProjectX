@@ -8,10 +8,15 @@ public class GenericException : Exception
 {
 	public string ErrorCode { get; set; }
 
-	public GenericException(GenericErrorEnum errorEnum)
+	public GenericException(GenericError errorEnum)
 		: base()
 	{
 		ErrorCode = errorEnum.ToString();
+	}
+
+	public GenericException(string message)
+		: base(message)
+	{
 	}
 
 	protected GenericException(SerializationInfo info, StreamingContext context)

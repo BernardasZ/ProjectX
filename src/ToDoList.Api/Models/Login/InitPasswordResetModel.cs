@@ -2,10 +2,10 @@
 
 namespace ToDoList.Api.Models.Login;
 
-public class InitPasswordResetModel : BaseValidatableObject
+public class InitPasswordResetModel : BaseValidatableObject, IBaseModel
 {
 	public string UserEmail { get; set; }
 
-	protected override BaseValidator Validate() => new UserValidator()
-		.ValidateEmail<UserValidator>(UserEmail, nameof(UserEmail));
+	protected override IBaseValidator<IUserValidator> Validate() => new UserValidator()
+		.ValidateEmail(UserEmail, nameof(UserEmail));
 }

@@ -1,11 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Options;
+using Serilog;
+using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using ToDoList.Api.Helpers;
-using System.Linq;
-using Serilog;
-using Microsoft.Extensions.Options;
+using ToDoList.Api.Options;
 
 namespace ToDoList.Api.Services.Concrete;
 
@@ -42,7 +41,9 @@ public class MessageService : IMessageService
 			smtp.EnableSsl = true;
 			smtp.Host = _optionManager.CurrentValue.SmtpSettings.Host;
 			smtp.Port = 587;
-			smtp.Credentials = new NetworkCredential(_optionManager.CurrentValue.SmtpSettings.UserName, _optionManager.CurrentValue.SmtpSettings.Password);
+			smtp.Credentials = new NetworkCredential(
+				_optionManager.CurrentValue.SmtpSettings.UserName,
+				_optionManager.CurrentValue.SmtpSettings.Password);
 			smtp.Send(message);
 		}
 	}

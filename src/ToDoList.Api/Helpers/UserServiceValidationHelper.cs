@@ -5,17 +5,6 @@ using ToDoList.Api.Exeptions;
 
 namespace ToDoList.Api.Helpers;
 
-public interface IUserServiceValidationHelper
-{
-	void ValidateUserData(UserData model);
-
-	void ValidateUserId(int userId);
-
-	void ValidateUserPasswordToken(UserData model);
-
-	bool IsAdmin();
-}
-
 public class UserServiceValidationHelper : IUserServiceValidationHelper
 {
 	private readonly IAesCryptoHelper _aesCryptoHelper;
@@ -33,7 +22,7 @@ public class UserServiceValidationHelper : IUserServiceValidationHelper
 	{
 		if (model == null)
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
+			throw new GenericException(Enums.GenericError.UserDoesNotExist);
 		}
 	}
 
@@ -41,15 +30,17 @@ public class UserServiceValidationHelper : IUserServiceValidationHelper
 	{
 		if (userId > 0 && userId.ToString() != _aesCryptoHelper.DecryptString(_clientContextScraper.GetClientClaimsIdentityName()))
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserIdentityMissMatch);
+			throw new GenericException(Enums.GenericError.UserIdentityMissMatch);
 		}
 	}
 
 	public void ValidateUserPasswordToken(UserData model)
 	{
-		if (model.IsTokenUsed == null || model.IsTokenUsed.Value || model.TokenExpirationTime.Value <= DateTime.Now)
+		if (model.IsTokenUsed == null
+			|| model.IsTokenUsed.Value
+			|| model.TokenExpirationTime.Value <= DateTime.Now)
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserResetPasswordTokenIsExpired);
+			throw new GenericException(Enums.GenericError.UserResetPasswordTokenIsExpired);
 		}
 	}
 

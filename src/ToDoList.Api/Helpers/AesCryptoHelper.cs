@@ -3,14 +3,9 @@ using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using ToDoList.Api.Options;
 
 namespace ToDoList.Api.Helpers;
-
-public interface IAesCryptoHelper
-{
-    string EncryptString(string text);
-    string DecryptString(string text);
-}
 
 public class AesCryptoHelper : IAesCryptoHelper
 {

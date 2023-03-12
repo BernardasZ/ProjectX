@@ -2,15 +2,14 @@
 using System.ComponentModel.DataAnnotations;
 using ToDoList.Api.Validators;
 
-namespace ToDoList.Api.Models
-{
-	public abstract class BaseValidatableObject : IValidatableObject
-	{
-		protected abstract BaseValidator Validate();
+namespace ToDoList.Api.Models;
 
-		public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-		{
-			return Validate().GetValidationResults();
-		}
+public abstract class BaseValidatableObject : IValidatableObject
+{
+	protected abstract IValidator Validate();
+
+	public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+	{
+		return Validate().GetValidationResults();
 	}
 }

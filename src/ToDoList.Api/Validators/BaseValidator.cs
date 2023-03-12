@@ -3,35 +3,38 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ToDoList.Api.Validators;
 
-public class BaseValidator
+public abstract class BaseValidator<Validator> : IBaseValidator<Validator>
+	where Validator : IValidator
 {
-	protected readonly ICollection<ValidationResult> _results = new List<ValidationResult>();
+	protected readonly ICollection<ValidationResult> ValidationResults = new List<ValidationResult>();
 
-	public T ValidateString<T>(string value, string name) where T : BaseValidator
+	public Validator ValidateString(string value, string name)
 	{
 		if (string.IsNullOrWhiteSpace(value))
 		{
 			AddDefaultMessage(name);
 		}
 
-		return this as T;
+		return GetValidator();
 	}
 
-	public T ValidateId<T>(int value, string name) where T : BaseValidator
+	public Validator ValidateId(int value, string name)
 	{
 		if (value <= 0)
 		{
 			AddDefaultMessage(name);
 		}
 
-		return this as T;
+		return GetValidator();
 	}
+
+	public Validator GetValidator() => (Validator)(IValidator)this;
+
+	public IEnumerable<ValidationResult> GetValidationResults() => ValidationResults;
 
 	protected void AddDefaultMessage(string name) => AddMessage($"Invalid property \"{name}\".");
 
 	protected void AddCustomMessage(string message) => AddMessage(message);
 
-	private void AddMessage(string message) => _results.Add(new ValidationResult(message));
-
-	public IEnumerable<ValidationResult> GetValidationResults() => _results;
+	private void AddMessage(string message) => ValidationResults.Add(new ValidationResult(message));
 }

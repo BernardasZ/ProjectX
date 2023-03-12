@@ -2,10 +2,10 @@
 
 namespace ToDoList.Api.Models.User;
 
-public class UserDeleteModel : BaseValidatableObject
+public class UserDeleteModel : BaseValidatableObject, IBaseModel
 {
 	public int UserId { get; set; }
 
-	protected override BaseValidator Validate() => new UserValidator()
-		.ValidateId<UserValidator>(UserId, nameof(UserId));
+	protected override IBaseValidator<IUserValidator> Validate() => new UserValidator()
+		.ValidateId(UserId, nameof(UserId));
 }

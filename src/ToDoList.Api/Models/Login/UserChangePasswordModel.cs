@@ -2,16 +2,16 @@
 
 namespace ToDoList.Api.Models.Login;
 
-public class UserChangePasswordModel : BaseValidatableObject
+public class UserChangePasswordModel : BaseValidatableObject, IBaseModel
 {
 	public string UserEmail { get; set; }
 
 	public string NewPassword { get; set; }
 
-    public string OldPassword { get; set; }
+	public string OldPassword { get; set; }
 
-	protected override BaseValidator Validate() => new UserValidator()
-		.ValidateEmail<UserValidator>(UserEmail, nameof(UserEmail))
-		.ValidatePassword<UserValidator>(NewPassword, nameof(NewPassword))
-		.ValidatePassword<UserValidator>(OldPassword, nameof(OldPassword));
+	protected override IBaseValidator<IUserValidator> Validate() => new UserValidator()
+		.ValidateEmail(UserEmail, nameof(UserEmail))
+		.ValidatePassword(NewPassword, nameof(NewPassword))
+		.ValidatePassword(OldPassword, nameof(OldPassword));
 }

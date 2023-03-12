@@ -1,7 +1,9 @@
 ﻿using DataModel.Entities.ProjectX;
+using DataModel.Filters;
 using DataModel.Repositories;
 using System;
 using System.Linq;
+using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
 
 namespace ToDoList.Api.Services.Concrete;
@@ -22,58 +24,59 @@ public class UserSessionService : IUserSessionService
 		_aesCryptoHelper = aesCryptoHelper;
 	}
 
-	public bool IsValidUserSession()
-	{
-		var userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
-		var ipAddress = _clientContextScraper.GetClientIpAddress();
-
-		return _userSessionRepository
-			.FetchAll()
-			.Any(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress);
-	}
+	public bool IsValidUserSession() => _userSessionRepository
+			.GetAllByFilter(GetUserSessionFilter())
+			.Any();
 
 	public void CreateUserSession(string userId)
 	{
-		var ipAddress = _clientContextScraper.GetClientIpAddress();
-		var userIdentity = _aesCryptoHelper.EncryptString(userId);
-
-		var userSession = new UserSession
+		var session = new UserSession
 		{
-			SessionIdentifier = userIdentity,
-			Ip = ipAddress,
+			SessionIdentifier = _aesCryptoHelper.EncryptString(userId),
+			Ip = _clientContextScraper.GetClientIpAddress(),
 			CreateDt = DateTime.Now
 		};
 
-		_userSessionRepository.Insert(userSession);
-		_userSessionRepository.Save();
+		_userSessionRepository.Insert(session);
 	}
 
 	public void DeleteUserSession()
 	{
-		var ipAddress = _clientContextScraper.GetClientIpAddress();
-		var userIdentity = _clientContextScraper.GetClientClaimsIdentityName();
+		var session = _userSessionRepository
+			.GetAllByFilter(GetUserSessionFilter())
+			.FirstOrDefault();
 
-		DeleteUserSession(userIdentity, ipAddress);
+		if (session == null)
+		{
+			throw new GenericException("Session does not exist.");
+		}
+
+		_userSessionRepository.Delete(session);
 	}
 
 	public void DeleteUserSession(string userId)
 	{
-		var ipAddress = _clientContextScraper.GetClientIpAddress();
-		var userIdentity = _aesCryptoHelper.EncryptString(userId);
-
-		DeleteUserSession(userIdentity, ipAddress);
-	}
-
-	public void DeleteUserSession(string userIdentity, string ipAddress)
-	{
 		var session = _userSessionRepository
-			.FetchAll()
-			.FirstOrDefault(x => x.SessionIdentifier == userIdentity && x.Ip == ipAddress);
+			.GetAllByFilter(GetUserSessionFilterByUserId(userId))
+			.FirstOrDefault();
 
-		if (session != null)
+		if (session == null)
 		{
-			_userSessionRepository.Delete(session);
-			_userSessionRepository.Save();
+			throw new GenericException("Session does not exist.");
 		}
+
+		_userSessionRepository.Delete(session);
 	}
+
+	private UserSessionEntityFilter GetUserSessionFilter() => new()
+	{
+		SessionIdentifier = _clientContextScraper.GetClientClaimsIdentityName(),
+		Ip = _clientContextScraper.GetClientIpAddress()
+	};
+
+	private UserSessionEntityFilter GetUserSessionFilterByUserId(string userId) => new()
+	{
+		SessionIdentifier = _aesCryptoHelper.EncryptString(userId),
+		Ip = _clientContextScraper.GetClientIpAddress()
+	};
 }

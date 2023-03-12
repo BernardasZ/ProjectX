@@ -1,55 +1,41 @@
 ﻿using DataModel.Entities.ProjectX;
 using DataModel.Repositories;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ToDoList.Api.Helpers;
+using ToDoList.Api.Options;
 
 namespace ToDoList.Api.Services.Concrete;
 
-public class PermissionCacheService : ICacheService<List<PermissionView>>
+public class PermissionCacheService : IPermissionCacheService
 {
-	private static readonly object cacheLockOne;
-
-	private readonly IMemoryCache _memoryCache;
+	private readonly ICacheService<List<PermissionView>> _cacheService;
 	private readonly IRepository<PermissionView> _permissionViewRepository;
 	private readonly IOptionsMonitor<OptionManager> _optionsManager;
 
-	static PermissionCacheService()
-	{
-		cacheLockOne = new object();
-	}
-
 	public PermissionCacheService(
-		IMemoryCache memoryCache,
+		ICacheService<List<PermissionView>> cacheService,
 		IRepository<PermissionView> permissionViewRepositoryr,
 		IOptionsMonitor<OptionManager> optionsManager)
 	{
-		_memoryCache = memoryCache;
+		_cacheService = cacheService;
 		_permissionViewRepository = permissionViewRepositoryr;
 		_optionsManager = optionsManager;
 	}
 
-	public List<PermissionView> GetCache()
-	{
-		var key = _optionsManager.CurrentValue.PermissionCacheSettings.Key;
+	public List<PermissionView> GetCache() => GetPermissionsCache() ?? SetPermissionsCache();
 
-		List<PermissionView> cacheItem;
+	private List<PermissionView> GetPermissionsCache() => _cacheService.GetCache(GetKey());
 
-		lock (cacheLockOne)
-		{		
-			if (!_memoryCache.TryGetValue(key, out cacheItem) || cacheItem == null)
-			{
-				var expirationTime = TimeSpan.FromMinutes(_optionsManager.CurrentValue.PermissionCacheSettings.ExpirationTimeInMin);
+	private List<PermissionView> SetPermissionsCache() =>
+		_cacheService.SetCache(GetPermissionViewData(), GetKey(), GetExpirationTime());
 
-				cacheItem = _permissionViewRepository.FetchAll().ToList();		
-				
-				_memoryCache.Set(key, cacheItem, expirationTime);
-			}	
-		}
+	private List<PermissionView> GetPermissionViewData() => _permissionViewRepository.GetAllByFilter().ToList();
 
-		return cacheItem;
-	}	
+	private string GetKey() => _optionsManager.CurrentValue.PermissionCacheSettings.Key;
+
+	private int GetExpirationTimeInMin() => _optionsManager.CurrentValue.PermissionCacheSettings.ExpirationTimeInMin;
+
+	private TimeSpan GetExpirationTime() => TimeSpan.FromMinutes(GetExpirationTimeInMin());
 }

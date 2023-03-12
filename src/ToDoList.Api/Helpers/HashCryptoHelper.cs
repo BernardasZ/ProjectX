@@ -4,11 +4,6 @@ using System.Text;
 
 namespace ToDoList.Api.Helpers;
 
-public interface IHashCryptoHelper
-{
-	string HashString(string text);
-}
-
 public class HashCryptoHelper : IHashCryptoHelper
 {
 	public string HashString(string text)

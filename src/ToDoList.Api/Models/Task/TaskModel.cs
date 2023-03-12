@@ -3,18 +3,18 @@ using ToDoList.Api.Validators;
 
 namespace ToDoList.Api.Models.Task;
 
-public class TaskModel : BaseValidatableObject
+public class TaskModel : BaseValidatableObject, IBaseModel
 {
-    public int Id { get; set; }
+	public int Id { get; set; }
 
-    public int UserId { get; set; }
+	public int UserId { get; set; }
 
-    public string TaskName { get; set; }
+	public string TaskName { get; set; }
 
-    public TaskStatusEnum Status { get; set; }
+	public TaskStatusEnum Status { get; set; }
 
-	protected override BaseValidator Validate() => new BaseValidator()
-		.ValidateId<BaseValidator>(Id, nameof(Id))
-		.ValidateId<BaseValidator>(UserId, nameof(UserId))
-		.ValidateString<BaseValidator>(TaskName, nameof(TaskName));
+	protected override IBaseValidator<ITaskValidator> Validate() => new TaskValidator()
+		.ValidateId(Id, nameof(Id))
+		.ValidateId(UserId, nameof(UserId))
+		.ValidateString(TaskName, nameof(TaskName));
 }

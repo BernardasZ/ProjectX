@@ -1,25 +1,32 @@
-﻿using Microsoft.EntityFrameworkCore;
-using DataModel.Entities.ProjectX;
+﻿using DataModel.Entities.ProjectX;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataModel.DbContexts;
 
 public class ProjectXDbContext : DbContext
 {
-    public ProjectXDbContext(DbContextOptions<ProjectXDbContext> options)
-        : base(options)
-    {
-    }
+	public ProjectXDbContext(DbContextOptions<ProjectXDbContext> options)
+		: base(options)
+	{
+	}
 
-    public virtual DbSet<PermissionAction> PermissionAction { get; set; }
-    public virtual DbSet<PermissionController> PermissionController { get; set; }
-    public virtual DbSet<PermissionMapping> PermissionMapping { get; set; }
-    public virtual DbSet<PermissionView> PermissionView { get; set; }
-    public virtual DbSet<Role> Role { get; set; }
-    public virtual DbSet<Task> Task { get; set; }
-    public virtual DbSet<UserData> UserData { get; set; }
-    public virtual DbSet<UserSession> UserSession { get; set; }
+	public virtual DbSet<PermissionAction> PermissionAction { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+	public virtual DbSet<PermissionController> PermissionController { get; set; }
+
+	public virtual DbSet<PermissionMapping> PermissionMapping { get; set; }
+
+	public virtual DbSet<PermissionView> PermissionView { get; set; }
+
+	public virtual DbSet<Role> Role { get; set; }
+
+	public virtual DbSet<Task> Task { get; set; }
+
+	public virtual DbSet<UserData> UserData { get; set; }
+
+	public virtual DbSet<UserSession> UserSession { get; set; }
+
+	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
 		PermissionActionMapping(modelBuilder);
 		PermissionMappingMapping(modelBuilder);
@@ -34,14 +41,14 @@ public class ProjectXDbContext : DbContext
 		modelBuilder.Entity<UserData>(entity =>
 		{
 			entity.HasIndex(e => e.RoleId)
-				.HasName("user_data__role_idx");
+				.HasDatabaseName("user_data__role_idx");
 
 			entity.HasIndex(e => e.UserEmail)
-				.HasName("Email_UNIQUE")
+				.HasDatabaseName("Email_UNIQUE")
 				.IsUnique();
 
 			entity.HasIndex(e => e.UserName)
-				.HasName("UserName_UNIQUE")
+				.HasDatabaseName("UserName_UNIQUE")
 				.IsUnique();
 
 			entity.HasOne(d => d.Role)
@@ -67,13 +74,13 @@ public class ProjectXDbContext : DbContext
 		modelBuilder.Entity<PermissionMapping>(entity =>
 		{
 			entity.HasIndex(e => e.ActionId)
-				.HasName("permission_mapping__permission_action_idx");
+				.HasDatabaseName("permission_mapping__permission_action_idx");
 
 			entity.HasIndex(e => e.ControllerId)
-				.HasName("permission_mapping__permission_controller_idx");
+				.HasDatabaseName("permission_mapping__permission_controller_idx");
 
 			entity.HasIndex(e => e.RoleId)
-				.HasName("permission_mapping__role_idx");
+				.HasDatabaseName("permission_mapping__role_idx");
 
 			entity.HasOne(d => d.Action)
 				.WithMany(p => p.PermissionMapping)
@@ -100,7 +107,7 @@ public class ProjectXDbContext : DbContext
 		modelBuilder.Entity<PermissionAction>(entity =>
 		{
 			entity.HasIndex(e => e.ControllerId)
-				.HasName("permission_action__permission_controller_idx");
+				.HasDatabaseName("permission_action__permission_controller_idx");
 
 			entity.HasOne(d => d.Controller)
 				.WithMany(p => p.PermissionAction)

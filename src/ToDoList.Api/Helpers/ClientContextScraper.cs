@@ -5,19 +5,6 @@ using System.Security.Claims;
 
 namespace ToDoList.Api.Helpers;
 
-public interface IClientContextScraper
-{
-	string GetClientClaimsIdentityName();
-
-	string GetClientClaimsRole();
-
-	string GetClientIpAddress();
-
-	string GetControllerName();
-
-	string GetActionrName();
-}
-
 public class ClientContextScraper : IClientContextScraper
 {
 	private readonly IHttpContextAccessor _httpContextAccessor;
@@ -35,9 +22,12 @@ public class ClientContextScraper : IClientContextScraper
 			? string.Empty
 			: _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name).Value;
 
-	public string GetClientClaimsRole() => !_httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role)
+	public string GetClientClaimsRole()
+	{
+		return !_httpContextAccessor.HttpContext.User.Claims.Any(c => c.Type == ClaimTypes.Role)
 			? string.Empty
 			: _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role).Value;
+	}
 
 	public string GetControllerName() =>
 		_httpContextAccessor.HttpContext.Request.RouteValues.GetValueOrDefault("controller").ToString();

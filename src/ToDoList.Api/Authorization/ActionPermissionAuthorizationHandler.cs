@@ -7,6 +7,7 @@ namespace ToDoList.Api.Authorization;
 internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuthorizationRequirement>
 {
 	private readonly IUserPermissionService _userPermissionService;
+
 	public ActionPermissionAuthorizationHandler(
 		IUserPermissionService userPermissionService)
 	{
@@ -24,6 +25,6 @@ internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuth
 			context.Fail();
 		}
 
-        return Task.CompletedTask;
-    }
+		return Task.CompletedTask;
+	}
 }

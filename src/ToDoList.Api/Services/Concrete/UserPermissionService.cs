@@ -8,14 +8,14 @@ namespace ToDoList.Api.Services.Concrete;
 
 public class UserPermissionService : IUserPermissionService
 {
-	private readonly ICacheService<List<PermissionView>> _cacheService;
+	private readonly IPermissionCacheService _permissionCacheService;
 	private readonly IClientContextScraper _clientContextScraper;
 
 	public UserPermissionService(
-		ICacheService<List<PermissionView>> cacheService,
+		IPermissionCacheService permissionCacheService,
 		IClientContextScraper clientContextScraper)
 	{
-		_cacheService = cacheService;
+		_permissionCacheService = permissionCacheService;
 		_clientContextScraper = clientContextScraper;
 	}
 
@@ -33,10 +33,10 @@ public class UserPermissionService : IUserPermissionService
 		}
 
 		return GetPermissions()
-			.Any(x => (x.RoleName == userRole || x.RoleName == UserRoleEnum.AllRoles.ToString()) 
-					&& x.ControllerName == controller 
+			.Any(x => (x.RoleName == userRole || x.RoleName == UserRoleEnum.AllRoles.ToString())
+					&& x.ControllerName == controller
 					&& (x.ActionName == action || x.AllowAllActions));
 	}
 
-	public List<PermissionView> GetPermissions() => _cacheService.GetCache();
+	public List<PermissionView> GetPermissions() => _permissionCacheService.GetCache();
 }

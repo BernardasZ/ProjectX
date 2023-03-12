@@ -6,26 +6,25 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace DataModel.Entities.ProjectX;
 
 [Table("role", Schema = "ProjectX")]
-public class Role
+public class Role : BaseEntity
 {
-    public Role()
-    {
-        PermissionMapping = new HashSet<PermissionMapping>();
-        UserData = new HashSet<UserData>();
-    }
+	public Role()
+	{
+		PermissionMapping = new HashSet<PermissionMapping>();
+		UserData = new HashSet<UserData>();
+	}
 
-    [Key]
-    [Column("id")]
-    public int Id { get; set; }
-    [Required]
-    [Column("role_name")]
-    [StringLength(50)]
-    public string RoleName { get; set; }
-    [Column("role_value", TypeName = "tinyint unsigned")]
-    public UserRoleEnum RoleValue { get; set; }
+	[Required]
+	[Column("role_name")]
+	[StringLength(50)]
+	public string RoleName { get; set; }
 
-    [InverseProperty("Role")]
-    public virtual ICollection<PermissionMapping> PermissionMapping { get; set; }
-    [InverseProperty("Role")]
-    public virtual ICollection<UserData> UserData { get; set; }
+	[Column("role_value", TypeName = "tinyint unsigned")]
+	public UserRoleEnum RoleValue { get; set; }
+
+	[InverseProperty("Role")]
+	public virtual ICollection<PermissionMapping> PermissionMapping { get; set; }
+
+	[InverseProperty("Role")]
+	public virtual ICollection<UserData> UserData { get; set; }
 }

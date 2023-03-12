@@ -4,11 +4,9 @@ public interface IUserSessionService
 {
 	bool IsValidUserSession();
 
-	void CreateUserSession(string userId);
+	void CreateUserSession(string id);
 
 	void DeleteUserSession();
 
-	void DeleteUserSession(string userId);
-
-	void DeleteUserSession(string userIdentity, string ipAddress);
+	void DeleteUserSession(string id);
 }

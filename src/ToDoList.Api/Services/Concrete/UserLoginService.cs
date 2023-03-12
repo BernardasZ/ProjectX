@@ -1,13 +1,15 @@
 ﻿using DataModel.Entities.ProjectX;
+using DataModel.Filters;
 using DataModel.Repositories;
 using Microsoft.Extensions.Options;
 using System;
 using System.Linq;
 using System.Net.Mail;
-using System.Security.Claims;
 using ToDoList.Api.Exeptions;
 using ToDoList.Api.Helpers;
 using ToDoList.Api.Models.Login;
+using ToDoList.Api.Models.User;
+using ToDoList.Api.Options;
 
 namespace ToDoList.Api.Services.Concrete;
 
@@ -47,44 +49,31 @@ public class UserLoginService : IUserLoginService
 
 	public UserLoginResponseModel Login(UserLoginModel model)
 	{
-		model.Password = _hashCryptoHelper.HashString(model.Password);
-
-		var data = _userDataRepository.FetchAll()
-			.Where(x => x.UserEmail == model.UserEmail && x.PassHash == model.Password)
-			.Select(x => new
-			{
-				x,
-				x.Role.RoleValue
-			})
-			.FirstOrDefault();
-
-		if (data == null)
+		var filter = new UserEntityFilter
 		{
-			throw new GenericException(Enums.GenericErrorEnum.UserDoesNotExist);
+			UserEmail = model.UserEmail,
+			PassHash = _hashCryptoHelper.HashString(model.Password)
+		};
+
+		var user = _userDataRepository.GetAllByFilter(filter).FirstOrDefault();
+
+		if (user == null)
+		{
+			throw new GenericException(Enums.GenericError.UserDoesNotExist);
 		}
 
-		var userData = data.x;
-		var role = data.RoleValue;
+		_userSessionService.DeleteUserSession(user.Id.ToString());
+		_userSessionService.CreateUserSession(user.Id.ToString());
 
-		_userSessionService.DeleteUserSession(userData.Id.ToString());
-		_userSessionService.CreateUserSession(userData.Id.ToString());
-
-		if (userData.FailedLoginCount != 0)
+		if (user.FailedLoginCount != 0)
 		{
-			userData.FailedLoginCount = 0;
-			_userDataRepository.Update(userData);
-			_userDataRepository.Save();
+			user.FailedLoginCount = 0;
+			_userDataRepository.Update(user);
 		}
-
-		var claims = new ClaimsIdentity(new Claim[]
-		{
-			new Claim(ClaimTypes.Name, _aesCryptoHelper.EncryptString(userData.Id.ToString())),
-			new Claim(ClaimTypes.Role, role.ToString())
-		});
 
 		return new UserLoginResponseModel()
 		{
-			JWT = _jwtHelper.ConstructUserJwt(claims)
+			JWT = _jwtHelper.ConstructUserJwt(user.Role.RoleValue.ToString(), user.Id.ToString())
 		};
 	}
 
@@ -93,68 +82,69 @@ public class UserLoginService : IUserLoginService
 		_userSessionService.DeleteUserSession();
 	}
 
-	public void ChangePassword(UserChangePasswordModel model)
+	public UserModel ChangePassword(UserChangePasswordModel model)
 	{
-		model.NewPassword = _hashCryptoHelper.HashString(model.NewPassword);
-		model.OldPassword = _hashCryptoHelper.HashString(model.OldPassword);
+		var filter = new UserEntityFilter
+		{
+			Id = int.Parse(_aesCryptoHelper.DecryptString(_clientContextScraper.GetClientClaimsIdentityName())),
+			UserEmail = model.UserEmail,
+			PassHash = _hashCryptoHelper.HashString(model.OldPassword)
+		};
 
-		var userId = int.Parse(_aesCryptoHelper.DecryptString(_clientContextScraper.GetClientClaimsIdentityName()));
-		var userData = _userDataRepository
-			.FetchAll()
-			.FirstOrDefault(x => x.Id == userId && x.UserEmail == model.UserEmail && x.PassHash == model.OldPassword);
+		var user = _userDataRepository.GetAllByFilter(filter).FirstOrDefault();
 
-		_userServiceValidationHelper.ValidateUserData(userData);
+		_userServiceValidationHelper.ValidateUserData(user);
 
-		userData.PassHash = model.NewPassword;
-		userData.FailedLoginCount = 0;
-		_userDataRepository.Update(userData);
-		_userDataRepository.Save();
+		user.PassHash = _hashCryptoHelper.HashString(model.NewPassword);
+		user.FailedLoginCount = 0;
+		var newUser = _userDataRepository.Update(user);
 	}
 
 	public void ResetPassword(UserResetPasswordModel model)
 	{
-		model.NewPassword = _hashCryptoHelper.HashString(model.NewPassword);
+		var filter = new UserEntityFilter { TokenHash = model.Token };
 
-		var userData = _userDataRepository
-			.FetchAll()
-			.FirstOrDefault(x => x.TokenHash == model.Token);
+		var user = _userDataRepository.GetAllByFilter(filter).FirstOrDefault();
 
-		_userServiceValidationHelper.ValidateUserData(userData);
-		_userServiceValidationHelper.ValidateUserPasswordToken(userData);
+		_userServiceValidationHelper.ValidateUserData(user);
+		_userServiceValidationHelper.ValidateUserPasswordToken(user);
 
-		userData.PassHash = model.NewPassword;
-		userData.IsTokenUsed = true;
-		userData.FailedLoginCount = 0;
+		user.PassHash = _hashCryptoHelper.HashString(model.NewPassword);
+		user.IsTokenUsed = true;
+		user.FailedLoginCount = 0;
 
-		_userDataRepository.Update(userData);
-		_userDataRepository.Save();
+		var newUser = _userDataRepository.Update(user);
 	}
 
 	public void InitUserPasswordReset(InitPasswordResetModel model)
 	{
-		var userData = _userDataRepository
-			.FetchAll()
-			.FirstOrDefault(x => x.UserEmail == model.UserEmail);
+		var filter = new UserEntityFilter { UserEmail = model.UserEmail };
 
-		_userServiceValidationHelper.ValidateUserData(userData);
+		var user = _userDataRepository.GetAllByFilter(filter).FirstOrDefault();
 
-		var token = _hashCryptoHelper.HashString(model.UserEmail);
+		_userServiceValidationHelper.ValidateUserData(user);
+
 		var expirationMins = _optionManager.CurrentValue.AppSettings.PasswordResetExpirationInMin;
 
-		userData.IsTokenUsed = false;
-		userData.TokenExpirationTime = DateTime.Now.AddMinutes(expirationMins);
-		userData.TokenHash = token;
+		user.IsTokenUsed = false;
+		user.TokenExpirationTime = DateTime.Now.AddMinutes(expirationMins);
+		user.TokenHash = _hashCryptoHelper.HashString(model.UserEmail);
 
-		_userDataRepository.Update(userData);
-		_userDataRepository.Save();
+		_userDataRepository.Update(user);
 
-		var from = _optionManager.CurrentValue.SmtpSettings.Sender;
-		var to = model.UserEmail;
-		var subject = Resource.MessageSubject_PasswordReset;
-		var body = string.Format(Resource.MessageTemplate_PasswordReset, token);
+		SendEmail(model, user.TokenHash);
+	}
 
-		var message = new MailMessage(from, to, subject, body);
-		message.IsBodyHtml = true;
+	private void SendEmail(InitPasswordResetModel model, string token)
+	{
+		var message = new MailMessage(
+			_optionManager.CurrentValue.SmtpSettings.Sender,
+			model.UserEmail,
+			Resource.MessageSubject_PasswordReset,
+			string.Format(Resource.MessageTemplate_PasswordReset, token))
+		{
+			IsBodyHtml = true
+		};
 
 		_messageService.SendEmail(message);
 	}

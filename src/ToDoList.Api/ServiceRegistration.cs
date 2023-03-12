@@ -1,13 +1,10 @@
-﻿using DataModel.Entities.ProjectX;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using ToDoList.Api.Authorization;
 using ToDoList.Api.Constants;
@@ -49,12 +46,13 @@ public static class ServiceRegistration
 
 	public static void AddLocalServices(this IServiceCollection services)
 	{
-		services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-		services.AddSingleton<IHashCryptoHelper, HashCryptoHelper>();
+		services.AddHttpContextAccessor();
+
+		services.AddSingleton(typeof(ICacheService<>), typeof(CacheService<>));
+		services.AddScoped<IHashCryptoHelper, HashCryptoHelper>();
 		services.AddScoped<IUserServiceValidationHelper, UserServiceValidationHelper>();
 		services.AddScoped<ITaskServiceValidationHelper, TaskServiceValidationHelper>();
 		services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
-		services.AddSingleton<ICacheService<List<PermissionView>>, PermissionCacheService>();
 		services.AddScoped<IUserPermissionService, UserPermissionService>();
 		services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
 		services.AddScoped<IUserSessionService, UserSessionService>();
@@ -64,6 +62,7 @@ public static class ServiceRegistration
 		services.AddScoped<ITaskService, TaskService>();
 		services.AddScoped<IMessageService, MessageService>();
 		services.AddScoped<IUserLoginService, UserLoginService>();
+		services.AddScoped<IPermissionCacheService, PermissionCacheService>();
 	}
 
 	public static void AddSwagger(this IServiceCollection services) =>

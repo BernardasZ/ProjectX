@@ -2,12 +2,12 @@
 
 namespace ToDoList.Api.Models.Task;
 
-public class TaskDeleteModel : BaseValidatableObject
+public class TaskDeleteModel : BaseValidatableObject, IBaseModel
 {
 	public int Id { get; set; }
 	public int UserId { get; set; }
 
-	protected override BaseValidator Validate() => new BaseValidator()
-		.ValidateId<BaseValidator>(Id, nameof(Id))
-		.ValidateId<BaseValidator>(UserId, nameof(UserId));
+	protected override IBaseValidator<ITaskValidator> Validate() => new TaskValidator()
+		.ValidateId(Id, nameof(Id))
+		.ValidateId(UserId, nameof(UserId));
 }

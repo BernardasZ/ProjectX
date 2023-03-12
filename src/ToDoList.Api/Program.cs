@@ -10,19 +10,19 @@ public class Program
 {
 	public static void Main(string[] args)
 	{
-        try
-        {
-            Log.Information("Application Starting.");
-            CreateHostBuilder(args).Build().Run();
-        }
-        catch (Exception ex)
-        {
-            Log.Fatal(ex, "The Application failed to start.");
-        }
-        finally
-        {
-            Log.CloseAndFlush();
-        }
+		try
+		{
+			Log.Information("Application Starting.");
+			CreateHostBuilder(args).Build().Run();
+		}
+		catch (Exception ex)
+		{
+			Log.Fatal(ex, "The Application failed to start.");
+		}
+		finally
+		{
+			Log.CloseAndFlush();
+		}
 	}
 
 	public static void CreateLogger() =>

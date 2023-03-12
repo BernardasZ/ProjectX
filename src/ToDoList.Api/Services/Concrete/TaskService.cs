@@ -23,49 +23,53 @@ public class TaskService : ITaskService
 		_taskServiceValidationHelper = taskServiceValidationHelper;
 	}
 
-	public List<TaskModel> GetTaskList(TaskModel model)
+	public List<TaskModel> GetAll()
+	{
+		throw new System.NotImplementedException();
+	}
+
+	public List<TaskModel> GetAllTasksByUserId(int id)
 	{
 		if (!_userServiceValidationHelper.IsAdmin())
 		{
-			_userServiceValidationHelper.ValidateUserId(model.UserId);
+			_userServiceValidationHelper.ValidateUserId(id);
 		}
 
 		return _taskRepository
-			.FetchAll()
-			.Where(x => x.UserId == model.UserId)
-			.Select(x => new TaskModel() 
-			{ 
-				Id = x.Id, 
-				UserId = x.UserId, 
-				TaskName = x.TaskName, 
-				Status = x.Status 
+			.GetAllByFilter()
+			.Where(x => x.UserId == id)
+			.Select(x => new TaskModel()
+			{
+				Id = x.Id,
+				UserId = x.UserId,
+				TaskName = x.TaskName,
+				Status = x.Status
 			})
 			.ToList();
 	}
 
-	public TaskModel CreateTask(TaskModel model)
+	public TaskModel Add(TaskModel item)
 	{
-		_userServiceValidationHelper.ValidateUserId(model.UserId);
+		_userServiceValidationHelper.ValidateUserId(item.UserId);
 
 		var taskData = new TaskData()
 		{
-			TaskName = model.TaskName,
-			UserId = model.UserId,
-			Status = model.Status
+			TaskName = item.TaskName,
+			UserId = item.UserId,
+			Status = item.Status
 		};
 
 		_taskRepository.Insert(taskData);
-		_taskRepository.Save();
 
-		model.Id = taskData.Id;
+		item.Id = taskData.Id;
 
-		return model;
+		return item;
 	}
 
-	public TaskModel ReadTask(TaskModel model)
+	public TaskModel GetById(int id)
 	{
 		var isAdmin = _userServiceValidationHelper.IsAdmin();
-		var taskData = _taskRepository.GetById(model.Id);
+		var taskData = _taskRepository.GetById(id);
 
 		_taskServiceValidationHelper.ValidateTaskData(taskData);
 
@@ -83,30 +87,30 @@ public class TaskService : ITaskService
 		};
 	}
 
-	public TaskModel UpdateTask(TaskModel model)
+	public TaskModel Update(TaskModel item)
 	{
-		var taskData = _taskRepository.GetById(model.Id);
+		var taskData = _taskRepository.GetById(item.Id);
 
 		_taskServiceValidationHelper.ValidateTaskData(taskData);
 		_userServiceValidationHelper.ValidateUserId(taskData.UserId);
 
-		taskData.TaskName = model.TaskName;
-		taskData.Status = model.Status;
+		taskData.TaskName = item.TaskName;
+		taskData.Status = item.Status;
 
 		_taskRepository.Update(taskData);
-		_taskRepository.Save();
 
-		model.Id = taskData.Id;
+		item.Id = taskData.Id;
 
-		return model;
+		return item;
 	}
 
-	public void DeleteTask(TaskModel model)
+	public void Delete(TaskModel model)
 	{
 		var isAdmin = _userServiceValidationHelper.IsAdmin();
 		var taskData = _taskRepository
-			.FetchAll()
-			.FirstOrDefault(x => (x.UserId == model.UserId || isAdmin == true) && x.Id == model.Id);
+			.GetAllByFilter()
+			.FirstOrDefault(x => (x.UserId == model.UserId || isAdmin == true)
+								&& x.Id == model.Id);
 
 		_taskServiceValidationHelper.ValidateTaskData(taskData);
 
@@ -116,6 +120,5 @@ public class TaskService : ITaskService
 		}
 
 		_taskRepository.Delete(taskData);
-		_taskRepository.Save();
 	}
 }

@@ -2,6 +2,7 @@
 using Serilog;
 using System;
 using System.Security.Authentication;
+using System.Text.Json;
 using System.Threading.Tasks;
 using ToDoList.Api.Exeptions;
 
@@ -9,22 +10,24 @@ namespace ToDoList.Api.Middleware;
 
 public class ErrorHandlerMiddleware
 {
-    private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
-    private readonly RequestDelegate _next;
+	private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
+	private readonly RequestDelegate _next;
 
-    public ErrorHandlerMiddleware(RequestDelegate next)
-    {
-        _next = next;
-    }
+	public ErrorHandlerMiddleware(RequestDelegate next)
+	{
+		_next = next;
+	}
 
-    public async Task Invoke(HttpContext context)
-    {
-        try
-        {
-            await _next(context);
-        }
-        catch (Exception ex)
+	public async Task Invoke(HttpContext context)
+	{
+		try
 		{
+			await _next(context);
+		}
+		catch (Exception ex)
+		{
+			logger.Error(ex, "Unhandled service error.");
+
 			await SendErrorResponse(context, ex);
 		}
 	}
@@ -35,9 +38,7 @@ public class ErrorHandlerMiddleware
 		response.StatusCode = GetHttpStatusCode(ex);
 		response.ContentType = "application/json";
 
-		logger.Error(ex, "Unhandled service error.");
-
-		await response.WriteAsync(ex.Message);
+		await response.WriteAsync(JsonSerializer.Serialize(ex.Message));
 	}
 
 	private static int GetHttpStatusCode(Exception exception) => exception switch
