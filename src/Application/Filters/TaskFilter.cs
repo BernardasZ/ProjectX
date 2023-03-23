@@ -1,8 +1,9 @@
-﻿using Domain.Extensions;
+﻿using Application.Extensions;
+using Domain.Filters;
 using Domain.Models;
 using TaskStatus = Domain.Enums.TaskStatus;
 
-namespace Domain.Filters;
+namespace Application.Filters;
 
 public class TaskFilter : IFilter<TaskModel>
 {

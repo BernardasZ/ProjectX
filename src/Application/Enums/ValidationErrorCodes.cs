@@ -1,9 +1,7 @@
-﻿namespace Domain.Enums;
+﻿namespace Application.Enums;
 
-public enum GenericError
+public enum ValidationErrorCodes
 {
-	InternalSystemError,
-	OperationIsUnavailable,
 	TaskDoesNotExist,
 	UserExist,
 	UserDoesNotExist,

@@ -16,6 +16,7 @@ public static class ServiceRegistration
 	public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.Configure<Configuration>(configuration);
+		services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
 		services.AddScoped<IHashCryptoHelper, HashCryptoHelper>();
 		services.AddScoped<IUserValidationService, UserValidationService>();
 		services.AddScoped<ITaskValidationService, TaskValidationService>();
@@ -27,6 +28,6 @@ public static class ServiceRegistration
 		services.AddScoped<IPermissionCacheService, PermissionCacheService>();
 		services.AddScoped<IUserRecoverService, UserRecoverService>();
 		services.AddScoped<IDateTime, DateTimeService>();
-		services.AddScoped(typeof(IRepository<>), typeof(RepositoryBase<>));
+		services.AddScoped<ISessionIdentifierEncoder, SessionIdentifierEncoder>();
 	}
 }

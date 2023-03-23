@@ -1,6 +1,6 @@
 ﻿using Application.Database.Repositories;
+using Application.Filters;
 using Application.Services.Interfaces;
-using Domain.Filters;
 using Domain.Models;
 
 namespace Application.Services;
@@ -71,11 +71,17 @@ public class UserSessionService : IUserSessionService
 		DeleteUserSessions(filter);
 	}
 
+	public void DeleteAllUserSessions(int userId)
+	{
+		var filter = new UserSessionFilter { UserId = userId };
+
+		DeleteUserSessions(filter);
+	}
+
 	private void DeleteUserSessions(UserSessionFilter filter)
 	{
-		_userSessionRepository
-		   .GetAll(filter)
-		   .ToList()
-		   .ForEach(session => _userSessionRepository.Delete(session));
+		var sessions = _userSessionRepository.GetAll(filter);
+
+		sessions.ForEach(session => _userSessionRepository.Delete(session));
 	}
 }

@@ -1,6 +1,7 @@
-﻿using Domain.Models;
+﻿using Domain.Filters;
+using Domain.Models;
 
-namespace Domain.Filters;
+namespace Application.Filters;
 
 public class FindAnyUserFilter : IFilter<UserModel>
 {

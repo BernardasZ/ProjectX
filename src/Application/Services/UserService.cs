@@ -1,8 +1,10 @@
 ﻿using Application.Database.Repositories;
+using Application.Enums;
+using Application.Exceptions;
+using Application.Filters;
 using Application.Services.Interfaces;
 using Application.Validations;
 using Domain.Enums;
-using Domain.Exeptions;
 using Domain.Filters;
 using Domain.Models;
 
@@ -13,22 +15,25 @@ public class UserService : IServiceBase<UserModel>
 	private readonly IRepository<UserModel> _userRepository;
 	private readonly IRepository<RoleModel> _roleRepository;
 	private readonly IUserValidationService _userValidation;
+	private readonly IUserSessionService _userSessionService;
 
 	public UserService(
 		IRepository<UserModel> userRepository,
 		IRepository<RoleModel> roleRepository,
-		IUserValidationService userValidation)
+		IUserValidationService userValidation,
+		IUserSessionService userSessionService)
 	{
 		_userRepository = userRepository;
 		_roleRepository = roleRepository;
 		_userValidation = userValidation;
+		_userSessionService = userSessionService;
 	}
 
 	public List<UserModel> GetAll(IFilter<UserModel> filter)
 	{
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
-			throw new GenericException(GenericError.OperationIsUnavailable);
+			throw new ValidationException(ValidationErrorCodes.UserIdentityMissMatch);
 		}
 
 		return _userRepository.GetAll(filter).ToList();
@@ -82,8 +87,8 @@ public class UserService : IServiceBase<UserModel>
 		}
 
 		var user = _userRepository.GetById(item.Id.Value);
-		user.UserSessions = null;
 
+		_userSessionService.DeleteAllUserSessions(user.Id.Value);
 		_userRepository.Delete(user);
 	}
 
@@ -97,7 +102,7 @@ public class UserService : IServiceBase<UserModel>
 
 		if (_userRepository.GetAll(filter).Any())
 		{
-			throw new GenericException(GenericError.UserExist);
+			throw new ValidationException(ValidationErrorCodes.UserExist);
 		}
 	}
 }

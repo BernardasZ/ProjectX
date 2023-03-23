@@ -38,8 +38,12 @@ public class ApiMapperProfile : Profile
 			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s == 0 ? (int?)null : s));
 
 		CreateMap<UserCreateDto, UserModel>();
-		CreateMap<UserUpdateDto, UserModel>();
-		CreateMap<UserDeleteDto, UserModel>();
+		CreateMap<UserUpdateDto, UserModel>()
+			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.UserId));
+
+		CreateMap<UserDeleteDto, UserModel>()
+			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.UserId));
+
 		CreateMap<UserModel, UserResponseDto>();
 		CreateMap<UserModel, UserLoginResponseModel>();
 

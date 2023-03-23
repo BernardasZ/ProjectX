@@ -24,14 +24,10 @@ public class Startup
 	{
 		services.AddControllers()
 			.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
-		services.AddSwagger();
 		services.AddMemoryCache();
-		services.AddHttpContextAccessor();
+		services.AddApiServices(Configuration);
 		services.AddInfrastructure(Configuration);
 		services.AddApplication(Configuration);
-		services.AddLocalServices();
-		services.AddAuthentication(Configuration);
-		services.AddAuthorization();
 		services.AddAutoMapper(typeof(ApiMapperProfile));
 	}
 
@@ -48,6 +44,7 @@ public class Startup
 		{
 			c.SwaggerEndpoint("v1/swagger.json", "ToDoTasks.Api");
 			c.RoutePrefix = "swagger";
+			c.DisplayRequestDuration();
 		});
 
 		app.UseForwardedHeaders(new ForwardedHeadersOptions

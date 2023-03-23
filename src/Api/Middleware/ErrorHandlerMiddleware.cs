@@ -1,4 +1,7 @@
-﻿using Domain.Exeptions;
+﻿using Application.Database.Exceptions;
+using Application.Exceptions;
+using Domain.Exeptions;
+using Domain.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using System;
@@ -10,6 +13,7 @@ namespace Api.Middleware;
 
 public class ErrorHandlerMiddleware
 {
+	private const string _UnhandledException = "Unhandled service error occurred.";
 	private readonly RequestDelegate _next;
 	private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
@@ -27,7 +31,7 @@ public class ErrorHandlerMiddleware
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Unhandled service error.");
+			_logger.LogError(ex, _UnhandledException);
 
 			await SendErrorResponse(context, ex);
 		}
@@ -39,13 +43,29 @@ public class ErrorHandlerMiddleware
 		response.StatusCode = GetHttpStatusCode(ex);
 		response.ContentType = "application/json";
 
-		await response.WriteAsync(JsonSerializer.Serialize(ex.Message));
+		var errorMessage = GetErrorMessage(context, ex);
+
+		await response.WriteAsync(JsonSerializer.Serialize(new { Error = errorMessage }));
 	}
 
 	private static int GetHttpStatusCode(Exception exception) => exception switch
 	{
-		GenericException => StatusCodes.Status400BadRequest,
+		ValidationException => StatusCodes.Status400BadRequest,
+		RepositoryBaseException => StatusCodes.Status400BadRequest,
 		AuthenticationException => StatusCodes.Status401Unauthorized,
+		Exception => StatusCodes.Status404NotFound,
 		_ => StatusCodes.Status400BadRequest,
 	};
+
+	private static string GetErrorMessage(HttpContext context, Exception exception)
+	{
+		if (exception is IExceptionTranslationMapper exceptionBase)
+		{
+			var resourceManager = (IResourceManager)context.RequestServices.GetService(typeof(IResourceManager));
+
+			return exceptionBase.GetErrorTranslation(resourceManager);
+		}
+
+		return _UnhandledException;
+	}
 }

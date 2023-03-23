@@ -1,7 +1,8 @@
-﻿using Domain.Extensions;
+﻿using Application.Extensions;
+using Domain.Filters;
 using Domain.Models;
 
-namespace Domain.Filters;
+namespace Application.Filters;
 
 public class UserSessionFilter : IFilter<UserSessionModel>
 {
@@ -14,8 +15,8 @@ public class UserSessionFilter : IFilter<UserSessionModel>
 	public int? UserId { get; set; }
 
 	public IQueryable<UserSessionModel> GetFilter(IQueryable<UserSessionModel> query) => query
-		.Where(x => SessionIdentifier != null && x.SessionIdentifier == SessionIdentifier)
-		.Where(x => Ip != null && x.Ip == Ip)
-		.WhereIf(CreateDt != null, x => x.CreateDt == CreateDt)
-		.WhereIf(UserId != null, x => x.User.Id == UserId);
+		.WhereIf(SessionIdentifier != null, x => x.SessionIdentifier == SessionIdentifier)
+		.WhereIf(Ip != null, x => x.Ip == Ip)
+		.WhereIf(CreateDt.HasValue, x => x.CreateDt == CreateDt)
+		.WhereIf(UserId.HasValue, x => x.User.Id == UserId);
 }

@@ -1,4 +1,5 @@
 ﻿using Application.Database.Repositories;
+using Application.Filters;
 using Application.Services.Interfaces;
 using Application.Validations;
 using Domain.Filters;
@@ -39,11 +40,7 @@ public class TaskService : ITaskService
 	{
 		_userValidation.CheckIfUserIdMatchesSessionId(item.User.Id.Value);
 
-		var user = _userRepository.GetById(item.User.Id.Value);
-
-		_userValidation.CheckIfUserNotNull(user);
-
-		item.User = user;
+		item.User = _userRepository.GetById(item.User.Id.Value);
 
 		return _taskRepository.Insert(item);
 	}
@@ -51,8 +48,6 @@ public class TaskService : ITaskService
 	public TaskModel GetById(int id)
 	{
 		var task = _taskRepository.GetById(id);
-
-		_taskValidation.CheckIfTaskNotNull(task);
 
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{

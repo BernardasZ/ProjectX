@@ -1,19 +1,18 @@
 ﻿using Application.Database.DbContexts;
+using Application.Database.Enums;
+using Application.Database.Exceptions;
 using Domain.Filters;
 using Domain.Models;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Database.Repositories;
 
 public class RepositoryBase<TEntity> : IRepository<TEntity>
 	where TEntity : ModelBase
 {
-	private readonly ILogger<RepositoryBase<TEntity>> _logger;
 	protected readonly IDbContextBase Context;
 
-	public RepositoryBase(IDbContextBase context, ILogger<RepositoryBase<TEntity>> logger)
+	public RepositoryBase(IDbContextBase context)
 	{
-		_logger = logger;
 		Context = context;
 	}
 
@@ -25,9 +24,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while fetching all {typeName}s.", typeof(TEntity).Name);
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.GetAll, $"Error while fetching all {typeof(TEntity).Name}s.", ex);
 		}
 	}
 
@@ -43,9 +40,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while getting {typeName}.", typeof(TEntity).Name);
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.GetById, $"Error while getting {typeof(TEntity).Name}.", ex);
 		}
 	}
 
@@ -61,9 +56,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while inserting {typeName}.", typeof(TEntity).Name);
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.Insert, $"Error while inserting {typeof(TEntity).Name}.", ex);
 		}
 	}
 
@@ -78,9 +71,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while updating {typeName}.", typeof(TEntity).Name);
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.Update, $"Error while updating {typeof(TEntity).Name}.", ex);
 		}
 	}
 
@@ -93,9 +84,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while deleting {typeName}.", typeof(TEntity).Name);
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.Delete, $"Error while deleting {typeof(TEntity).Name}.", ex);
 		}
 	}
 
@@ -107,9 +96,7 @@ public class RepositoryBase<TEntity> : IRepository<TEntity>
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, "Error while saving changes.");
-
-			throw;
+			throw new RepositoryBaseException(RepositoryErrorCodes.Save, "Error while saving changes.", ex);
 		}
 	}
 }

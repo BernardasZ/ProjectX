@@ -1,4 +1,5 @@
 ﻿using Application.Database.Repositories;
+using Application.Filters;
 using Application.Helpers.Cryptography;
 using Application.Messages;
 using Application.Models.Login;

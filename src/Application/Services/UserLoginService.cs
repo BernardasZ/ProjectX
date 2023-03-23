@@ -1,12 +1,12 @@
 ﻿using Application.Authentication;
 using Application.Database.Repositories;
+using Application.Enums;
+using Application.Exceptions;
+using Application.Filters;
 using Application.Models.Login;
 using Application.Services.Interfaces;
 using Application.Validations;
 using AutoMapper;
-using Domain.Enums;
-using Domain.Exeptions;
-using Domain.Filters;
 using Domain.Models;
 
 namespace Application.Services;
@@ -42,11 +42,11 @@ public class UserLoginService : IUserLoginService
 		CheckUserLoginValidationCriteria(model, user);
 
 		_userSessionService.DeleteUserSessionsByIpAndUserId(user.Id.Value);
+		var session = _userSessionService.CreateUserSession(user.Id.ToString());
 
 		user.FailedLoginCount = 0;
+		user.UserSessions.Add(session);
 		user = _userRepository.Update(user);
-
-		var session = _userSessionService.CreateUserSession(user.Id.ToString());
 
 		var jwt = _jwtHelper.ConstructUserJwt(user.Role.Value.ToString(), session.SessionIdentifier);
 
@@ -58,17 +58,17 @@ public class UserLoginService : IUserLoginService
 	{
 		_userValidation.CheckIfUserNotNull(user);
 
+		if (user.FailedLoginCount > 10)
+		{
+			throw new ValidationException(ValidationErrorCodes.UserIsBlocked);
+		}
+
 		if (user.PassHash != model.PassHash)
 		{
 			user.FailedLoginCount++;
 			_userRepository.Update(user);
 
-			throw new GenericException(GenericError.UserPasswordIsIncorrect);
-		}
-
-		if (user.PassHash == model.PassHash && user.FailedLoginCount > 10)
-		{
-			throw new GenericException(GenericError.UserIsBlocked);
+			throw new ValidationException(ValidationErrorCodes.UserPasswordIsIncorrect);
 		}
 	}
 

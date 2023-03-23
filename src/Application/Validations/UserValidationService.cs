@@ -1,6 +1,7 @@
-﻿using Application.Services.Interfaces;
+﻿using Application.Enums;
+using Application.Exceptions;
+using Application.Services.Interfaces;
 using Domain.Enums;
-using Domain.Exeptions;
 using Domain.Models;
 
 namespace Application.Validations;
@@ -25,7 +26,7 @@ public class UserValidationService : IUserValidationService
 	{
 		if (model == null)
 		{
-			throw new GenericException(GenericError.UserDoesNotExist);
+			throw new ValidationException(ValidationErrorCodes.UserDoesNotExist);
 		}
 	}
 
@@ -37,7 +38,7 @@ public class UserValidationService : IUserValidationService
 
 		if (userId > 0 && userId.ToString() != sessionIdentifier.UserId)
 		{
-			throw new GenericException(GenericError.UserIdentityMissMatch);
+			throw new ValidationException(ValidationErrorCodes.UserIdentityMissMatch);
 		}
 	}
 
@@ -47,7 +48,7 @@ public class UserValidationService : IUserValidationService
 			|| model.IsTokenUsed.Value
 			|| model.TokenExpirationTime.Value <= _dateTime.GetDateTime())
 		{
-			throw new GenericException(GenericError.UserResetPasswordTokenIsExpired);
+			throw new ValidationException(ValidationErrorCodes.UserResetPasswordTokenIsExpired);
 		}
 	}
 

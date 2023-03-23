@@ -5,6 +5,7 @@ using Application.Authentication;
 using Application.Authorization;
 using Application.Services.Interfaces;
 using Domain.Constants;
+using Domain.Resources;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -18,7 +19,15 @@ namespace Api;
 
 public static class ServiceRegistration
 {
-	public static void AddAuthentication(this IServiceCollection services, IConfiguration configuration) =>
+	public static void AddApiServices(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.AddAuthentication(configuration);
+		services.AddAuthorization();
+		services.AddLocalServices();
+		services.AddSwagger();
+	}
+
+	private static void AddAuthentication(this IServiceCollection services, IConfiguration configuration) =>
 		services.AddAuthentication(x =>
 		{
 			x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -40,15 +49,17 @@ public static class ServiceRegistration
 			};
 		});
 
-	public static void AddAuthorization(this IServiceCollection services) =>
+	private static void AddAuthorization(this IServiceCollection services) =>
 		services.AddAuthorization(x =>
 		{
 			x.AddPolicy(Permissions.CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement()));
 		});
 
-	public static void AddLocalServices(this IServiceCollection services)
+	private static void AddLocalServices(this IServiceCollection services)
 	{
+		services.AddHttpContextAccessor();
 		services.AddSingleton(typeof(ICacheService<>), typeof(CacheService<>));
+		services.AddSingleton<IResourceManager, ApiErrorResourceManager>();
 		services.AddScoped<IPermissionCacheService, PermissionCacheService>();
 		services.AddScoped<IUserPermissionService, UserPermissionService>();
 		services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
@@ -56,7 +67,7 @@ public static class ServiceRegistration
 		services.AddScoped<IJwtService, JwtService>();
 	}
 
-	public static void AddSwagger(this IServiceCollection services) =>
+	private static void AddSwagger(this IServiceCollection services) =>
 		services.AddSwaggerGen(x =>
 		{
 			x.EnableAnnotations();

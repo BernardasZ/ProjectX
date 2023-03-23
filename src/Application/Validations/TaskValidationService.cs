@@ -1,5 +1,5 @@
-﻿using Domain.Enums;
-using Domain.Exeptions;
+﻿using Application.Enums;
+using Application.Exceptions;
 using Domain.Models;
 
 namespace Application.Validations;
@@ -10,7 +10,7 @@ public class TaskValidationService : ITaskValidationService
 	{
 		if (model == null)
 		{
-			throw new GenericException(GenericError.TaskDoesNotExist);
+			throw new ValidationException(ValidationErrorCodes.TaskDoesNotExist);
 		}
 	}
 }

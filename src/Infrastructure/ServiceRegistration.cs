@@ -18,13 +18,11 @@ public static class ServiceRegistration
 		services.AddMessagingService();
 	}
 
-	private static void AddProjectXDbContext(this IServiceCollection services, IConfiguration configuration)
-	{
+	private static void AddProjectXDbContext(this IServiceCollection services, IConfiguration configuration) =>
 		services.AddDbContext<IProjectXDbContext, ProjectXDbContext>(contextOptions =>
 			contextOptions.UseSqlServer(
 				configuration.GetConnectionString("ProjectXConnectionString"),
 				serverOptions => serverOptions.MigrationsAssembly("MigrationsProjextX")));
-	}
 
 	private static void AddMessagingService(this IServiceCollection services)
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace Domain.Extensions;
+namespace Application.Extensions;
 
 internal static class FilterHelperExtensions
 {

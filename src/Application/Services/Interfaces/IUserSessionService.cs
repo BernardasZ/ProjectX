@@ -11,4 +11,6 @@ public interface IUserSessionService
 	void DeleteUserSessionsByIpAndUserId();
 
 	void DeleteUserSessionsByIpAndUserId(int userId);
+
+	void DeleteAllUserSessions(int userId);
 }

@@ -1,7 +1,8 @@
-﻿using Domain.Extensions;
+﻿using Application.Extensions;
+using Domain.Filters;
 using Domain.Models;
 
-namespace Domain.Filters;
+namespace Application.Filters;
 
 public class PermissionMappingFilter : IFilter<PermissionMappingModel>
 {

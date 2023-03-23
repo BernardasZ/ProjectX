@@ -19,7 +19,7 @@ public class SessionIdentifierEncoder : ISessionIdentifierEncoder
 			identifier[(identifier.IndexOf(_splitChar) + 1)..])));
 
 	public (string UserId, DateTime DateTime) DecodeSessionIdentifier(string identifier) =>
-		DecodeSessionIdentifier(_aesCryptoHelper.DecryptString(identifier));
+		ExtractSessionIdentifierVariables(_aesCryptoHelper.DecryptString(identifier));
 
 	public string EncodeSessionIdentifier(string userId, DateTime dateTime) =>
 		_aesCryptoHelper.EncryptString(
