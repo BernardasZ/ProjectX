@@ -1,10 +1,11 @@
 ﻿using Api.Authorization;
+using Api.Constants;
+using Api.Resources;
 using Api.Services;
 using Api.Services.Interfaces;
 using Application.Authentication;
 using Application.Authorization;
 using Application.Services.Interfaces;
-using Domain.Constants;
 using Domain.Resources;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;

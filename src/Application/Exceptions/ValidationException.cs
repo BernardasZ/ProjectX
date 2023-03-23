@@ -1,5 +1,5 @@
 ﻿using Application.Enums;
-using Domain.Exeptions;
+using Application.Exeptions;
 using System.Runtime.Serialization;
 
 namespace Application.Exceptions;

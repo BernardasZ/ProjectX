@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Runtime.Serialization;
 
-namespace Domain.Exeptions;
+namespace Application.Exeptions;
 
 public abstract class ExceptionBase<TEnum> : Exception, IExceptionTranslationMapper
 	where TEnum : Enum

@@ -1,11 +1,11 @@
 ﻿using Api.Attributes;
+using Api.Constants;
 using Api.DTOs.Login;
 using Api.DTOs.User;
 using Application.Helpers.Cryptography;
 using Application.Models.Login;
 using Application.Services.Interfaces;
 using AutoMapper;
-using Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

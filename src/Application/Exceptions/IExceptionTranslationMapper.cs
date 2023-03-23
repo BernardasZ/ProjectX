@@ -1,6 +1,6 @@
 ﻿using Domain.Resources;
 
-namespace Domain.Exeptions;
+namespace Application.Exeptions;
 
 public interface IExceptionTranslationMapper
 {

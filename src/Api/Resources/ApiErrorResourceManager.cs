@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Resources;
 
-namespace Api;
+namespace Api.Resources;
 
 public class ApiErrorResourceManager : IResourceManager
 {

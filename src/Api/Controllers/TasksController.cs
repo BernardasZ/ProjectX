@@ -1,8 +1,8 @@
 ﻿using Api.Attributes;
+using Api.Constants;
 using Api.DTOs.Task;
 using Application.Services.Interfaces;
 using AutoMapper;
-using Domain.Constants;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
