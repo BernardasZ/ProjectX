@@ -1,8 +1,8 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 
 namespace Api.DTOs.User;
 
-public class UserUpdateDto : BaseValidatableObject, IDtoBase
+public class UserUpdateDto : BaseValidatableObject
 {
 	public int UserId { get; set; }
 

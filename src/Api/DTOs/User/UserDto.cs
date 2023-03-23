@@ -1,9 +1,9 @@
-﻿using Api.Validators;
-using Domain.Enums;
+﻿using Domain.Enums;
+using Domain.Validators;
 
 namespace Api.DTOs.User;
 
-public class UserDto : BaseValidatableObject, IDtoBase
+public class UserDto : BaseValidatableObject
 {
 	public int Id { get; set; }
 

@@ -1,9 +1,9 @@
-﻿using Api.Validators;
-using Domain.Enums;
+﻿using Domain.Enums;
+using Domain.Validators;
 
 namespace Api.DTOs.Task;
 
-public class TaskCreateDto : BaseValidatableObject, IDtoBase
+public class TaskCreateDto : BaseValidatableObject
 {
 	public int UserId { get; set; }
 

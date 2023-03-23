@@ -2,7 +2,7 @@
 
 namespace Api.DTOs.User;
 
-public class UserResponseDto : IDtoBase
+public class UserResponseDto
 {
 	public int Id { get; set; }
 

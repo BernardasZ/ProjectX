@@ -1,4 +1,4 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 

@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 
-namespace Api.Validators;
+namespace Domain.Validators;
 
 public abstract class BaseValidator<Validator> : IBaseValidator<Validator>
 	where Validator : IValidator

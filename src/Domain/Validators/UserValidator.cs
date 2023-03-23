@@ -1,6 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 
-namespace Api.Validators;
+namespace Domain.Validators;
 
 public class UserValidator : BaseValidator<IUserValidator>, IUserValidator
 {

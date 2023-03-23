@@ -1,8 +1,8 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 
 namespace Api.DTOs.User;
 
-public class UserDeleteDto : BaseValidatableObject, IDtoBase
+public class UserDeleteDto : BaseValidatableObject
 {
 	public int UserId { get; set; }
 

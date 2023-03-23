@@ -1,8 +1,8 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 
 namespace Api.DTOs.Login;
 
-public class UserChangePasswordDto : BaseValidatableObject, IDtoBase
+public class UserChangePasswordDto : BaseValidatableObject
 {
 	public string Email { get; set; }
 

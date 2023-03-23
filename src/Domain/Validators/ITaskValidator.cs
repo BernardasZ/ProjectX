@@ -1,4 +1,4 @@
-﻿namespace Api.Validators;
+﻿namespace Domain.Validators;
 
 public interface ITaskValidator : IBaseValidator<ITaskValidator>
 {

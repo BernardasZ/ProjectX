@@ -1,8 +1,8 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 
 namespace Api.DTOs.Login;
 
-public class InitPasswordResetDto : BaseValidatableObject, IDtoBase
+public class InitPasswordResetDto : BaseValidatableObject
 {
 	public string Email { get; set; }
 

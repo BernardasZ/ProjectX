@@ -1,8 +1,8 @@
-﻿using Api.Validators;
+﻿using Domain.Validators;
 
 namespace Api.DTOs.Login;
 
-public class UserResetPasswordDto : BaseValidatableObject, IDtoBase
+public class UserResetPasswordDto : BaseValidatableObject
 {
 	public string Token { get; set; }
 

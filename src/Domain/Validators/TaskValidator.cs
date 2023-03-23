@@ -1,4 +1,4 @@
-﻿namespace Api.Validators;
+﻿namespace Domain.Validators;
 
 public class TaskValidator : BaseValidator<ITaskValidator>, ITaskValidator
 {
