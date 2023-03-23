@@ -1,7 +1,10 @@
 ﻿using Api.Attributes;
-using Api.Constants;
-using Api.Models.User;
-using Api.Services;
+using Api.DTOs.User;
+using Application.Helpers.Cryptography;
+using Application.Services.Interfaces;
+using AutoMapper;
+using Domain.Constants;
+using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -12,67 +15,74 @@ namespace Api.Controllers;
 [ApiController]
 public class UsersController : ControllerBase
 {
-	private readonly IBaseService<UserModel> _userService;
+	private readonly IServiceBase<UserModel> _userService;
+	private readonly IHashCryptoHelper _cryptoHelper;
+	private readonly IMapper _mapper;
 
-	public UsersController(IBaseService<UserModel> userService)
+	public UsersController(
+		IServiceBase<UserModel> userService,
+		IHashCryptoHelper cryptoHelper,
+		IMapper mapper)
 	{
 		_userService = userService;
+		_cryptoHelper = cryptoHelper;
+		_mapper = mapper;
 	}
 
 	[HttpGet]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<IEnumerable<UserModel>> GetAll() =>
-		Ok(_userService.GetAll());
+	public ActionResult<IEnumerable<UserResponseDto>> GetAll()
+	{
+		var result = _userService.GetAll();
+
+		return Ok(_mapper.Map<List<UserResponseDto>>(result));
+	}
 
 	[HttpPost]
 	[AllowAnonymous]
-	public IActionResult Create([FromBody] UserCreateModel model)
+	public ActionResult<UserResponseDto> Create([FromBody] UserCreateDto dto)
 	{
-		var data = new UserModel
-		{
-			Email = model.Email,
-			Name = model.Name,
-			Password = model.Password
-		};
+		var user = _mapper
+			.Map<UserCreateDto, UserModel>(dto, map => map
+			.AfterMap((source, destination) =>
+				destination.PassHash = _cryptoHelper.GetHashString(source.Password)));
 
-		_userService.Create(data);
+		var result = _userService.Create(user);
 
-		return Ok();
+		return Ok(_mapper.Map<UserResponseDto>(result));
 	}
 
 	[HttpGet("{id}")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserModel> GetById(int id) =>
-		Ok(_userService.GetById(id));
+	public ActionResult<UserResponseDto> GetById(int id)
+	{
+		var result = _userService.GetById(id);
+
+		return Ok(_mapper.Map<UserResponseDto>(result));
+	}
 
 	[HttpPut]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserModel> Update([FromBody] UserUpdateModel model)
+	public ActionResult<UserResponseDto> Update([FromBody] UserUpdateDto dto)
 	{
-		var data = new UserModel
-		{
-			Id = model.UserId,
-			Email = model.Email,
-			Name = model.Name,
-		};
+		var user = _mapper.Map<UserModel>(dto);
 
-		return Ok(_userService.Update(data));
+		var result = _userService.Update(user);
+
+		return Ok(_mapper.Map<UserResponseDto>(result));
 	}
 
 	[HttpDelete]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult Delete([FromBody] UserDeleteModel model)
+	public ActionResult Delete([FromBody] UserDeleteDto dto)
 	{
-		var data = new UserModel
-		{
-			Id = model.UserId
-		};
+		var user = _mapper.Map<UserModel>(dto);
 
-		_userService.Delete(data);
+		_userService.Delete(user);
 
 		return Ok();
 	}

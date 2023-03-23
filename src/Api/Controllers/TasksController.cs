@@ -1,7 +1,9 @@
 ﻿using Api.Attributes;
-using Api.Constants;
-using Api.Models.Task;
-using Api.Services;
+using Api.DTOs.Task;
+using Application.Services.Interfaces;
+using AutoMapper;
+using Domain.Constants;
+using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -15,57 +17,58 @@ namespace Api.Controllers;
 public class TasksController : ControllerBase
 {
 	private readonly ITaskService _taskService;
+	private readonly IMapper _mapper;
 
-	public TasksController(ITaskService taskService)
+	public TasksController(
+		ITaskService taskService,
+		IMapper mapper)
 	{
 		_taskService = taskService;
+		_mapper = mapper;
 	}
 
 	[HttpGet("user/{id}")]
-	public ActionResult<IEnumerable<TaskModel>> GetAllByUserId(int id) =>
-		Ok(_taskService.GetAllTasksByUserId(id));
+	public ActionResult<IEnumerable<TaskDto>> GetAllByUserId(int id)
+	{
+		var result = _taskService.GetAllTasksByUserId(id);
+
+		return Ok(_mapper.Map<List<TaskDto>>(result));
+	}
 
 	[HttpPost]
-	public IActionResult Create([FromBody] TaskCreateModel model)
+	public ActionResult<TaskDto> Create([FromBody] TaskCreateDto dto)
 	{
-		var data = new TaskModel
-		{
-			UserId = model.UserId,
-			Name = model.Name,
-			Status = model.Status
-		};
+		var task = _mapper.Map<TaskModel>(dto);
 
-		return Ok(_taskService.Create(data));
+		var result = _taskService.Create(task);
+
+		return Ok(_mapper.Map<TaskDto>(result));
 	}
 
 	[HttpGet("{id}")]
-	public ActionResult<TaskModel> GetById(int id) =>
-		Ok(_taskService.GetById(id));
+	public ActionResult<TaskDto> GetById(int id)
+	{
+		var result = _taskService.GetById(id);
+
+		return Ok(_mapper.Map<TaskDto>(result));
+	}
 
 	[HttpPut]
-	public ActionResult<TaskModel> Update([FromBody] TaskUpdateModel model)
+	public ActionResult<TaskDto> Update([FromBody] TaskUpdateDto dto)
 	{
-		var data = new TaskModel
-		{
-			Id = model.Id,
-			UserId = model.UserId,
-			Name = model.Name,
-			Status = model.Status
-		};
+		var task = _mapper.Map<TaskModel>(dto);
 
-		return Ok(_taskService.Update(data));
+		var result = _taskService.Update(task);
+
+		return Ok(_mapper.Map<TaskDto>(result));
 	}
 
 	[HttpDelete]
-	public ActionResult Delete([FromBody] TaskDeleteModel model)
+	public ActionResult Delete([FromBody] TaskDeleteDto dto)
 	{
-		var data = new TaskModel
-		{
-			Id = model.Id,
-			UserId = model.UserId
-		};
+		var task = _mapper.Map<TaskModel>(dto);
 
-		_taskService.Delete(data);
+		_taskService.Delete(task);
 
 		return Ok();
 	}

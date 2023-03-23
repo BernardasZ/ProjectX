@@ -1,7 +1,6 @@
-using Api.Mapper;
+using Api.Mappers;
 using Api.Middleware;
-using Api.Options;
-using DataModel;
+using Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -23,16 +22,17 @@ public class Startup
 
 	public void ConfigureServices(IServiceCollection services)
 	{
-		services.Configure<OptionManager>(Configuration);
-		services.AddMemoryCache();
-		services.AddMySqlDbContext(Configuration);
 		services.AddControllers()
 			.AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 		services.AddSwagger();
+		services.AddMemoryCache();
+		services.AddHttpContextAccessor();
+		services.AddInfrastructure(Configuration);
+		services.AddApplication(Configuration);
+		services.AddLocalServices();
 		services.AddAuthentication(Configuration);
 		services.AddAuthorization();
-		services.AddLocalServices();
-		services.AddAutoMapper(typeof(AutoMapperProfile));
+		services.AddAutoMapper(typeof(ApiMapperProfile));
 	}
 
 	public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

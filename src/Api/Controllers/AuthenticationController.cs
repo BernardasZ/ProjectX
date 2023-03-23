@@ -1,8 +1,11 @@
 ﻿using Api.Attributes;
-using Api.Constants;
-using Api.Models.Login;
-using Api.Models.User;
-using Api.Services;
+using Api.DTOs.Login;
+using Api.DTOs.User;
+using Application.Helpers.Cryptography;
+using Application.Models.Login;
+using Application.Services.Interfaces;
+using AutoMapper;
+using Domain.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,23 +17,36 @@ public class AuthenticationController : ControllerBase
 {
 	private readonly IUserLoginService _userLoginService;
 	private readonly IUserRecoverService _userRecoverService;
+	private readonly IHashCryptoHelper _cryptoHelper;
+	private readonly IMapper _mapper;
 
 	public AuthenticationController(
 		IUserLoginService userLoginService,
-		IUserRecoverService userRecoverService)
+		IUserRecoverService userRecoverService,
+		IHashCryptoHelper cryptoHelper,
+		IMapper mapper)
 	{
 		_userLoginService = userLoginService;
 		_userRecoverService = userRecoverService;
+		_cryptoHelper = cryptoHelper;
+		_mapper = mapper;
 	}
 
-	[HttpPost]
-	[Route("login")]
+	[HttpPost("login")]
 	[AllowAnonymous]
-	public ActionResult<UserLoginResponseModel> Login([FromBody] UserLoginModel model) =>
-		Ok(_userLoginService.Login(model));
+	public ActionResult<UserLoginResponseDto> Login([FromBody] UserLoginDto dto)
+	{
+		var user = _mapper
+			.Map<UserLoginDto, UserLoginModel>(dto, map => map
+			.AfterMap((source, destination) =>
+				destination.PassHash = _cryptoHelper.GetHashString(source.Password)));
 
-	[HttpPost]
-	[Route("logout")]
+		var result = _userLoginService.Login(user);
+
+		return Ok(_mapper.Map<UserLoginResponseDto>(result));
+	}
+
+	[HttpPost("logout")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
 	public ActionResult Logout()
@@ -40,22 +56,46 @@ public class AuthenticationController : ControllerBase
 		return Ok();
 	}
 
-	[HttpPost]
-	[Route("change-password")]
+	[HttpPost("change-password")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserModel> ChangePassword([FromBody] UserChangePasswordModel model) =>
-		Ok(_userRecoverService.ChangePassword(model));
+	public ActionResult<UserResponseDto> ChangePassword([FromBody] UserChangePasswordDto dto)
+	{
+		var user = _mapper
+			.Map<UserChangePasswordDto, UserChangePasswordModel>(dto, map => map
+			.AfterMap((source, destination) =>
+			{
+				destination.NewPassHash = _cryptoHelper.GetHashString(source.NewPassword);
+				destination.OldPassHash = _cryptoHelper.GetHashString(source.OldPassword);
+			}));
 
-	[HttpPost]
-	[Route("reset-password")]
-	[AllowAnonymous]
-	public ActionResult<UserModel> ResetPassword([FromBody] UserResetPasswordModel model) =>
-		Ok(_userRecoverService.ResetPassword(model));
+		var result = _userRecoverService.ChangePassword(user);
 
-	[HttpPost]
-	[Route("init-password-reset")]
+		return Ok(_mapper.Map<UserResponseDto>(result));
+	}
+
+	[HttpPost("reset-password")]
 	[AllowAnonymous]
-	public ActionResult<bool> InitPasswordReset([FromBody] InitPasswordResetModel model) =>
-		Ok(_userRecoverService.InitUserPasswordReset(model));
+	public ActionResult<UserResponseDto> ResetPassword([FromBody] UserResetPasswordDto dto)
+	{
+		var user = _mapper
+			.Map<UserResetPasswordDto, UserResetPasswordModel>(dto, map => map
+			.AfterMap((source, destination) =>
+				destination.NewPassHash = _cryptoHelper.GetHashString(source.NewPassword)));
+
+		var result = _userRecoverService.ResetPassword(user);
+
+		return Ok(_mapper.Map<UserResponseDto>(result));
+	}
+
+	[HttpPost("init-password-reset")]
+	[AllowAnonymous]
+	public IActionResult InitPasswordReset([FromBody] InitPasswordResetDto dto)
+	{
+		var user = _mapper.Map<InitPasswordResetModel>(dto);
+
+		_userRecoverService.InitUserPasswordReset(user);
+
+		return Ok();
+	}
 }

@@ -1,4 +1,4 @@
-﻿using Api.Services;
+﻿using Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using System.Threading.Tasks;
 

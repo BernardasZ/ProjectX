@@ -1,9 +1,10 @@
 ﻿using Api.Authorization;
-using Api.Constants;
-using Api.Helpers;
-using Api.Models.User;
 using Api.Services;
-using Api.Services.Concrete;
+using Api.Services.Interfaces;
+using Application.Authentication;
+using Application.Authorization;
+using Application.Services.Interfaces;
+using Domain.Constants;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -47,24 +48,12 @@ public static class ServiceRegistration
 
 	public static void AddLocalServices(this IServiceCollection services)
 	{
-		services.AddHttpContextAccessor();
-
 		services.AddSingleton(typeof(ICacheService<>), typeof(CacheService<>));
-		services.AddScoped<IHashCryptoHelper, HashCryptoHelper>();
-		services.AddScoped<IUserServiceValidationHelper, UserServiceValidationHelper>();
-		services.AddScoped<ITaskServiceValidationHelper, TaskServiceValidationHelper>();
-		services.AddScoped<IAesCryptoHelper, AesCryptoHelper>();
+		services.AddScoped<IPermissionCacheService, PermissionCacheService>();
 		services.AddScoped<IUserPermissionService, UserPermissionService>();
 		services.AddScoped<IAuthorizationHandler, ActionPermissionAuthorizationHandler>();
-		services.AddScoped<IUserSessionService, UserSessionService>();
-		services.AddScoped<IClientContextScraper, ClientContextScraper>();
-		services.AddScoped<IJwtHelper, JwtHelper>();
-		services.AddScoped<IBaseService<UserModel>, UserService>();
-		services.AddScoped<ITaskService, TaskService>();
-		services.AddScoped<IMessageService, MessageService>();
-		services.AddScoped<IUserLoginService, UserLoginService>();
-		services.AddScoped<IPermissionCacheService, PermissionCacheService>();
-		services.AddScoped<IUserRecoverService, UserRecoverService>();
+		services.AddScoped<IClientContextScraper, ClientContextScraperService>();
+		services.AddScoped<IJwtService, JwtService>();
 	}
 
 	public static void AddSwagger(this IServiceCollection services) =>

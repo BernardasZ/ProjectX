@@ -1,6 +1,6 @@
-﻿using Api.Exeptions;
+﻿using Domain.Exeptions;
 using Microsoft.AspNetCore.Http;
-using Serilog;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Security.Authentication;
 using System.Text.Json;
@@ -10,12 +10,13 @@ namespace Api.Middleware;
 
 public class ErrorHandlerMiddleware
 {
-	private readonly ILogger logger = Log.ForContext<ErrorHandlerMiddleware>();
 	private readonly RequestDelegate _next;
+	private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
-	public ErrorHandlerMiddleware(RequestDelegate next)
+	public ErrorHandlerMiddleware(RequestDelegate next, ILogger<ErrorHandlerMiddleware> logger)
 	{
 		_next = next;
+		_logger = logger;
 	}
 
 	public async Task Invoke(HttpContext context)
@@ -26,7 +27,7 @@ public class ErrorHandlerMiddleware
 		}
 		catch (Exception ex)
 		{
-			logger.Error(ex, "Unhandled service error.");
+			_logger.LogError(ex, "Unhandled service error.");
 
 			await SendErrorResponse(context, ex);
 		}
