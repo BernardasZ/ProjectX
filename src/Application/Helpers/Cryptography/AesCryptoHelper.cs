@@ -7,60 +7,60 @@ namespace Application.Helpers.Cryptography;
 
 public class AesCryptoHelper : IAesCryptoHelper
 {
-	private readonly IOptionsMonitor<Configuration> _configuration;
+    private readonly IOptionsMonitor<CryptographySettings> _appSettings;
 
-	public AesCryptoHelper(IOptionsMonitor<Configuration> configuration)
-	{
-		_configuration = configuration;
-	}
+    public AesCryptoHelper(IOptionsMonitor<CryptographySettings> appSettings)
+    {
+        _appSettings = appSettings;
+    }
 
-	public string EncryptString(string text)
-	{
-		byte[] clearBytes = Encoding.Unicode.GetBytes(text);
+    public string EncryptString(string text)
+    {
+        byte[] clearBytes = Encoding.Unicode.GetBytes(text);
 
-		using (var encryptor = CreateAesEncryptor())
-		{
-			var stream = GetEncryptorStream(clearBytes, encryptor.CreateEncryptor());
+        using (var encryptor = CreateAesEncryptor())
+        {
+            var stream = GetEncryptorStream(clearBytes, encryptor.CreateEncryptor());
 
-			return Convert.ToBase64String(stream.ToArray());
-		}
-	}
+            return Convert.ToBase64String(stream.ToArray());
+        }
+    }
 
-	public string DecryptString(string cipherText)
-	{
-		byte[] cipherBytes = Convert.FromBase64String(cipherText.Replace(" ", "+"));
+    public string DecryptString(string cipherText)
+    {
+        byte[] cipherBytes = Convert.FromBase64String(cipherText.Replace(" ", "+"));
 
-		using (var encryptor = CreateAesEncryptor())
-		{
-			var stream = GetEncryptorStream(cipherBytes, encryptor.CreateDecryptor());
+        using (var encryptor = CreateAesEncryptor())
+        {
+            var stream = GetEncryptorStream(cipherBytes, encryptor.CreateDecryptor());
 
-			return Encoding.Unicode.GetString(stream.ToArray());
-		}
-	}
+            return Encoding.Unicode.GetString(stream.ToArray());
+        }
+    }
 
-	private static MemoryStream GetEncryptorStream(byte[] bytesToWrite, ICryptoTransform encryptor)
-	{
-		var stream = new MemoryStream();
+    private static MemoryStream GetEncryptorStream(byte[] bytesToWrite, ICryptoTransform encryptor)
+    {
+        var stream = new MemoryStream();
 
-		using (var cs = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
-		{
-			cs.Write(bytesToWrite, 0, bytesToWrite.Length);
-			cs.Close();
-		}
+        using (var cs = new CryptoStream(stream, encryptor, CryptoStreamMode.Write))
+        {
+            cs.Write(bytesToWrite, 0, bytesToWrite.Length);
+            cs.Close();
+        }
 
-		return stream;
-	}
+        return stream;
+    }
 
-	private Aes CreateAesEncryptor()
-	{
-		var encryptor = Aes.Create();
-		var pdb = new Rfc2898DeriveBytes(
-			_configuration.CurrentValue.AppSettings.AesKey,
-			Encoding.Unicode.GetBytes(_configuration.CurrentValue.AppSettings.AlgorithmIV));
+    private Aes CreateAesEncryptor()
+    {
+        var encryptor = Aes.Create();
+        var pdb = new Rfc2898DeriveBytes(
+            _appSettings.CurrentValue.AesKey,
+            Encoding.Unicode.GetBytes(_appSettings.CurrentValue.AlgorithmIV));
 
-		encryptor.Key = pdb.GetBytes(32);
-		encryptor.IV = pdb.GetBytes(16);
+        encryptor.Key = pdb.GetBytes(32);
+        encryptor.IV = pdb.GetBytes(16);
 
-		return encryptor;
-	}
+        return encryptor;
+    }
 }
