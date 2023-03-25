@@ -10,10 +10,8 @@ public class ClientContextScraperService : IClientContextScraper
 {
 	private readonly IHttpContextAccessor _httpContextAccessor;
 
-	public ClientContextScraperService(IHttpContextAccessor httpContextAccessor)
-	{
+	public ClientContextScraperService(IHttpContextAccessor httpContextAccessor) =>
 		_httpContextAccessor = httpContextAccessor;
-	}
 
 	public string GetClientIpAddress() => _httpContextAccessor.HttpContext.Request.Headers.ContainsKey("X-Forwarded-For")
 			? _httpContextAccessor.HttpContext.Request.Headers["X-Forwarded-For"].ToString().Split(":")[0].Split(',')[0].Trim()

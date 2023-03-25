@@ -30,8 +30,5 @@ public static class ServiceRegistration
 				connectionString,
 				serverOptions => serverOptions.MigrationsAssembly("MigrationsProjextX")));
 
-	private static void AddMessagingService(this IServiceCollection services)
-	{
-		services.AddScoped<IMessageService, MessageService>();
-	}
+	private static void AddMessagingService(this IServiceCollection services) => services.AddScoped<IMessageService, MessageService>();
 }

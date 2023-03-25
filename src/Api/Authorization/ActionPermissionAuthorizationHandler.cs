@@ -9,10 +9,8 @@ internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuth
 	private readonly IUserPermissionService _userPermissionService;
 
 	public ActionPermissionAuthorizationHandler(
-		IUserPermissionService userPermissionService)
-	{
+		IUserPermissionService userPermissionService) =>
 		_userPermissionService = userPermissionService;
-	}
 
 	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IAuthorizationRequirement requirement)
 	{

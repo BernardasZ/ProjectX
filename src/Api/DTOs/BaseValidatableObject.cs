@@ -8,8 +8,6 @@ public abstract class BaseValidatableObject : IValidatableObject
 {
 	protected abstract IValidator Validate();
 
-	public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-	{
-		return Validate().GetValidationResults();
-	}
+	public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext) =>
+		Validate().GetValidationResults();
 }

@@ -13,7 +13,7 @@ namespace Api.Middleware;
 
 public class ErrorHandlerMiddleware
 {
-	private const string _UnhandledException = "Unhandled service error occurred.";
+	private const string _unhandledException = "Unhandled service error occurred.";
 	private readonly RequestDelegate _next;
 	private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
@@ -31,7 +31,7 @@ public class ErrorHandlerMiddleware
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, _UnhandledException);
+			_logger.LogError(ex, _unhandledException);
 
 			await SendErrorResponse(context, ex);
 		}
@@ -66,6 +66,6 @@ public class ErrorHandlerMiddleware
 			return exceptionBase.GetErrorTranslation(resourceManager);
 		}
 
-		return _UnhandledException;
+		return _unhandledException;
 	}
 }

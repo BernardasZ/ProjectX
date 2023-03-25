@@ -2,7 +2,6 @@
 
 #nullable disable
 
-
 namespace MigrationsProjextX.Migrations;
 
 /// <inheritdoc />
@@ -19,10 +18,7 @@ public partial class Init : Migration
 					.Annotation("SqlServer:Identity", "1, 1"),
 				Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false)
 			},
-			constraints: table =>
-			{
-				table.PrimaryKey("PK_PermissionControllers", x => x.Id);
-			});
+			constraints: table => table.PrimaryKey("PK_PermissionControllers", x => x.Id));
 
 		migrationBuilder.CreateTable(
 			name: "Roles",
@@ -33,10 +29,7 @@ public partial class Init : Migration
 				Name = table.Column<string>(type: "nvarchar(255)", maxLength: 255, nullable: false),
 				Value = table.Column<int>(type: "int", nullable: false)
 			},
-			constraints: table =>
-			{
-				table.PrimaryKey("PK_Roles", x => x.Id);
-			});
+			constraints: table => table.PrimaryKey("PK_Roles", x => x.Id));
 
 		migrationBuilder.CreateTable(
 			name: "UserSessions",
@@ -48,10 +41,7 @@ public partial class Init : Migration
 				CreateDt = table.Column<DateTime>(type: "datetime2", nullable: false),
 				Ip = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false)
 			},
-			constraints: table =>
-			{
-				table.PrimaryKey("PK_UserSessions", x => x.Id);
-			});
+			constraints: table => table.PrimaryKey("PK_UserSessions", x => x.Id));
 
 		migrationBuilder.CreateTable(
 			name: "PermissionActions",
