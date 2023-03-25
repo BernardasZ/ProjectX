@@ -1,4 +1,5 @@
-﻿using Api.Attributes;
+﻿using System.Collections.Generic;
+using Api.Attributes;
 using Api.Constants;
 using Api.DTOs.Task;
 using Application.Services.Interfaces;
@@ -6,7 +7,6 @@ using AutoMapper;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Api.Controllers;
 

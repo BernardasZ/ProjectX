@@ -14,14 +14,13 @@ public static class ServiceRegistration
 {
 	public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
 	{
-		var connectionstrings = new ConnectionStrings();
-		configuration.GetSection(ConnectionStrings.SelectionName).Bind(connectionstrings);
-
-		services.Configure<SmtpSettings>(configuration);
+		var connectionstrings = new ConnectionStringSettings();
+		configuration.GetSection(ConnectionStringSettings.SelectionName).Bind(connectionstrings);
+		
 		services.AddScoped<IDbContextBase, ProjectXDbContext>();
 
 		services.AddProjectXDbContext(connectionstrings.ProjectXConnectionString);
-		services.AddMessagingService();
+		services.AddMessagingService(configuration);
 	}
 
 	private static void AddProjectXDbContext(this IServiceCollection services, string connectionString) =>
@@ -30,5 +29,10 @@ public static class ServiceRegistration
 				connectionString,
 				serverOptions => serverOptions.MigrationsAssembly("MigrationsProjextX")));
 
-	private static void AddMessagingService(this IServiceCollection services) => services.AddScoped<IMessageService, MessageService>();
+	private static void AddMessagingService(this IServiceCollection services, IConfiguration configuration)
+	{
+		services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SelectionName));
+
+		services.AddScoped<IMessageService, MessageService>();
+	}
 }

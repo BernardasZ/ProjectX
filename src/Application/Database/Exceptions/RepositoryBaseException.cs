@@ -1,6 +1,6 @@
-﻿using Application.Database.Enums;
+﻿using System.Runtime.Serialization;
+using Application.Database.Enums;
 using Domain.Exeptions;
-using System.Runtime.Serialization;
 
 namespace Application.Database.Exceptions;
 

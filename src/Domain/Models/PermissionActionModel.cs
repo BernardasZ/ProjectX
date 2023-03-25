@@ -2,10 +2,7 @@
 
 public class PermissionActionModel : ModelBase
 {
-	public PermissionActionModel()
-	{
-		PermissionMappings = new HashSet<PermissionMappingModel>();
-	}
+	public PermissionActionModel() => PermissionMappings = new HashSet<PermissionMappingModel>();
 
 	public string Name { get; set; }
 

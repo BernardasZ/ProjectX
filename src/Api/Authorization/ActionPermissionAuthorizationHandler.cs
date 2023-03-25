@@ -1,6 +1,6 @@
-﻿using Application.Services.Interfaces;
+﻿using System.Threading.Tasks;
+using Application.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using System.Threading.Tasks;
 
 namespace Api.Authorization;
 

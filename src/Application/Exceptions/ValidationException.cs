@@ -1,6 +1,6 @@
-﻿using Application.Exceptions.Enums;
+﻿using System.Runtime.Serialization;
+using Application.Exceptions.Enums;
 using Domain.Exeptions;
-using System.Runtime.Serialization;
 
 namespace Application.Exceptions;
 

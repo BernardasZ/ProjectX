@@ -1,6 +1,6 @@
-﻿using Domain.Validators;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Domain.Validators;
 
 namespace Api.DTOs;
 

@@ -1,4 +1,6 @@
-﻿using Api.Authorization;
+﻿using System;
+using System.Text;
+using Api.Authorization;
 using Api.Constants;
 using Api.Options;
 using Api.Resources;
@@ -13,8 +15,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Text;
 
 namespace Api;
 
@@ -54,14 +54,14 @@ public static class ServiceRegistration
 		});
 
 	private static void AddAuthorization(this IServiceCollection services) =>
-		services.AddAuthorization(x =>
-		{
-			x.AddPolicy(Permissions.CheckPermissions, policy => policy.Requirements.Add(new ActionPermissionRequirement()));
-		});
+		services.AddAuthorization(x => x.AddPolicy(
+			Permissions.CheckPermissions,
+			policy => policy.Requirements.Add(new ActionPermissionRequirement())));
 
 	private static void AddLocalServices(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.Configure<JwtSettings>(configuration);
+		services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SelectionName));
+
 		services.AddHttpContextAccessor();
 		services.AddSingleton(typeof(ICacheService<>), typeof(CacheService<>));
 		services.AddSingleton<IResourceManager, ApiErrorResourceManager>();

@@ -1,6 +1,6 @@
-﻿using Domain.Resources;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Resources;
+using Domain.Resources;
 
 namespace Api.Resources;
 

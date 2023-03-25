@@ -1,8 +1,8 @@
-﻿using Application.Services.Interfaces;
-using Microsoft.AspNetCore.Http;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Application.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace Api.Services;
 

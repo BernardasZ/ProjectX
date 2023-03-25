@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Infrastructure.Databases.ProjectX.Seeds;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Databases.ProjectX.Configurations;
@@ -17,5 +18,7 @@ internal class UserConfiguration : ConfigurationBase<UserModel>
 
 		builder.Navigation(x => x.Role).AutoInclude();
 		builder.Navigation(x => x.UserSessions).AutoInclude();
+
+		builder.HasData(UserSeed.GetUserSeed());
 	}
 }

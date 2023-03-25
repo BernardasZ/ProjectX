@@ -18,9 +18,10 @@ public static class ServiceRegistration
 {
 	public static void AddApplication(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.Configure<UserSettings>(configuration);
-		services.Configure<CryptographySettings>(configuration);
-		services.Configure<PermissionCacheSettings>(configuration);
+		services.Configure<UserSettings>(configuration.GetSection(UserSettings.SelectionName));
+		services.Configure<CryptographySettings>(configuration.GetSection(CryptographySettings.SelectionName));
+		services.Configure<PermissionCacheSettings>(configuration.GetSection(PermissionCacheSettings.SelectionName));
+
 		services.AddScoped(typeof(IRepositoryBase<>), typeof(RepositoryBase<>));
 		services.AddScoped<IHashCryptoHelper, HashCryptoHelper>();
 		services.AddScoped<IUserValidationService, UserValidationService>();

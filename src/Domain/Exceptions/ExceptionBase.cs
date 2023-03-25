@@ -1,6 +1,6 @@
-﻿using Domain.Resources;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Runtime.Serialization;
+using Domain.Resources;
 
 namespace Domain.Exeptions;
 

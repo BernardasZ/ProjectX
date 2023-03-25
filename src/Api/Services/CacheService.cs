@@ -1,6 +1,6 @@
-﻿using Application.Services.Interfaces;
+﻿using System;
+using Application.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
-using System;
 
 namespace Api.Services;
 

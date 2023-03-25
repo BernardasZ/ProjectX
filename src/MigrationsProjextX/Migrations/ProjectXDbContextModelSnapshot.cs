@@ -43,6 +43,92 @@ namespace MigrationsProjextX.Migrations
                     b.HasIndex("ControllerId");
 
                     b.ToTable("PermissionActions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ControllerId = 1,
+                            Name = "Logout"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ControllerId = 1,
+                            Name = "ChangePassword"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ControllerId = 1,
+                            Name = "All"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            ControllerId = 2,
+                            Name = "GetAllByUserId"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            ControllerId = 2,
+                            Name = "Create"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            ControllerId = 2,
+                            Name = "GetById"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            ControllerId = 2,
+                            Name = "Update"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            ControllerId = 2,
+                            Name = "Delete"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            ControllerId = 2,
+                            Name = "All"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            ControllerId = 3,
+                            Name = "GetAll"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            ControllerId = 3,
+                            Name = "GetById"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            ControllerId = 3,
+                            Name = "Update"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            ControllerId = 3,
+                            Name = "Delete"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            ControllerId = 3,
+                            Name = "All"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Models.PermissionControllerModel", b =>
@@ -61,6 +147,23 @@ namespace MigrationsProjextX.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("PermissionControllers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Authentication"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Tasks"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Name = "Users"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Models.PermissionMappingModel", b =>
@@ -92,6 +195,32 @@ namespace MigrationsProjextX.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("PermissionMappings");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            ActionId = 3,
+                            AllowAllActions = true,
+                            ControllerId = 1,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            ActionId = 9,
+                            AllowAllActions = true,
+                            ControllerId = 2,
+                            RoleId = 1
+                        },
+                        new
+                        {
+                            Id = 3,
+                            ActionId = 14,
+                            AllowAllActions = true,
+                            ControllerId = 3,
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("Domain.Models.RoleModel", b =>
@@ -199,6 +328,17 @@ namespace MigrationsProjextX.Migrations
                     b.HasIndex("RoleId");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Email = "admin@projectx.com",
+                            FailedLoginCount = 0,
+                            Name = "projectxadmin",
+                            PassHash = "E5scnWql/WJsaL0tYvsNKVbYP8ZJR0s0WNNhCjLlcXw=",
+                            RoleId = 1
+                        });
                 });
 
             modelBuilder.Entity("Domain.Models.UserSessionModel", b =>

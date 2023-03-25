@@ -1,13 +1,13 @@
-﻿using Application.Database.Exceptions;
+﻿using System;
+using System.Security.Authentication;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Application.Database.Exceptions;
 using Application.Exceptions;
 using Domain.Exeptions;
 using Domain.Resources;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Security.Authentication;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Api.Middleware;
 

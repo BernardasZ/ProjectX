@@ -1,4 +1,5 @@
 ﻿using Domain.Models;
+using Infrastructure.Databases.ProjectX.Seeds;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Infrastructure.Databases.ProjectX.Configurations;
@@ -14,5 +15,7 @@ internal class PermissionMappingConfiguration : ConfigurationBase<PermissionMapp
 		builder.Navigation(x => x.Role).AutoInclude();
 		builder.Navigation(x => x.Action).AutoInclude();
 		builder.Navigation(x => x.Controller).AutoInclude();
+
+		builder.HasData(PermissionMappingSeed.GetPermissionMappingSeed());
 	}
 }

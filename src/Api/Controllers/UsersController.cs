@@ -1,4 +1,5 @@
-﻿using Api.Attributes;
+﻿using System.Collections.Generic;
+using Api.Attributes;
 using Api.Constants;
 using Api.DTOs.User;
 using Application.Helpers.Cryptography;
@@ -7,7 +8,6 @@ using Domain.Abstractions;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 
 namespace Api.Controllers;
 

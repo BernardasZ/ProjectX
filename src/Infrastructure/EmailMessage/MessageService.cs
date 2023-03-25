@@ -1,11 +1,11 @@
-﻿using Application.Messages;
-using Infrastructure.EmailMessage.Options;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
+using Application.Messages;
+using Infrastructure.EmailMessage.Options;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Infrastructure.EmailMessage;
 
