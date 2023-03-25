@@ -4,15 +4,15 @@ using Domain.Models;
 namespace Domain.Abstractions;
 
 public interface IServiceBase<TModel>
-    where TModel : ModelBase
+	where TModel : ModelBase
 {
-    List<TModel> GetAll(IFilter<TModel> filter = default);
+	List<TModel> GetAll(IFilter<TModel> filter = default);
 
-    TModel GetById(int id);
+	TModel GetById(int id);
 
-    TModel Create(TModel item);
+	TModel Create(TModel item);
 
-    TModel Update(TModel item);
+	TModel Update(TModel item);
 
-    void Delete(TModel item);
+	void Delete(TModel item);
 }

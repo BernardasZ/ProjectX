@@ -5,24 +5,24 @@ using System.Runtime.Serialization;
 namespace Domain.Exeptions;
 
 public abstract class ExceptionBase<TEnum> : Exception, IExceptionTranslationMapper
-    where TEnum : Enum
+	where TEnum : Enum
 {
-    private readonly TEnum ErrorCode;
+	private readonly TEnum ErrorCode;
 
-    public ExceptionBase(TEnum errorCode)
-        : base() => ErrorCode = errorCode;
+	public ExceptionBase(TEnum errorCode)
+		: base() => ErrorCode = errorCode;
 
-    public ExceptionBase(
-        TEnum errorCode,
-        string message = null,
-        Exception innerException = null)
-        : base(message, innerException) => ErrorCode = errorCode;
+	public ExceptionBase(
+		TEnum errorCode,
+		string message = null,
+		Exception innerException = null)
+		: base(message, innerException) => ErrorCode = errorCode;
 
-    protected ExceptionBase(SerializationInfo info, StreamingContext context)
-        : base(info, context)
-    {
-    }
+	protected ExceptionBase(SerializationInfo info, StreamingContext context)
+		: base(info, context)
+	{
+	}
 
-    public virtual string GetErrorTranslation(IResourceManager resourceManager) =>
-        resourceManager.GetString($"{GetType().Name}_{ErrorCode}", CultureInfo.CurrentCulture);
+	public virtual string GetErrorTranslation(IResourceManager resourceManager) =>
+		resourceManager.GetString($"{GetType().Name}_{ErrorCode}", CultureInfo.CurrentCulture);
 }

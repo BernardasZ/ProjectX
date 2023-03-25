@@ -11,37 +11,37 @@ namespace Api.Services;
 
 public class JwtService : IJwtService
 {
-    private readonly IOptionsMonitor<JwtSettings> _jwtSettings;
-    private readonly IDateTime _dateTime;
+	private readonly IOptionsMonitor<JwtSettings> _jwtSettings;
+	private readonly IDateTime _dateTime;
 
-    public JwtService(
-        IOptionsMonitor<JwtSettings> jwtSettings,
-        IDateTime dateTime)
-    {
-        _jwtSettings = jwtSettings;
-        _dateTime = dateTime;
-    }
+	public JwtService(
+		IOptionsMonitor<JwtSettings> jwtSettings,
+		IDateTime dateTime)
+	{
+		_jwtSettings = jwtSettings;
+		_dateTime = dateTime;
+	}
 
-    public string ConstructUserJwt(string role, string identifier)
-    {
-        var claims = new ClaimsIdentity(new Claim[]
-        {
-            new Claim(ClaimTypes.Role, role),
-            new Claim(ClaimTypes.NameIdentifier, identifier)
-        });
+	public string ConstructUserJwt(string role, string identifier)
+	{
+		var claims = new ClaimsIdentity(new Claim[]
+		{
+			new Claim(ClaimTypes.Role, role),
+			new Claim(ClaimTypes.NameIdentifier, identifier)
+		});
 
-        var key = Encoding.ASCII.GetBytes(_jwtSettings.CurrentValue.JWTSecret);
-        var days = _jwtSettings.CurrentValue.JWTExpirationInDay;
+		var key = Encoding.ASCII.GetBytes(_jwtSettings.CurrentValue.JWTSecret);
+		var days = _jwtSettings.CurrentValue.JWTExpirationInDay;
 
-        var tokenDescriptor = new SecurityTokenDescriptor
-        {
-            Subject = claims,
-            Expires = _dateTime.GetDateTime().AddDays(days),
-            SigningCredentials = new SigningCredentials(
-                new SymmetricSecurityKey(key),
-                SecurityAlgorithms.HmacSha256Signature)
-        };
+		var tokenDescriptor = new SecurityTokenDescriptor
+		{
+			Subject = claims,
+			Expires = _dateTime.GetDateTime().AddDays(days),
+			SigningCredentials = new SigningCredentials(
+				new SymmetricSecurityKey(key),
+				SecurityAlgorithms.HmacSha256Signature)
+		};
 
-        return new JwtSecurityTokenHandler().CreateEncodedJwt(tokenDescriptor);
-    }
+		return new JwtSecurityTokenHandler().CreateEncodedJwt(tokenDescriptor);
+	}
 }

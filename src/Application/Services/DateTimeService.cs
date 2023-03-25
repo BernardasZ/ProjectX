@@ -4,5 +4,5 @@ namespace Application.Services;
 
 public class DateTimeService : IDateTime
 {
-    public DateTime GetDateTime() => DateTime.UtcNow;
+	public DateTime GetDateTime() => DateTime.UtcNow;
 }

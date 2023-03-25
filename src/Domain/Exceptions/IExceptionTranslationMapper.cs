@@ -4,5 +4,5 @@ namespace Domain.Exeptions;
 
 public interface IExceptionTranslationMapper
 {
-    string GetErrorTranslation(IResourceManager resourceManager);
+	string GetErrorTranslation(IResourceManager resourceManager);
 }

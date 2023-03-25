@@ -2,5 +2,5 @@
 
 public interface IDateTime
 {
-    DateTime GetDateTime();
+	DateTime GetDateTime();
 }

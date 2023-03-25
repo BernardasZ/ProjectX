@@ -7,8 +7,8 @@ public class HashCryptoHelper : IHashCryptoHelper
 {
 	public string GetHashString(string text)
 	{
-		using SHA256 mySHA256 = SHA256.Create();
-		byte[] hashValue = mySHA256.ComputeHash(Encoding.Unicode.GetBytes(text));
+		using var mySHA256 = SHA256.Create();
+		var hashValue = mySHA256.ComputeHash(Encoding.Unicode.GetBytes(text));
 
 		return Convert.ToBase64String(hashValue);
 	}

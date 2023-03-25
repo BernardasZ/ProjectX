@@ -14,86 +14,86 @@ namespace Application.Services;
 
 public class UserRecoverService : IUserRecoverService
 {
-    private readonly IRepositoryBase<UserModel> _userRepository;
-    private readonly IHashCryptoHelper _cryptoHelper;
-    private readonly IOptionsMonitor<UserSettings> _appSettings;
-    private readonly IMessageService _messageService;
-    private readonly IUserValidationService _userValidation;
-    private readonly IDateTime _dateTime;
+	private readonly IRepositoryBase<UserModel> _userRepository;
+	private readonly IHashCryptoHelper _cryptoHelper;
+	private readonly IOptionsMonitor<UserSettings> _appSettings;
+	private readonly IMessageService _messageService;
+	private readonly IUserValidationService _userValidation;
+	private readonly IDateTime _dateTime;
 
-    public UserRecoverService(
-        IRepositoryBase<UserModel> userDataRepository,
-        IHashCryptoHelper hashCryptoHelper,
-        IOptionsMonitor<UserSettings> appSettings,
-        IMessageService messageService,
-        IUserValidationService userValidation,
-        IDateTime dateTime)
-    {
-        _userRepository = userDataRepository;
-        _cryptoHelper = hashCryptoHelper;
-        _appSettings = appSettings;
-        _messageService = messageService;
-        _userValidation = userValidation;
-        _dateTime = dateTime;
-    }
+	public UserRecoverService(
+		IRepositoryBase<UserModel> userDataRepository,
+		IHashCryptoHelper hashCryptoHelper,
+		IOptionsMonitor<UserSettings> appSettings,
+		IMessageService messageService,
+		IUserValidationService userValidation,
+		IDateTime dateTime)
+	{
+		_userRepository = userDataRepository;
+		_cryptoHelper = hashCryptoHelper;
+		_appSettings = appSettings;
+		_messageService = messageService;
+		_userValidation = userValidation;
+		_dateTime = dateTime;
+	}
 
-    public UserModel ChangePassword(UserChangePasswordModel model)
-    {
-        var filter = new UserFilter
-        {
-            Email = model.Email,
-            PassHash = model.OldPassHash
-        };
+	public UserModel ChangePassword(UserChangePasswordModel model)
+	{
+		var filter = new UserFilter
+		{
+			Email = model.Email,
+			PassHash = model.OldPassHash
+		};
 
-        var user = GetUserByFilter(filter);
+		var user = GetUserByFilter(filter);
 
-        user.PassHash = model.NewPassHash;
-        user.FailedLoginCount = 0;
+		user.PassHash = model.NewPassHash;
+		user.FailedLoginCount = 0;
 
-        return _userRepository.Update(user);
-    }
+		return _userRepository.Update(user);
+	}
 
-    public UserModel ResetPassword(UserResetPasswordModel model)
-    {
-        var user = GetUserByFilter(new UserFilter { TokenHash = model.Token });
+	public UserModel ResetPassword(UserResetPasswordModel model)
+	{
+		var user = GetUserByFilter(new UserFilter { TokenHash = model.Token });
 
-        _userValidation.CheckIfUserPasswordResetTokenIsValid(user);
+		_userValidation.CheckIfUserPasswordResetTokenIsValid(user);
 
-        user.PassHash = model.NewPassHash;
-        user.IsTokenUsed = true;
-        user.FailedLoginCount = 0;
+		user.PassHash = model.NewPassHash;
+		user.IsTokenUsed = true;
+		user.FailedLoginCount = 0;
 
-        return _userRepository.Update(user);
-    }
+		return _userRepository.Update(user);
+	}
 
-    public void InitUserPasswordReset(InitPasswordResetModel model)
-    {
-        var user = GetUserByFilter(new UserFilter { Email = model.Email });
+	public void InitUserPasswordReset(InitPasswordResetModel model)
+	{
+		var user = GetUserByFilter(new UserFilter { Email = model.Email });
 
-        user.IsTokenUsed = false;
-        user.TokenExpirationTime = _dateTime.GetDateTime()
-            .AddMinutes(_appSettings.CurrentValue.PasswordResetExpirationInMin);
-        user.TokenHash = _cryptoHelper.GetHashString(model.Email);
+		user.IsTokenUsed = false;
+		user.TokenExpirationTime = _dateTime.GetDateTime()
+			.AddMinutes(_appSettings.CurrentValue.PasswordResetExpirationInMin);
+		user.TokenHash = _cryptoHelper.GetHashString(model.Email);
 
-        var result = _userRepository.Update(user);
+		var result = _userRepository.Update(user);
 
-        SendPasswordResetConfitmationEmail(result);
-    }
+		SendPasswordResetConfitmationEmail(result);
+	}
 
-    private UserModel GetUserByFilter(IFilter<UserModel> filter)
-    {
-        var user = _userRepository.GetAll(filter).FirstOrDefault();
+	private UserModel GetUserByFilter(IFilter<UserModel> filter)
+	{
+		var user = _userRepository.GetAll(filter).FirstOrDefault();
 
-        _userValidation.CheckIfUserNotNull(user);
+		_userValidation.CheckIfUserNotNull(user);
 
-        return user;
-    }
+		return user;
+	}
 
-    private void SendPasswordResetConfitmationEmail(UserModel model)
-    {
-        _messageService.SendEmailMessage(
-            model.Email,
-            ApplicationResource.MessageSubject_PasswordReset,
-            string.Format(ApplicationResource.MessageTemplate_PasswordReset, model.TokenHash));
-    }
+	private void SendPasswordResetConfitmationEmail(UserModel model)
+	{
+		_messageService.SendEmailMessage(
+			model.Email,
+			ApplicationResource.MessageSubject_PasswordReset,
+			string.Format(ApplicationResource.MessageTemplate_PasswordReset, model.TokenHash));
+	}
 }

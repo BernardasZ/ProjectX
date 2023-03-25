@@ -6,11 +6,11 @@ namespace Application.Validations;
 
 public class TaskValidationService : ITaskValidationService
 {
-    public void CheckIfTaskNotNull(TaskModel model)
-    {
-        if (model == null)
-        {
-            throw new ValidationException(ValidationErrorCodes.TaskDoesNotExist);
-        }
-    }
+	public void CheckIfTaskNotNull(TaskModel model)
+	{
+		if (model == null)
+		{
+			throw new ValidationException(ValidationErrorCodes.TaskDoesNotExist);
+		}
+	}
 }

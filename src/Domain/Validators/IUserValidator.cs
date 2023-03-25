@@ -1,9 +1,8 @@
-﻿namespace Domain.Validators
-{
-	public interface IUserValidator : IBaseValidator<IUserValidator>
-	{
-		IUserValidator ValidateEmail(string value, string name);
+﻿namespace Domain.Validators;
 
-		IUserValidator ValidatePassword(string value, string name);
-	}
+public interface IUserValidator : IBaseValidator<IUserValidator>
+{
+	IUserValidator ValidateEmail(string value, string name);
+
+	IUserValidator ValidatePassword(string value, string name);
 }

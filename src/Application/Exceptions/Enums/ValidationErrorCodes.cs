@@ -2,11 +2,11 @@
 
 public enum ValidationErrorCodes
 {
-    TaskDoesNotExist,
-    UserExist,
-    UserDoesNotExist,
-    UserIdentityMissMatch,
-    UserResetPasswordTokenIsExpired,
-    UserPasswordIsIncorrect,
-    UserIsBlocked
+	TaskDoesNotExist,
+	UserExist,
+	UserDoesNotExist,
+	UserIdentityMissMatch,
+	UserResetPasswordTokenIsExpired,
+	UserPasswordIsIncorrect,
+	UserIsBlocked
 }

@@ -4,7 +4,7 @@ namespace Application.Services.Interfaces;
 
 public interface IUserPermissionService
 {
-    bool ValidateUserPermissions();
+	bool ValidateUserPermissions();
 
-    List<PermissionMappingModel> GetPermissions();
+	List<PermissionMappingModel> GetPermissions();
 }

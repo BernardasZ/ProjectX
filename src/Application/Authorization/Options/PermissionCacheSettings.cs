@@ -2,9 +2,9 @@
 
 public class PermissionCacheSettings
 {
-    public const string SelectionName = nameof(PermissionCacheSettings);
+	public const string SelectionName = nameof(PermissionCacheSettings);
 
-    public string Key { get; set; }
+	public string Key { get; set; }
 
-    public int ExpirationTimeInMin { get; set; }
+	public int ExpirationTimeInMin { get; set; }
 }
