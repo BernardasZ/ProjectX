@@ -71,7 +71,8 @@ public class TaskService : ITaskService
 
 		_taskValidation.CheckIfTaskNotNull(task);
 
-		task.Name = item.Name;
+		task.Title = item.Title;
+		task.Description = item.Description;
 		task.Status = item.Status;
 
 		return _taskRepository.Update(task);
@@ -93,8 +94,5 @@ public class TaskService : ITaskService
 		_taskRepository.Delete(task);
 	}
 
-	public List<TaskModel> GetAll(IFilter<TaskModel> filter = null)
-	{
-		throw new NotImplementedException();
-	}
+	public List<TaskModel> GetAll(IFilter<TaskModel> filter = null) => throw new NotImplementedException();
 }

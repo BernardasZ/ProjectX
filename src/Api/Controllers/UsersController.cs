@@ -32,16 +32,16 @@ public class UsersController : ControllerBase
 	[HttpGet]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<IEnumerable<UserResponseDto>> GetAll()
+	public ActionResult<IEnumerable<UserDto>> GetAll()
 	{
 		var result = _userService.GetAll();
 
-		return Ok(_mapper.Map<List<UserResponseDto>>(result));
+		return Ok(_mapper.Map<List<UserDto>>(result));
 	}
 
 	[HttpPost]
 	[AllowAnonymous]
-	public ActionResult<UserResponseDto> Create([FromBody] UserCreateDto dto)
+	public ActionResult<UserDto> Create([FromBody] UserCreateDto dto)
 	{
 		var user = _mapper
 			.Map<UserCreateDto, UserModel>(dto, map => map
@@ -50,29 +50,29 @@ public class UsersController : ControllerBase
 
 		var result = _userService.Create(user);
 
-		return Ok(_mapper.Map<UserResponseDto>(result));
+		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpGet("{id}")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserResponseDto> GetById(int id)
+	public ActionResult<UserDto> GetById(int id)
 	{
 		var result = _userService.GetById(id);
 
-		return Ok(_mapper.Map<UserResponseDto>(result));
+		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpPut]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserResponseDto> Update([FromBody] UserUpdateDto dto)
+	public ActionResult<UserDto> Update([FromBody] UserUpdateDto dto)
 	{
 		var user = _mapper.Map<UserModel>(dto);
 
 		var result = _userService.Update(user);
 
-		return Ok(_mapper.Map<UserResponseDto>(result));
+		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpDelete]

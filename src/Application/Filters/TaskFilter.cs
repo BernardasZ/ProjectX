@@ -19,5 +19,5 @@ public class TaskFilter : IFilter<TaskModel>
 		.WhereIf(Id != null, x => x.Id == Id)
 		.WhereIf(UserId != null, x => x.User.Id == UserId)
 		.WhereIf(Status != null, x => x.Status == Status)
-		.WhereIf(!string.IsNullOrWhiteSpace(Name), x => x.Name == Name);
+		.WhereIf(!string.IsNullOrWhiteSpace(Name), x => x.Title == Name);
 }

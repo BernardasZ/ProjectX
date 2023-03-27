@@ -59,7 +59,7 @@ public class AuthenticationController : ControllerBase
 	[HttpPost("change-password")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserResponseDto> ChangePassword([FromBody] UserChangePasswordDto dto)
+	public ActionResult<UserDto> ChangePassword([FromBody] UserChangePasswordDto dto)
 	{
 		var user = _mapper
 			.Map<UserChangePasswordDto, UserChangePasswordModel>(dto, map => map
@@ -71,12 +71,12 @@ public class AuthenticationController : ControllerBase
 
 		var result = _userRecoverService.ChangePassword(user);
 
-		return Ok(_mapper.Map<UserResponseDto>(result));
+		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpPost("reset-password")]
 	[AllowAnonymous]
-	public ActionResult<UserResponseDto> ResetPassword([FromBody] UserResetPasswordDto dto)
+	public ActionResult<UserDto> ResetPassword([FromBody] UserResetPasswordDto dto)
 	{
 		var user = _mapper
 			.Map<UserResetPasswordDto, UserResetPasswordModel>(dto, map => map
@@ -85,7 +85,7 @@ public class AuthenticationController : ControllerBase
 
 		var result = _userRecoverService.ResetPassword(user);
 
-		return Ok(_mapper.Map<UserResponseDto>(result));
+		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpPost("init-password-reset")]

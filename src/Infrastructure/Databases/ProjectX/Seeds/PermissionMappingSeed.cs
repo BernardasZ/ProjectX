@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Infrastructure.Helpers;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("Infrastructure.Tests")]
 
@@ -9,13 +10,13 @@ internal class PermissionMappingSeed
 {
 	public static IEnumerable<object> GetPermissionMappingSeed() =>
 		PermissionActionSeed.GetPermissionActionSeed()
-			.Where(action => action.GetType().GetProperty("Name").GetValue(action).Equals("All"))
+			.Where(action => ReflectionHelper.GetPropertyValue<string>(action, "Name").Equals("All"))
 			.Select((action, index) => new
 			{
 				Id = index + 1,
 				AllowAllActions = true,
-				ActionId = action.GetType().GetProperty("Id").GetValue(action),
-				ControllerId = action.GetType().GetProperty("ControllerId").GetValue(action),
+				ActionId = ReflectionHelper.GetPropertyValue<int>(action, "Id"),
+				ControllerId = ReflectionHelper.GetPropertyValue<int>(action, "ControllerId"),
 				RoleId = 1
 			});
 }

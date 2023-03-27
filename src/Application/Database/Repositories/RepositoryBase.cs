@@ -12,10 +12,7 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 {
 	protected readonly IDbContextBase Context;
 
-	public RepositoryBase(IDbContextBase context)
-	{
-		Context = context;
-	}
+	public RepositoryBase(IDbContextBase context) => Context = context;
 
 	public virtual List<TEntity> GetAll(IFilter<TEntity> filter = default)
 	{

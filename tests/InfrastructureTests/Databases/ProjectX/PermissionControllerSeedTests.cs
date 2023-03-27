@@ -16,18 +16,17 @@ public class PermissionControllerSeedTests
 			.Select(x => x.Name)
 			.ToList();
 
-		var controllers = Assembly.LoadFrom("Api")
+		var controllerNames = Assembly.LoadFrom("Api")
 			.DefinedTypes
 			.Where(type => type.BaseType == typeof(ControllerBase))
 			.Where(controller =>
 				controller.GetMethods().Any(method => method.GetCustomAttribute(typeof(AuthorizeAttribute)) != null
 					&& controller.GetCustomAttribute(typeof(AuthorizeAttribute)) == null)
 				|| controller.GetCustomAttribute(typeof(AuthorizeAttribute)) != null)
+			.Select(controller => controller.Name.Replace("Controller", string.Empty))
 			.ToList();
 
-		Assert.Equal(controllers.Count, permissionControllers.Count);
-		Assert.True(controllers.All(controller =>
-			permissionControllers.Contains(
-				controller.Name.Replace("Controller", string.Empty))));
+		Assert.Equal(controllerNames.Count, permissionControllers.Count);
+		Assert.True(controllerNames.All(name => permissionControllers.Contains(name)));
 	}
 }

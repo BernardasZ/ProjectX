@@ -20,7 +20,7 @@ public class ApiMapperProfile : Profile
 		CreateMap<TaskModel, TaskDto>()
 			.ForMember(dest => dest.UserId, opt => opt.MapFrom(s => s.User))
 			.ReverseMap()
-			.ForMember(dest => dest.User, opt => opt.MapFrom(s => s.UserId));
+			.ForMember(dest => dest.User, opt => opt.MapFrom(s => s.Id));
 
 		CreateMap<RoleModel, UserRole>()
 			.ConvertUsing(s => s.Value);
@@ -39,12 +39,11 @@ public class ApiMapperProfile : Profile
 
 		CreateMap<UserCreateDto, UserModel>();
 		CreateMap<UserUpdateDto, UserModel>()
-			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.UserId));
+			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.Id));
 
 		CreateMap<UserDeleteDto, UserModel>()
-			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.UserId));
+			.ForMember(dest => dest.Id, opt => opt.MapFrom(s => s.Id));
 
-		CreateMap<UserModel, UserResponseDto>();
 		CreateMap<UserModel, UserLoginResponseModel>();
 
 		CreateMap<UserLoginDto, UserLoginModel>();

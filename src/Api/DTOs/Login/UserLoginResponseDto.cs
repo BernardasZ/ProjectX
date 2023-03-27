@@ -2,7 +2,7 @@
 
 namespace Api.DTOs.Login;
 
-public class UserLoginResponseDto : UserResponseDto
+public class UserLoginResponseDto : UserDto
 {
 	public string JWT { get; set; }
 }

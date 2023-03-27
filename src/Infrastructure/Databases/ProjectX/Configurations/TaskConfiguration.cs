@@ -9,7 +9,8 @@ internal class TaskConfiguration : ConfigurationBase<TaskModel>
 	{
 		base.Configure(builder);
 
-		builder.Property(x => x.Name).HasMaxLength(255).IsRequired();
+		builder.Property(x => x.Title).HasMaxLength(255).IsRequired();
+		builder.Property(x => x.Description).HasMaxLength(1000).IsRequired();
 		builder.Property(x => x.Status).IsRequired();
 
 		builder.Navigation(x => x.User).AutoInclude();

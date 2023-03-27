@@ -29,15 +29,9 @@ public class UserService : IServiceBase<UserModel>
 		_userSessionService = userSessionService;
 	}
 
-	public List<UserModel> GetAll(IFilter<UserModel> filter)
-	{
-		if (!_userValidation.CheckIfUserIsAdmin())
-		{
-			throw new ValidationException(ValidationErrorCodes.UserIdentityMissMatch);
-		}
-
-		return _userRepository.GetAll(filter).ToList();
-	}
+	public List<UserModel> GetAll(IFilter<UserModel> filter) => !_userValidation.CheckIfUserIsAdmin()
+			? throw new ValidationException(ValidationErrorCodes.UserIdentityMissMatch)
+			: _userRepository.GetAll(filter).ToList();
 
 	public UserModel Create(UserModel item)
 	{
