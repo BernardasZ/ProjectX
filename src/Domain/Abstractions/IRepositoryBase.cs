@@ -6,15 +6,15 @@ namespace Domain.Abstractions;
 public interface IRepositoryBase<TEntity>
 	where TEntity : ModelBase
 {
-	List<TEntity> GetAll(IFilter<TEntity> filter = default);
+	Task<List<TEntity>> GetAllAsync(IFilter<TEntity> filter = default);
 
-	TEntity GetById(int id);
+	Task<TEntity> GetByIdAsync(int id);
 
-	TEntity Insert(TEntity entity);
+	Task<TEntity> InsertAsync(TEntity entity);
 
-	TEntity Update(TEntity entity);
+	Task<TEntity> UpdateAsync(TEntity entity);
 
-	void Delete(TEntity entity);
+	Task DeleteAsync(TEntity entity);
 
-	void Save();
+	Task SaveAsync();
 }

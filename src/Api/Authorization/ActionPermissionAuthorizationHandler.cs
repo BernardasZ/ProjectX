@@ -12,9 +12,9 @@ internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuth
 		IUserPermissionService userPermissionService) =>
 		_userPermissionService = userPermissionService;
 
-	protected override Task HandleRequirementAsync(AuthorizationHandlerContext context, IAuthorizationRequirement requirement)
+	protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context, IAuthorizationRequirement requirement)
 	{
-		if (_userPermissionService.ValidateUserPermissions())
+		if (await _userPermissionService.ValidateUserPermissionsAsync())
 		{
 			context.Succeed(requirement);
 		}
@@ -23,6 +23,6 @@ internal class ActionPermissionAuthorizationHandler : AuthorizationHandler<IAuth
 			context.Fail();
 		}
 
-		return Task.CompletedTask;
+		await Task.CompletedTask;
 	}
 }

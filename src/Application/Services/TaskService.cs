@@ -26,28 +26,28 @@ public class TaskService : ITaskService
 		_taskValidation = taskValidation;
 	}
 
-	public List<TaskModel> GetAllTasksByUserId(int id)
+	public async Task<List<TaskModel>> GetAllTasksByUserIdAsync(int id)
 	{
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
 			_userValidation.CheckIfUserIdMatchesSessionId(id);
 		}
 
-		return _taskRepository.GetAll(new TaskFilter { UserId = id });
+		return await _taskRepository.GetAllAsync(new TaskFilter { UserId = id });
 	}
 
-	public TaskModel Create(TaskModel item)
+	public async Task<TaskModel> CreateAsync(TaskModel item)
 	{
 		_userValidation.CheckIfUserIdMatchesSessionId(item.User.Id.Value);
 
-		item.User = _userRepository.GetById(item.User.Id.Value);
+		item.User = await _userRepository.GetByIdAsync(item.User.Id.Value);
 
-		return _taskRepository.Insert(item);
+		return await _taskRepository.InsertAsync(item);
 	}
 
-	public TaskModel GetById(int id)
+	public async Task<TaskModel> GetByIdAsync(int id)
 	{
-		var task = _taskRepository.GetById(id);
+		var task = await _taskRepository.GetByIdAsync(id);
 
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
@@ -57,7 +57,7 @@ public class TaskService : ITaskService
 		return task;
 	}
 
-	public TaskModel Update(TaskModel item)
+	public async Task<TaskModel> UpdateAsync(TaskModel item)
 	{
 		_userValidation.CheckIfUserIdMatchesSessionId(item.User.Id.Value);
 
@@ -67,7 +67,7 @@ public class TaskService : ITaskService
 			UserId = item.User.Id
 		};
 
-		var task = _taskRepository.GetAll(filter).FirstOrDefault();
+		var task = (await _taskRepository.GetAllAsync(filter)).FirstOrDefault();
 
 		_taskValidation.CheckIfTaskNotNull(task);
 
@@ -75,10 +75,10 @@ public class TaskService : ITaskService
 		task.Description = item.Description;
 		task.Status = item.Status;
 
-		return _taskRepository.Update(task);
+		return await _taskRepository.UpdateAsync(task);
 	}
 
-	public void Delete(TaskModel item)
+	public async Task DeleteAsync(TaskModel item)
 	{
 		_userValidation.CheckIfUserIdMatchesSessionId(item.User.Id.Value);
 
@@ -88,11 +88,11 @@ public class TaskService : ITaskService
 			UserId = _userValidation.CheckIfUserIsAdmin() ? null : item.User.Id
 		};
 
-		var task = _taskRepository.GetAll(filter).FirstOrDefault();
+		var task = (await _taskRepository.GetAllAsync(filter)).FirstOrDefault();
 
 		_taskValidation.CheckIfTaskNotNull(task);
-		_taskRepository.Delete(task);
+		await _taskRepository.DeleteAsync(task);
 	}
 
-	public List<TaskModel> GetAll(IFilter<TaskModel> filter = null) => throw new NotImplementedException();
+	public Task<List<TaskModel>> GetAllAsync(IFilter<TaskModel> filter = null) => Task.FromResult<List<TaskModel>>(new());
 }

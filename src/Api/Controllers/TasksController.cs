@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.Attributes;
 using Api.Constants;
 using Api.DTOs.Task;
@@ -28,47 +29,47 @@ public class TasksController : ControllerBase
 	}
 
 	[HttpGet("user/{id}")]
-	public ActionResult<IEnumerable<TaskDto>> GetAllByUserId(int id)
+	public async Task<ActionResult<IEnumerable<TaskDto>>> GetAllByUserIdAsync(int id)
 	{
-		var result = _taskService.GetAllTasksByUserId(id);
+		var result = await _taskService.GetAllTasksByUserIdAsync(id);
 
 		return Ok(_mapper.Map<List<TaskDto>>(result));
 	}
 
 	[HttpPost]
-	public ActionResult<TaskDto> Create([FromBody] TaskCreateDto dto)
+	public async Task<ActionResult<TaskDto>> CreateAsync([FromBody] TaskCreateDto dto)
 	{
 		var task = _mapper.Map<TaskModel>(dto);
 
-		var result = _taskService.Create(task);
+		var result = await _taskService.CreateAsync(task);
 
 		return Ok(_mapper.Map<TaskDto>(result));
 	}
 
 	[HttpGet("{id}")]
-	public ActionResult<TaskDto> GetById(int id)
+	public async Task<ActionResult<TaskDto>> GetByIdAsync(int id)
 	{
-		var result = _taskService.GetById(id);
+		var result = await _taskService.GetByIdAsync(id);
 
 		return Ok(_mapper.Map<TaskDto>(result));
 	}
 
 	[HttpPut]
-	public ActionResult<TaskDto> Update([FromBody] TaskUpdateDto dto)
+	public async Task<ActionResult<TaskDto>> UpdateAsync([FromBody] TaskUpdateDto dto)
 	{
 		var task = _mapper.Map<TaskModel>(dto);
 
-		var result = _taskService.Update(task);
+		var result = await _taskService.UpdateAsync(task);
 
 		return Ok(_mapper.Map<TaskDto>(result));
 	}
 
 	[HttpDelete]
-	public ActionResult Delete([FromBody] TaskDeleteDto dto)
+	public async Task<ActionResult> DeleteAsync([FromBody] TaskDeleteDto dto)
 	{
 		var task = _mapper.Map<TaskModel>(dto);
 
-		_taskService.Delete(task);
+		await _taskService.DeleteAsync(task);
 
 		return Ok();
 	}

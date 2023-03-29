@@ -33,20 +33,20 @@ public class UserLoginService : IUserLoginService
 		_mapper = mapper;
 	}
 
-	public UserLoginResponseModel Login(UserLoginModel model)
+	public async Task<UserLoginResponseModel> LoginAsync(UserLoginModel model)
 	{
 		var filter = new UserFilter { Email = model.Email, };
 
-		var user = _userRepository.GetAll(filter).FirstOrDefault();
+		var user = (await _userRepository.GetAllAsync(filter)).FirstOrDefault();
 
-		CheckUserLoginValidationCriteria(model, user);
+		await CheckUserLoginValidationCriteriaAsync(model, user);
 
-		_userSessionService.DeleteUserSessionsByIpAndUserId(user.Id.Value);
-		var session = _userSessionService.CreateUserSession(user.Id.ToString());
+		await _userSessionService.DeleteUserSessionsByIpAndUserIdAsync(user.Id.Value);
+		var session = await _userSessionService.CreateUserSessionAsync(user.Id.ToString());
 
 		user.FailedLoginCount = 0;
 		user.UserSessions.Add(session);
-		user = _userRepository.Update(user);
+		user = await _userRepository.UpdateAsync(user);
 
 		var jwt = _jwtHelper.ConstructUserJwt(user.Role.Value.ToString(), session.SessionIdentifier);
 
@@ -54,7 +54,7 @@ public class UserLoginService : IUserLoginService
 			map.AfterMap((src, dest) => dest.JWT = jwt));
 	}
 
-	private void CheckUserLoginValidationCriteria(UserLoginModel model, UserModel user)
+	private async Task CheckUserLoginValidationCriteriaAsync(UserLoginModel model, UserModel user)
 	{
 		_userValidation.CheckIfUserNotNull(user);
 
@@ -66,11 +66,11 @@ public class UserLoginService : IUserLoginService
 		if (user.PassHash != model.PassHash)
 		{
 			user.FailedLoginCount++;
-			_userRepository.Update(user);
+			await _userRepository.UpdateAsync(user);
 
 			throw new ValidationException(ValidationErrorCodes.UserPasswordIsIncorrect);
 		}
 	}
 
-	public void Logout() => _userSessionService.DeleteUserSessionsByIpAndUserId();
+	public async Task LogoutAsync() => await _userSessionService.DeleteUserSessionsByIpAndUserIdAsync();
 }

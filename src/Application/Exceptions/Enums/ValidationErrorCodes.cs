@@ -8,5 +8,8 @@ public enum ValidationErrorCodes
 	UserIdentityMissMatch,
 	UserResetPasswordTokenIsExpired,
 	UserPasswordIsIncorrect,
-	UserIsBlocked
+	UserIsBlocked,
+	UserSessionExpired,
+	FailedToChallangeToken,
+	FailedToValidateToken
 }

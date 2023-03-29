@@ -29,72 +29,73 @@ public class UserService : IServiceBase<UserModel>
 		_userSessionService = userSessionService;
 	}
 
-	public List<UserModel> GetAll(IFilter<UserModel> filter) => !_userValidation.CheckIfUserIsAdmin()
+	public async Task<List<UserModel>> GetAllAsync(IFilter<UserModel> filter) => !_userValidation.CheckIfUserIsAdmin()
 			? throw new ValidationException(ValidationErrorCodes.UserIdentityMissMatch)
-			: _userRepository.GetAll(filter).ToList();
+			: await _userRepository.GetAllAsync(filter);
 
-	public UserModel Create(UserModel item)
+	public async Task<UserModel> CreateAsync(UserModel item)
 	{
-		CheckIfUserHaveDuplicates(item);
+		await CheckIfUserHaveDuplicatesAsync(item);
 
 		var roleFilter = new RoleFilter { Value = UserRole.User };
 
-		var role = _roleRepository.GetAll(roleFilter).FirstOrDefault();
+		var role = (await _roleRepository.GetAllAsync(roleFilter)).FirstOrDefault();
 
 		item.Role = role;
 
-		return _userRepository.Insert(item);
+		return await _userRepository.InsertAsync(item);
 	}
 
-	public UserModel GetById(int id)
+	public async Task<UserModel> GetByIdAsync(int id)
 	{
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
 			_userValidation.CheckIfUserIdMatchesSessionId(id);
 		}
 
-		return _userRepository.GetById(id);
+		return await _userRepository.GetByIdAsync(id);
 	}
 
-	public UserModel Update(UserModel item)
+	public async Task<UserModel> UpdateAsync(UserModel item)
 	{
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
 			_userValidation.CheckIfUserIdMatchesSessionId(item.Id.Value);
 		}
 
-		CheckIfUserHaveDuplicates(item);
+		await CheckIfUserHaveDuplicatesAsync(item);
 
-		var user = _userRepository.GetById(item.Id.Value);
+		var user = await _userRepository.GetByIdAsync(item.Id.Value);
 
 		user.Email = item.Email;
 		user.Name = item.Name;
 
-		return _userRepository.Update(user);
+		return await _userRepository.UpdateAsync(user);
 	}
 
-	public void Delete(UserModel item)
+	public async Task DeleteAsync(UserModel item)
 	{
 		if (!_userValidation.CheckIfUserIsAdmin())
 		{
 			_userValidation.CheckIfUserIdMatchesSessionId(item.Id.Value);
 		}
 
-		var user = _userRepository.GetById(item.Id.Value);
+		var user = await _userRepository.GetByIdAsync(item.Id.Value);
 
-		_userSessionService.DeleteAllUserSessions(user.Id.Value);
-		_userRepository.Delete(user);
+		await _userSessionService.DeleteAllUserSessionsAsync(user.Id.Value);
+		await _userRepository.DeleteAsync(user);
 	}
 
-	private void CheckIfUserHaveDuplicates(UserModel item)
+	private async Task CheckIfUserHaveDuplicatesAsync(UserModel item)
 	{
 		var filter = new FindAnyUserFilter
 		{
+			Id = item.Id.Value,
 			Email = item.Email,
 			Name = item.Name
 		};
 
-		if (_userRepository.GetAll(filter).Any())
+		if ((await _userRepository.GetAllAsync(filter)).Any())
 		{
 			throw new ValidationException(ValidationErrorCodes.UserExist);
 		}

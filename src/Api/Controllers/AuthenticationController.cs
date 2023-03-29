@@ -1,4 +1,5 @@
-﻿using Api.Attributes;
+﻿using System.Threading.Tasks;
+using Api.Attributes;
 using Api.Constants;
 using Api.DTOs.Login;
 using Api.DTOs.User;
@@ -34,24 +35,24 @@ public class AuthenticationController : ControllerBase
 
 	[HttpPost("login")]
 	[AllowAnonymous]
-	public ActionResult<UserLoginResponseDto> Login([FromBody] UserLoginDto dto)
+	public async Task<ActionResult<UserLoginResponseDto>> LoginAsync([FromBody] UserLoginDto dto)
 	{
 		var user = _mapper
 			.Map<UserLoginDto, UserLoginModel>(dto, map => map
 			.AfterMap((source, destination) =>
 				destination.PassHash = _cryptoHelper.GetHashString(source.Password)));
 
-		var result = _userLoginService.Login(user);
+		var result = await _userLoginService.LoginAsync(user);
 
 		return Ok(_mapper.Map<UserLoginResponseDto>(result));
 	}
 
-	[HttpPost("logout")]
+	[HttpDelete("logout")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult Logout()
+	public async Task<ActionResult> LogoutAsync()
 	{
-		_userLoginService.Logout();
+		await _userLoginService.LogoutAsync();
 
 		return Ok();
 	}
@@ -59,7 +60,7 @@ public class AuthenticationController : ControllerBase
 	[HttpPost("change-password")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserDto> ChangePassword([FromBody] UserChangePasswordDto dto)
+	public async Task<ActionResult<UserDto>> ChangePasswordAsync([FromBody] UserChangePasswordDto dto)
 	{
 		var user = _mapper
 			.Map<UserChangePasswordDto, UserChangePasswordModel>(dto, map => map
@@ -69,33 +70,38 @@ public class AuthenticationController : ControllerBase
 				destination.OldPassHash = _cryptoHelper.GetHashString(source.OldPassword);
 			}));
 
-		var result = _userRecoverService.ChangePassword(user);
+		var result = await _userRecoverService.ChangePasswordAsync(user);
 
 		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpPost("reset-password")]
 	[AllowAnonymous]
-	public ActionResult<UserDto> ResetPassword([FromBody] UserResetPasswordDto dto)
+	public async Task<ActionResult<UserDto>> ResetPasswordAsync([FromBody] UserResetPasswordDto dto)
 	{
 		var user = _mapper
 			.Map<UserResetPasswordDto, UserResetPasswordModel>(dto, map => map
 			.AfterMap((source, destination) =>
 				destination.NewPassHash = _cryptoHelper.GetHashString(source.NewPassword)));
 
-		var result = _userRecoverService.ResetPassword(user);
+		var result = await _userRecoverService.ResetPasswordAsync(user);
 
 		return Ok(_mapper.Map<UserDto>(result));
 	}
 
 	[HttpPost("init-password-reset")]
 	[AllowAnonymous]
-	public IActionResult InitPasswordReset([FromBody] InitPasswordResetDto dto)
+	public async Task<ActionResult> InitPasswordResetAsync([FromBody] InitPasswordResetDto dto)
 	{
 		var user = _mapper.Map<InitPasswordResetModel>(dto);
 
-		_userRecoverService.InitUserPasswordReset(user);
+		await _userRecoverService.InitUserPasswordResetAsync(user);
 
 		return Ok();
 	}
+
+	[HttpGet("check-session")]
+	[Authorize(Permissions.CheckPermissions)]
+	[SessionCheck]
+	public ActionResult CheckSession() => Ok();
 }

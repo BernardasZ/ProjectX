@@ -4,5 +4,5 @@ namespace Application.Authorization;
 
 public interface IPermissionCacheService
 {
-	List<PermissionMappingModel> GetCache();
+	Task<List<PermissionMappingModel>> GetCacheAsync();
 }

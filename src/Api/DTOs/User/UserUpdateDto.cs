@@ -12,5 +12,6 @@ public class UserUpdateDto : BaseValidatableObject
 
 	protected override IBaseValidator<IUserValidator> Validate() => new UserValidator()
 			.ValidateId(Id, nameof(Id))
+			.ValidateString(Name, nameof(Name))
 			.ValidateEmail(Email, nameof(Email));
 }

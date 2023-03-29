@@ -6,13 +6,13 @@ namespace Domain.Abstractions;
 public interface IServiceBase<TModel>
 	where TModel : ModelBase
 {
-	List<TModel> GetAll(IFilter<TModel> filter = default);
+	Task<List<TModel>> GetAllAsync(IFilter<TModel> filter = default);
 
-	TModel GetById(int id);
+	Task<TModel> GetByIdAsync(int id);
 
-	TModel Create(TModel item);
+	Task<TModel> CreateAsync(TModel item);
 
-	TModel Update(TModel item);
+	Task<TModel> UpdateAsync(TModel item);
 
-	void Delete(TModel item);
+	Task DeleteAsync(TModel item);
 }

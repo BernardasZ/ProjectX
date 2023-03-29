@@ -22,14 +22,14 @@ public class PermissionCacheService : IPermissionCacheService
 		_permissionCacheSettings = permissionCacheSettings;
 	}
 
-	public List<PermissionMappingModel> GetCache() => GetPermissionsCache() ?? SetPermissionsCache();
+	public async Task<List<PermissionMappingModel>> GetCacheAsync() => GetPermissionsCache() ?? await SetPermissionsCacheAsync();
 
 	private List<PermissionMappingModel> GetPermissionsCache() => _cacheService.GetCache(GetKey());
 
-	private List<PermissionMappingModel> SetPermissionsCache() =>
-		_cacheService.SetCache(GetPermissionMappingData(), GetKey(), GetExpirationTime());
+	private async Task<List<PermissionMappingModel>> SetPermissionsCacheAsync() =>
+		_cacheService.SetCache(await GetPermissionMappingDataAsync(), GetKey(), GetExpirationTime());
 
-	private List<PermissionMappingModel> GetPermissionMappingData() => _repository.GetAll().ToList();
+	private async Task<List<PermissionMappingModel>> GetPermissionMappingDataAsync() => await _repository.GetAllAsync();
 
 	private string GetKey() => _permissionCacheSettings.CurrentValue.Key;
 

@@ -4,6 +4,7 @@ using Application.Database.Exceptions;
 using Domain.Abstractions;
 using Domain.Filters;
 using Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Application.Database.Repositories;
 
@@ -14,11 +15,11 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 
 	public RepositoryBase(IDbContextBase context) => Context = context;
 
-	public virtual List<TEntity> GetAll(IFilter<TEntity> filter = default)
+	public virtual async Task<List<TEntity>> GetAllAsync(IFilter<TEntity> filter = default)
 	{
 		try
 		{
-			return GetFilterQuery(filter).ToList();
+			return await GetFilterQuery(filter).ToListAsync();
 		}
 		catch (Exception ex)
 		{
@@ -30,11 +31,11 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 			? filter.GetFilter(Context.Set<TEntity>().AsQueryable())
 			: Context.Set<TEntity>().AsQueryable();
 
-	public virtual TEntity GetById(int id)
+	public virtual async Task<TEntity> GetByIdAsync(int id)
 	{
 		try
 		{
-			return Context.Set<TEntity>().Single(x => x.Id == id);
+			return await Context.Set<TEntity>().SingleAsync(x => x.Id == id);
 		}
 		catch (Exception ex)
 		{
@@ -42,13 +43,13 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 		}
 	}
 
-	public virtual TEntity Insert(TEntity item)
+	public virtual async Task<TEntity> InsertAsync(TEntity item)
 	{
 		try
 		{
-			var entityEntry = Context.Set<TEntity>().Add(item);
+			var entityEntry = await Context.Set<TEntity>().AddAsync(item);
 
-			Save();
+			await SaveAsync();
 
 			return entityEntry.Entity;
 		}
@@ -58,12 +59,12 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 		}
 	}
 
-	public virtual TEntity Update(TEntity item)
+	public virtual async Task<TEntity> UpdateAsync(TEntity item)
 	{
 		try
 		{
 			var entityEntry = Context.Set<TEntity>().Update(item);
-			Save();
+			await SaveAsync();
 
 			return entityEntry.Entity;
 		}
@@ -73,12 +74,12 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 		}
 	}
 
-	public virtual void Delete(TEntity entity)
+	public virtual async Task DeleteAsync(TEntity entity)
 	{
 		try
 		{
 			Context.Set<TEntity>().Remove(entity);
-			Save();
+			await SaveAsync();
 		}
 		catch (Exception ex)
 		{
@@ -86,11 +87,11 @@ public class RepositoryBase<TEntity> : IRepositoryBase<TEntity>
 		}
 	}
 
-	public virtual void Save()
+	public virtual async Task SaveAsync()
 	{
 		try
 		{
-			Context.SaveChanges();
+			await Context.SaveChangesAsync();
 		}
 		catch (Exception ex)
 		{

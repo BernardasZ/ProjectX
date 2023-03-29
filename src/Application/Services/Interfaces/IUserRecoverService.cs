@@ -5,9 +5,9 @@ namespace Application.Services.Interfaces;
 
 public interface IUserRecoverService
 {
-	UserModel ChangePassword(UserChangePasswordModel model);
+	Task<UserModel> ChangePasswordAsync(UserChangePasswordModel model);
 
-	UserModel ResetPassword(UserResetPasswordModel model);
+	Task<UserModel> ResetPasswordAsync(UserResetPasswordModel model);
 
-	void InitUserPasswordReset(InitPasswordResetModel model);
+	Task InitUserPasswordResetAsync(InitPasswordResetModel model);
 }

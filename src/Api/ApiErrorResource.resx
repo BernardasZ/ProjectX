@@ -135,6 +135,12 @@
   <data name="RepositoryBaseException_Update" xml:space="preserve">
     <value>Error occurred while updating database entity.</value>
   </data>
+  <data name="ValidationException_FailedToChallangeToken" xml:space="preserve">
+    <value>Failed to challage users' token.</value>
+  </data>
+  <data name="ValidationException_FailedToValidateToken" xml:space="preserve">
+    <value>Failed to validate users' token.</value>
+  </data>
   <data name="ValidationException_TaskDoesNotExist" xml:space="preserve">
     <value>To do task does not exist.</value>
   </data>
@@ -155,5 +161,8 @@
   </data>
   <data name="ValidationException_UserResetPasswordTokenIsExpired" xml:space="preserve">
     <value>Users' reset token is expired.</value>
+  </data>
+  <data name="ValidationException_UserSessionExpired" xml:space="preserve">
+    <value>Users' session is expired.</value>
   </data>
 </root>

@@ -5,5 +5,5 @@ namespace Application.Services.Interfaces;
 
 public interface ITaskService : IServiceBase<TaskModel>
 {
-	List<TaskModel> GetAllTasksByUserId(int id);
+	Task<List<TaskModel>> GetAllTasksByUserIdAsync(int id);
 }

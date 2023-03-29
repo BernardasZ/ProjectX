@@ -24,7 +24,7 @@ public class UserSessionService : IUserSessionService
 		_sessionIdentifierEncoder = sessionIdentifierEncoder;
 	}
 
-	public bool IsValidUserSession()
+	public async Task<bool> IsValidUserSessionAsync()
 	{
 		var filter = new UserSessionFilter
 		{
@@ -32,10 +32,10 @@ public class UserSessionService : IUserSessionService
 			Ip = _clientContextScraper.GetClientIpAddress()
 		};
 
-		return _userSessionRepository.GetAll(filter).Any();
+		return (await _userSessionRepository.GetAllAsync(filter)).Any();
 	}
 
-	public UserSessionModel CreateUserSession(string userId)
+	public async Task<UserSessionModel> CreateUserSessionAsync(string userId)
 	{
 		var dateTime = _dateTime.GetDateTime();
 
@@ -46,10 +46,10 @@ public class UserSessionService : IUserSessionService
 			CreateDt = dateTime
 		};
 
-		return _userSessionRepository.Insert(session);
+		return await _userSessionRepository.InsertAsync(session);
 	}
 
-	public void DeleteUserSessionsByIpAndUserId()
+	public async Task DeleteUserSessionsByIpAndUserIdAsync()
 	{
 		var filter = new UserSessionFilter
 		{
@@ -57,10 +57,10 @@ public class UserSessionService : IUserSessionService
 			Ip = _clientContextScraper.GetClientIpAddress()
 		};
 
-		DeleteUserSessions(filter);
+		await DeleteUserSessionsAsync(filter);
 	}
 
-	public void DeleteUserSessionsByIpAndUserId(int userId)
+	public async Task DeleteUserSessionsByIpAndUserIdAsync(int userId)
 	{
 		var filter = new UserSessionFilter
 		{
@@ -68,20 +68,23 @@ public class UserSessionService : IUserSessionService
 			Ip = _clientContextScraper.GetClientIpAddress()
 		};
 
-		DeleteUserSessions(filter);
+		await DeleteUserSessionsAsync(filter);
 	}
 
-	public void DeleteAllUserSessions(int userId)
+	public async Task DeleteAllUserSessionsAsync(int userId)
 	{
 		var filter = new UserSessionFilter { UserId = userId };
 
-		DeleteUserSessions(filter);
+		await DeleteUserSessionsAsync(filter);
 	}
 
-	private void DeleteUserSessions(UserSessionFilter filter)
+	private async Task DeleteUserSessionsAsync(UserSessionFilter filter)
 	{
-		var sessions = _userSessionRepository.GetAll(filter);
+		var sessions = await _userSessionRepository.GetAllAsync(filter);
 
-		sessions.ForEach(session => _userSessionRepository.Delete(session));
+		foreach (var session in sessions)
+		{
+			await _userSessionRepository.DeleteAsync(session);
+		}
 	}
 }

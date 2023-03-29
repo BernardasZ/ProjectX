@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading.Tasks;
 using Api.Authorization;
 using Api.Constants;
 using Api.Options;
@@ -7,10 +8,13 @@ using Api.Resources;
 using Api.Services;
 using Application.Authentication;
 using Application.Authorization;
+using Application.Exceptions;
+using Application.Exceptions.Enums;
 using Application.Services.Interfaces;
 using Domain.Resources;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -50,6 +54,25 @@ public static class ServiceRegistration
 				ValidateIssuer = false,
 				ValidateAudience = false,
 				ClockSkew = TimeSpan.Zero
+			};
+
+			x.Events = new JwtBearerEvents
+			{
+				OnChallenge = context => throw new ValidationException(
+						ValidationErrorCodes.FailedToChallangeToken,
+						context.AuthenticateFailure?.Message,
+						context.AuthenticateFailure,
+						StatusCodes.Status401Unauthorized),
+				OnAuthenticationFailed = async context =>
+				{
+					context.Fail(new ValidationException(
+						ValidationErrorCodes.FailedToValidateToken,
+						context.Exception?.Message,
+						context.Exception,
+						StatusCodes.Status401Unauthorized));
+
+					await Task.CompletedTask;
+				}
 			};
 		});
 

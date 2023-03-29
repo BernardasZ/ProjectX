@@ -11,8 +11,17 @@ public class RepositoryBaseException : ExceptionBase<RepositoryErrorCodes>
 	{
 	}
 
-	public RepositoryBaseException(RepositoryErrorCodes errorCode, string message = null, Exception innerException = null)
-		: base(errorCode, message, innerException)
+	public RepositoryBaseException(RepositoryErrorCodes errorCode, int statusCode)
+		: base(errorCode, statusCode)
+	{
+	}
+
+	public RepositoryBaseException(
+		RepositoryErrorCodes errorCode,
+		string message = null,
+		Exception innerException = null,
+		int? statusCode = null)
+		: base(errorCode, message, innerException, statusCode)
 	{
 	}
 

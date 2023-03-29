@@ -8,9 +8,13 @@ public class UserValidator : BaseValidator<IUserValidator>, IUserValidator
 
 	public IUserValidator ValidateEmail(string value, string name)
 	{
-		if (string.IsNullOrWhiteSpace(value) || !new Regex(_emailRegex).IsMatch(value))
+		if (string.IsNullOrWhiteSpace(value))
 		{
-			AddDefaultMessage(name);
+			AddDefaultMessage(name);		
+		}
+		else if (!new Regex(_emailRegex).IsMatch(value))
+		{
+			AddCustomMessage("Incorrect email format.", name);
 		}
 
 		return GetValidator();
@@ -24,7 +28,7 @@ public class UserValidator : BaseValidator<IUserValidator>, IUserValidator
 		}
 		else if (value.Length < 12)
 		{
-			AddCustomMessage($"Invalid property \"{name}\", is too short.");
+			AddCustomMessage("Password is too short.", name);
 		}
 
 		return GetValidator();

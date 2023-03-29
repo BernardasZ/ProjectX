@@ -4,13 +4,13 @@ namespace Application.Services.Interfaces;
 
 public interface IUserSessionService
 {
-	bool IsValidUserSession();
+	Task<bool> IsValidUserSessionAsync();
 
-	UserSessionModel CreateUserSession(string userId);
+	Task<UserSessionModel> CreateUserSessionAsync(string userId);
 
-	void DeleteUserSessionsByIpAndUserId();
+	Task DeleteUserSessionsByIpAndUserIdAsync();
 
-	void DeleteUserSessionsByIpAndUserId(int userId);
+	Task DeleteUserSessionsByIpAndUserIdAsync(int userId);
 
-	void DeleteAllUserSessions(int userId);
+	Task DeleteAllUserSessionsAsync(int userId);
 }

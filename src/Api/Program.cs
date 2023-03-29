@@ -9,7 +9,7 @@ namespace Api;
 
 public class Program
 {
-	private const string _template = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {Message}{NewLine:1}{Exception:1}";
+	private const string _template = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} {CorrelationId} {Message}{NewLine:1}{Exception:1}";
 
 	public static void Main(string[] args)
 	{
@@ -33,9 +33,10 @@ public class Program
 
 	public static void CreateLogger() =>
 		Log.Logger = new LoggerConfiguration()
-			.MinimumLevel.Debug()
+			.MinimumLevel.Information()
 			.MinimumLevel.Override("Microsoft", LogEventLevel.Information)
 			.Enrich.FromLogContext()
+			.Enrich.WithCorrelationId()
 			.WriteTo.Console(outputTemplate: _template)
 			.WriteTo.Debug()
 			.WriteTo.File(
@@ -51,8 +52,5 @@ public class Program
 				l.ClearProviders();
 				l.AddSerilog();
 			})
-			.ConfigureWebHostDefaults(webBuilder =>
-			{
-				webBuilder.UseStartup<Startup>();
-			});
+			.ConfigureWebHostDefaults(webBuilder => webBuilder.UseStartup<Startup>());
 }

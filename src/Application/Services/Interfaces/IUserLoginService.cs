@@ -4,7 +4,7 @@ namespace Application.Services.Interfaces;
 
 public interface IUserLoginService
 {
-	UserLoginResponseModel Login(UserLoginModel model);
+	Task<UserLoginResponseModel> LoginAsync(UserLoginModel model);
 
-	void Logout();
+	Task LogoutAsync();
 }

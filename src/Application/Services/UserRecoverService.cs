@@ -37,7 +37,7 @@ public class UserRecoverService : IUserRecoverService
 		_dateTime = dateTime;
 	}
 
-	public UserModel ChangePassword(UserChangePasswordModel model)
+	public async Task<UserModel> ChangePasswordAsync(UserChangePasswordModel model)
 	{
 		var filter = new UserFilter
 		{
@@ -45,17 +45,17 @@ public class UserRecoverService : IUserRecoverService
 			PassHash = model.OldPassHash
 		};
 
-		var user = GetUserByFilter(filter);
+		var user = await GetUserByFilterAsync(filter);
 
 		user.PassHash = model.NewPassHash;
 		user.FailedLoginCount = 0;
 
-		return _userRepository.Update(user);
+		return await _userRepository.UpdateAsync(user);
 	}
 
-	public UserModel ResetPassword(UserResetPasswordModel model)
+	public async Task<UserModel> ResetPasswordAsync(UserResetPasswordModel model)
 	{
-		var user = GetUserByFilter(new UserFilter { TokenHash = model.Token });
+		var user = await GetUserByFilterAsync(new UserFilter { TokenHash = model.Token });
 
 		_userValidation.CheckIfUserPasswordResetTokenIsValid(user);
 
@@ -63,37 +63,35 @@ public class UserRecoverService : IUserRecoverService
 		user.IsTokenUsed = true;
 		user.FailedLoginCount = 0;
 
-		return _userRepository.Update(user);
+		return await _userRepository.UpdateAsync(user);
 	}
 
-	public void InitUserPasswordReset(InitPasswordResetModel model)
+	public async Task InitUserPasswordResetAsync(InitPasswordResetModel model)
 	{
-		var user = GetUserByFilter(new UserFilter { Email = model.Email });
+		var user = await GetUserByFilterAsync(new UserFilter { Email = model.Email });
 
 		user.IsTokenUsed = false;
 		user.TokenExpirationTime = _dateTime.GetDateTime()
 			.AddMinutes(_appSettings.CurrentValue.PasswordResetExpirationInMin);
 		user.TokenHash = _cryptoHelper.GetHashString(model.Email);
 
-		var result = _userRepository.Update(user);
+		var result = await _userRepository.UpdateAsync(user);
 
 		SendPasswordResetConfitmationEmail(result);
 	}
 
-	private UserModel GetUserByFilter(IFilter<UserModel> filter)
+	private async Task<UserModel> GetUserByFilterAsync(IFilter<UserModel> filter)
 	{
-		var user = _userRepository.GetAll(filter).FirstOrDefault();
+		var user = (await _userRepository.GetAllAsync(filter)).FirstOrDefault();
 
 		_userValidation.CheckIfUserNotNull(user);
 
 		return user;
 	}
 
-	private void SendPasswordResetConfitmationEmail(UserModel model)
-	{
+	private void SendPasswordResetConfitmationEmail(UserModel model) =>
 		_messageService.SendEmailMessage(
 			model.Email,
 			ApplicationResource.MessageSubject_PasswordReset,
 			string.Format(ApplicationResource.MessageTemplate_PasswordReset, model.TokenHash));
-	}
 }

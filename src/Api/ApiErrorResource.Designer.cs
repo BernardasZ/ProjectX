@@ -115,6 +115,24 @@ namespace Api {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to challage users&apos; token..
+        /// </summary>
+        public static string ValidationException_FailedToChallangeToken {
+            get {
+                return ResourceManager.GetString("ValidationException_FailedToChallangeToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to validate users&apos; token..
+        /// </summary>
+        public static string ValidationException_FailedToValidateToken {
+            get {
+                return ResourceManager.GetString("ValidationException_FailedToValidateToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To do task does not exist..
         /// </summary>
         public static string ValidationException_TaskDoesNotExist {
@@ -174,6 +192,15 @@ namespace Api {
         public static string ValidationException_UserResetPasswordTokenIsExpired {
             get {
                 return ResourceManager.GetString("ValidationException_UserResetPasswordTokenIsExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Users&apos; session is expired..
+        /// </summary>
+        public static string ValidationException_UserSessionExpired {
+            get {
+                return ResourceManager.GetString("ValidationException_UserSessionExpired", resourceCulture);
             }
         }
     }

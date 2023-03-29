@@ -31,9 +31,10 @@ public abstract class BaseValidator<Validator> : IBaseValidator<Validator>
 
 	public IEnumerable<ValidationResult> GetValidationResults() => ValidationResults;
 
-	protected void AddDefaultMessage(string name) => AddMessage($"Invalid property \"{name}\".");
+	protected void AddDefaultMessage(string name) => AddMessage("Field can not be empty.", name);
 
-	protected void AddCustomMessage(string message) => AddMessage(message);
+	protected void AddCustomMessage(string message, string name) => AddMessage(message, name);
 
-	private void AddMessage(string message) => ValidationResults.Add(new ValidationResult(message));
+	private void AddMessage(string message, string member) =>
+		ValidationResults.Add(new ValidationResult(message, new List<string> { member }));
 }

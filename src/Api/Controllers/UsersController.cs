@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Api.Attributes;
 using Api.Constants;
 using Api.DTOs.User;
@@ -32,23 +33,23 @@ public class UsersController : ControllerBase
 	[HttpGet]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<IEnumerable<UserDto>> GetAll()
+	public async Task<ActionResult<IEnumerable<UserDto>>> GetAllAsync()
 	{
-		var result = _userService.GetAll();
+		var result = await _userService.GetAllAsync();
 
 		return Ok(_mapper.Map<List<UserDto>>(result));
 	}
 
 	[HttpPost]
 	[AllowAnonymous]
-	public ActionResult<UserDto> Create([FromBody] UserCreateDto dto)
+	public async Task<ActionResult<UserDto>> CreateAsync([FromBody] UserCreateDto dto)
 	{
 		var user = _mapper
 			.Map<UserCreateDto, UserModel>(dto, map => map
 			.AfterMap((source, destination) =>
 				destination.PassHash = _cryptoHelper.GetHashString(source.Password)));
 
-		var result = _userService.Create(user);
+		var result = await _userService.CreateAsync(user);
 
 		return Ok(_mapper.Map<UserDto>(result));
 	}
@@ -56,9 +57,9 @@ public class UsersController : ControllerBase
 	[HttpGet("{id}")]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserDto> GetById(int id)
+	public async Task<ActionResult<UserDto>> GetByIdAsync(int id)
 	{
-		var result = _userService.GetById(id);
+		var result = await _userService.GetByIdAsync(id);
 
 		return Ok(_mapper.Map<UserDto>(result));
 	}
@@ -66,11 +67,11 @@ public class UsersController : ControllerBase
 	[HttpPut]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult<UserDto> Update([FromBody] UserUpdateDto dto)
+	public async Task<ActionResult<UserDto>> UpdateAsync([FromBody] UserUpdateDto dto)
 	{
 		var user = _mapper.Map<UserModel>(dto);
 
-		var result = _userService.Update(user);
+		var result = await _userService.UpdateAsync(user);
 
 		return Ok(_mapper.Map<UserDto>(result));
 	}
@@ -78,11 +79,11 @@ public class UsersController : ControllerBase
 	[HttpDelete]
 	[Authorize(Permissions.CheckPermissions)]
 	[SessionCheck]
-	public ActionResult Delete([FromBody] UserDeleteDto dto)
+	public async Task<ActionResult> DeleteAsync([FromBody] UserDeleteDto dto)
 	{
 		var user = _mapper.Map<UserModel>(dto);
 
-		_userService.Delete(user);
+		await _userService.DeleteAsync(user);
 
 		return Ok();
 	}

@@ -18,7 +18,7 @@ public class UserPermissionService : IUserPermissionService
 		_clientContextScraper = clientContextScraper;
 	}
 
-	public bool ValidateUserPermissions()
+	public async Task<bool> ValidateUserPermissionsAsync()
 	{
 		var userRole = _clientContextScraper.GetClientClaimsRole();
 		var controller = _clientContextScraper.GetControllerName();
@@ -31,7 +31,7 @@ public class UserPermissionService : IUserPermissionService
 			return false;
 		}
 
-		var permissions = GetPermissions()
+		var permissions = (await GetPermissionsAsync())
 			.Any(x => (x.Role.Name == userRole || (userRole == UserRole.Admin.ToString() && x.Role.Name == userRole))
 					&& x.Controller.Name == controller
 					&& (x.Action.Name == action || x.AllowAllActions));
@@ -39,5 +39,5 @@ public class UserPermissionService : IUserPermissionService
 		return permissions;
 	}
 
-	public List<PermissionMappingModel> GetPermissions() => _permissionCacheService.GetCache();
+	public async Task<List<PermissionMappingModel>> GetPermissionsAsync() => await _permissionCacheService.GetCacheAsync();
 }
