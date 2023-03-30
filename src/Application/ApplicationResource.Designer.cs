@@ -70,7 +70,7 @@ namespace Application {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to &lt;!DOCTYPE&gt;&lt;html&gt;&lt;body&gt;&lt;p style=&quot;Margin-top: 0;Margin-bottom: 0;&quot;&gt;&lt;span style=&quot;color:#000000&quot;&gt;Hi,&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;Margin-top: 20px;Margin-bottom: 0;&quot;&gt;&lt;span style=&quot;color:#000000&quot;&gt;You can reset your password by clicking on this link:&lt;/span&gt;&amp;nbsp;&lt;a style=&quot;text-decoration: underline;transition: opacity 0.1s ease-in;color: #18527c;&quot; href=&quot;http://localhost:65072/api/ResetPassword?token={0}&quot;&gt;password reset&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;.
+        ///   Looks up a localized string similar to &lt;!DOCTYPE&gt;&lt;html&gt;&lt;body&gt;&lt;p style=&quot;Margin-top: 0;Margin-bottom: 0;&quot;&gt;&lt;span style=&quot;color:#000000&quot;&gt;Hi,&lt;/span&gt;&lt;/p&gt;&lt;p style=&quot;Margin-top: 20px;Margin-bottom: 0;&quot;&gt;&lt;span style=&quot;color:#000000&quot;&gt;You can reset your password by clicking on this link:&lt;/span&gt;&amp;nbsp;&lt;a style=&quot;text-decoration: underline;transition: opacity 0.1s ease-in;color: #18527c;&quot; href=&quot;{0}{1}&quot;&gt;password reset&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;.
         /// </summary>
         public static string MessageTemplate_PasswordReset {
             get {

@@ -90,7 +90,7 @@ public class UserService : IServiceBase<UserModel>
 	{
 		var filter = new FindAnyUserFilter
 		{
-			Id = item.Id.Value,
+			Id = item.Id,
 			Email = item.Email,
 			Name = item.Name
 		};

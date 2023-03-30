@@ -16,7 +16,7 @@ public static class ServiceRegistration
 	{
 		var connectionstrings = new ConnectionStringSettings();
 		configuration.GetSection(ConnectionStringSettings.SelectionName).Bind(connectionstrings);
-		
+
 		services.AddScoped<IDbContextBase, ProjectXDbContext>();
 
 		services.AddProjectXDbContext(connectionstrings.ProjectXConnectionString);
@@ -33,6 +33,11 @@ public static class ServiceRegistration
 	{
 		services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SelectionName));
 
-		services.AddScoped<IMessageService, MessageService>();
+		var smtpSettings = new SmtpSettings();
+		configuration.GetSection(SmtpSettings.SelectionName).Bind(smtpSettings);
+
+		_ = smtpSettings.UseMock
+			? services.AddScoped<IMessageService, MessageServiceMock>()
+			: services.AddScoped<IMessageService, MessageService>();
 	}
 }

@@ -16,7 +16,8 @@ namespace Api.Middleware;
 
 public class ErrorHandlerMiddleware
 {
-	private const string _unhandledException = "Unhandled service error occurred.";
+	private const string _unhandledException = "Service error occurred.";
+	private const string _errorHandlerException = "Error occurred while handling service exception.";
 	private readonly RequestDelegate _next;
 	private readonly ILogger<ErrorHandlerMiddleware> _logger;
 
@@ -34,23 +35,31 @@ public class ErrorHandlerMiddleware
 		}
 		catch (Exception ex)
 		{
-			_logger.LogError(ex, _unhandledException);
-
-			await SendErrorResponse(context, ex);
+			await HandleErrorResponse(context, ex);
 		}
 	}
 
-	private static async Task SendErrorResponse(HttpContext context, Exception ex)
+	private async Task HandleErrorResponse(HttpContext context, Exception ex)
 	{
-		var response = context.Response;
+		try
+		{
+			var response = context.Response;
 
-		response.ContentType = "application/json";
-		response.StatusCode = GetHttpStatusCode(ex);
+			response.ContentType = "application/json";
+			response.StatusCode = GetHttpStatusCode(ex);
 
-		var errorCode = GetErrorCode(ex);
-		var errorMessage = GetErrorMessage(context, ex);
+			var errorCode = GetErrorCode(ex);
+			var errorMessage = GetErrorMessage(context, ex);
 
-		await response.WriteAsync(GetMessage(errorCode, errorMessage));
+			await response.WriteAsync(GetMessage(errorCode, errorMessage));
+
+			_logger.LogError(ex, "{title} ErrorCode: {errorCode}, Message: {message}", _unhandledException, errorCode, errorMessage);
+		}
+		catch (Exception handlerException)
+		{
+			handlerException.Data.Add("HandlerException", ex);
+			_logger.LogError(handlerException, _errorHandlerException);
+		}
 	}
 
 	private static string GetMessage(string code, string message) =>

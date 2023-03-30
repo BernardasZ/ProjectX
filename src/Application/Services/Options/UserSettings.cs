@@ -5,4 +5,6 @@ public class UserSettings
 	public const string SelectionName = nameof(UserSettings);
 
 	public int PasswordResetExpirationInMin { get; set; }
+
+	public string LinkToPasswordReset { get; set; }
 }

@@ -93,5 +93,5 @@ public class UserRecoverService : IUserRecoverService
 		_messageService.SendEmailMessage(
 			model.Email,
 			ApplicationResource.MessageSubject_PasswordReset,
-			string.Format(ApplicationResource.MessageTemplate_PasswordReset, model.TokenHash));
+			string.Format(ApplicationResource.MessageTemplate_PasswordReset, _appSettings.CurrentValue.LinkToPasswordReset, model.TokenHash));
 }

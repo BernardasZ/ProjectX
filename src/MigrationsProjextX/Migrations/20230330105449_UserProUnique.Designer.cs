@@ -4,6 +4,7 @@ using Infrastructure.Databases.ProjectX;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MigrationsProjextX.Migrations
 {
     [DbContext(typeof(ProjectXDbContext))]
-    partial class ProjectXDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230330105449_UserProUnique")]
+    partial class UserProUnique
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -49,89 +52,83 @@ namespace MigrationsProjextX.Migrations
                         {
                             Id = 1,
                             ControllerId = 1,
-                            Name = "LogoutAsync"
+                            Name = "Logout"
                         },
                         new
                         {
                             Id = 2,
                             ControllerId = 1,
-                            Name = "ChangePasswordAsync"
+                            Name = "ChangePassword"
                         },
                         new
                         {
                             Id = 3,
                             ControllerId = 1,
-                            Name = "CheckSession"
+                            Name = "All"
                         },
                         new
                         {
                             Id = 4,
-                            ControllerId = 1,
-                            Name = "All"
+                            ControllerId = 2,
+                            Name = "GetAllByUserId"
                         },
                         new
                         {
                             Id = 5,
                             ControllerId = 2,
-                            Name = "GetAllByUserIdAsync"
+                            Name = "Create"
                         },
                         new
                         {
                             Id = 6,
                             ControllerId = 2,
-                            Name = "CreateAsync"
+                            Name = "GetById"
                         },
                         new
                         {
                             Id = 7,
                             ControllerId = 2,
-                            Name = "GetByIdAsync"
+                            Name = "Update"
                         },
                         new
                         {
                             Id = 8,
                             ControllerId = 2,
-                            Name = "UpdateAsync"
+                            Name = "Delete"
                         },
                         new
                         {
                             Id = 9,
                             ControllerId = 2,
-                            Name = "DeleteAsync"
+                            Name = "All"
                         },
                         new
                         {
                             Id = 10,
-                            ControllerId = 2,
-                            Name = "All"
+                            ControllerId = 3,
+                            Name = "GetAll"
                         },
                         new
                         {
                             Id = 11,
                             ControllerId = 3,
-                            Name = "GetAllAsync"
+                            Name = "GetById"
                         },
                         new
                         {
                             Id = 12,
                             ControllerId = 3,
-                            Name = "GetByIdAsync"
+                            Name = "Update"
                         },
                         new
                         {
                             Id = 13,
                             ControllerId = 3,
-                            Name = "UpdateAsync"
+                            Name = "Delete"
                         },
                         new
                         {
                             Id = 14,
-                            ControllerId = 3,
-                            Name = "DeleteAsync"
-                        },
-                        new
-                        {
-                            Id = 15,
                             ControllerId = 3,
                             Name = "All"
                         });
@@ -206,7 +203,7 @@ namespace MigrationsProjextX.Migrations
                         new
                         {
                             Id = 1,
-                            ActionId = 4,
+                            ActionId = 3,
                             AllowAllActions = true,
                             ControllerId = 1,
                             RoleId = 1
@@ -214,7 +211,7 @@ namespace MigrationsProjextX.Migrations
                         new
                         {
                             Id = 2,
-                            ActionId = 10,
+                            ActionId = 9,
                             AllowAllActions = true,
                             ControllerId = 2,
                             RoleId = 1
@@ -222,7 +219,7 @@ namespace MigrationsProjextX.Migrations
                         new
                         {
                             Id = 3,
-                            ActionId = 15,
+                            ActionId = 14,
                             AllowAllActions = true,
                             ControllerId = 3,
                             RoleId = 1

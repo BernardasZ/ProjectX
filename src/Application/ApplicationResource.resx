@@ -121,6 +121,6 @@
     <value>ProjectX - Reset password</value>
   </data>
   <data name="MessageTemplate_PasswordReset" xml:space="preserve">
-    <value>&lt;!DOCTYPE&gt;&lt;html&gt;&lt;body&gt;&lt;p style="Margin-top: 0;Margin-bottom: 0;"&gt;&lt;span style="color:#000000"&gt;Hi,&lt;/span&gt;&lt;/p&gt;&lt;p style="Margin-top: 20px;Margin-bottom: 0;"&gt;&lt;span style="color:#000000"&gt;You can reset your password by clicking on this link:&lt;/span&gt;&amp;nbsp;&lt;a style="text-decoration: underline;transition: opacity 0.1s ease-in;color: #18527c;" href="http://localhost:65072/api/ResetPassword?token={0}"&gt;password reset&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</value>
+    <value>&lt;!DOCTYPE&gt;&lt;html&gt;&lt;body&gt;&lt;p style="Margin-top: 0;Margin-bottom: 0;"&gt;&lt;span style="color:#000000"&gt;Hi,&lt;/span&gt;&lt;/p&gt;&lt;p style="Margin-top: 20px;Margin-bottom: 0;"&gt;&lt;span style="color:#000000"&gt;You can reset your password by clicking on this link:&lt;/span&gt;&amp;nbsp;&lt;a style="text-decoration: underline;transition: opacity 0.1s ease-in;color: #18527c;" href="{0}{1}"&gt;password reset&lt;/a&gt;.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</value>
   </data>
 </root>

@@ -4,6 +4,8 @@ public class SmtpSettings
 {
 	public const string SelectionName = nameof(SmtpSettings);
 
+	public bool UseMock { get; set; }
+
 	public string Host { get; set; }
 
 	public string UserName { get; set; }

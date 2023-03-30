@@ -10,6 +10,7 @@ internal class UserConfiguration : ConfigurationBase<UserModel>
 	{
 		base.Configure(builder);
 
+		builder.HasIndex(x => new { x.Name, x.Email }).IsUnique();
 		builder.Property(x => x.Name).HasMaxLength(255).IsRequired();
 		builder.Property(x => x.Email).HasMaxLength(255).IsRequired();
 		builder.Property(x => x.PassHash).HasMaxLength(255).IsRequired();

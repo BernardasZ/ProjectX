@@ -14,21 +14,22 @@ internal class PermissionActionSeed
 
 		var actionControllerCollection = new List<(string Name, PermissionControllerModel Controller)>
 		{
-			("Logout", controllers[0]),
-			("ChangePassword", controllers[0]),
+			("LogoutAsync", controllers[0]),
+			("ChangePasswordAsync", controllers[0]),
+			("CheckSession", controllers[0]),
 			("All", controllers[0]),
 
-			("GetAllByUserId", controllers[1]),
-			("Create", controllers[1]),
-			("GetById", controllers[1]),
-			("Update", controllers[1]),
-			("Delete", controllers[1]),
+			("GetAllByUserIdAsync", controllers[1]),
+			("CreateAsync", controllers[1]),
+			("GetByIdAsync", controllers[1]),
+			("UpdateAsync", controllers[1]),
+			("DeleteAsync", controllers[1]),
 			("All", controllers[1]),
 
-			("GetAll", controllers[2]),
-			("GetById", controllers[2]),
-			("Update", controllers[2]),
-			("Delete", controllers[2]),
+			("GetAllAsync", controllers[2]),
+			("GetByIdAsync", controllers[2]),
+			("UpdateAsync", controllers[2]),
+			("DeleteAsync", controllers[2]),
 			("All", controllers[2]),
 		};
 
